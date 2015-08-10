@@ -1,0 +1,12 @@
+site_name: ADOdb
+site_url: http://adodb.sourceforge.net
+repo_url: https://github.com/ADOdb/ADOdb
+site_dir: docs/site
+
+pages:
+- Home: index.md
+- Changelog:
+  - 'v4.x': changelog_v4.x.md
+  - 'v3.x': changelog_v3.x.md
+  - 'v2.x': changelog_v2.x.md
+
