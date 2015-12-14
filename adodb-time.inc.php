@@ -524,14 +524,14 @@ function adodb_date_test()
 	if (adodb_year_digit_check(10) != 2010) print "Err 2-digit 2010<br>";
 	if (adodb_year_digit_check(20) != 2020) print "Err 2-digit 2020<br>";
 	if (adodb_year_digit_check(30) != 2030) print "Err 2-digit 2030<br>";
-	if (adodb_year_digit_check(40) != 1940) print "Err 2-digit 1940<br>";
+	if (adodb_year_digit_check(40) != 2040) print "Err 2-digit 1940<br>";
 	if (adodb_year_digit_check(50) != 1950) print "Err 2-digit 1950<br>";
 	if (adodb_year_digit_check(90) != 1990) print "Err 2-digit 1990<br>";
 
 	// Test string formating
 	print "<p>Testing date formating</p>";
 
-	$fmt = '\d\a\t\e T Y-m-d H:i:s a A d D F g G h H i j l L m M n O \R\F\C2822 r s t U w y Y z Z 2003';
+	$fmt = '\d\a\t\e T Y-m-d H:i:s a A e T d D F g G h H i j l L m M n O \R\F\C2822 r s t U w y Y z Z 2003';
 	$s1 = date($fmt,0);
 	$s2 = adodb_date($fmt,0);
 	if ($s1 != $s2) {
@@ -549,13 +549,14 @@ function adodb_date_test()
 		if (($s1) != ($s2)) {
 			for ($j=0,$k=strlen($s1); $j < $k; $j++) {
 				if ($s1[$j] != $s2[$j]) {
-					print substr($s1,$j).' ';
+//					print '#'.substr($s1,0,$j+1).' ';
 					break;
 				}
 			}
-			print "<b>Error date(): $ts<br><pre>
-&nbsp; \"$s1\" (date len=".strlen($s1).")
-&nbsp; \"$s2\" (adodb_date len=".strlen($s2).")</b></pre><br>";
+			print "<p><pre>
+\"$s1\" (date len=".strlen($s1).")
+\"$s2\" (adodb_date len=".strlen($s2).")
+ " . str_repeat(' ', $j) . "<b>^-- Error date(): $ts</b></pre>";
 			$fail = true;
 		}
 
@@ -776,7 +777,7 @@ function adodb_getdate($d=false,$fast=false)
 				return @getdate($d);
 		}
 	}
-	return _adodb_getdate($d);
+	return _adodb_getdate($d, $fast);
 }
 
 /*
