@@ -41,43 +41,43 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
     class ADODB_mysqli extends ADOConnection
     {
-        var $databaseType = 'mysqli';
-        var $dataProvider = 'mysql';
-        var $hasInsertID = true;
-        var $hasAffectedRows = true;
-        var $metaTablesSQL = "SELECT
-			TABLE_NAME,
-			CASE WHEN TABLE_TYPE = 'VIEW' THEN 'V' ELSE 'T' END
-		FROM INFORMATION_SCHEMA.TABLES
-		WHERE TABLE_SCHEMA=";
-        var $metaColumnsSQL = "SHOW COLUMNS FROM `%s`";
-        var $fmtTimeStamp = "'Y-m-d H:i:s'";
-        var $hasLimit = true;
-        var $hasMoveFirst = true;
-        var $hasGenID = true;
-        var $isoDates = true; // accepts dates in ISO format
-        var $sysDate = 'CURDATE()';
-        var $sysTimeStamp = 'NOW()';
-        var $hasTransactions = true;
-        var $forceNewConnect = false;
-        var $poorAffectedRows = true;
-        var $clientFlags = 0;
-        var $substr = "substring";
-        var $port = 3306; //Default to 3306 to fix HHVM bug
-        var $socket = ''; //Default to empty string to fix HHVM bug
-        var $_bindInputArray = false;
-        var $nameQuote = '`';       /// string to use to quote identifiers and names
-        var $optionFlags = array(array(MYSQLI_READ_DEFAULT_GROUP,0));
-        var $arrayClass = 'ADORecordSet_array_mysqli';
-        var $multiQuery = false;
+        public $databaseType = 'mysqli';
+        public $dataProvider = 'mysql';
+        public $hasInsertID = true;
+        public $hasAffectedRows = true;
+        public $metaTablesSQL = "SELECT
+                TABLE_NAME,
+                CASE WHEN TABLE_TYPE = 'VIEW' THEN 'V' ELSE 'T' END
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_SCHEMA=";
+        public $metaColumnsSQL = "SHOW COLUMNS FROM `%s`";
+        public $fmtTimeStamp = "'Y-m-d H:i:s'";
+        public $hasLimit = true;
+        public $hasMoveFirst = true;
+        public $hasGenID = true;
+        public $isoDates = true; // accepts dates in ISO format
+        public $sysDate = 'CURDATE()';
+        public $sysTimeStamp = 'NOW()';
+        public $hasTransactions = true;
+        public $forceNewConnect = false;
+        public $poorAffectedRows = true;
+        public $clientFlags = 0;
+        public $substr = "substring";
+        public $port = 3306; //Default to 3306 to fix HHVM bug
+        public $socket = ''; //Default to empty string to fix HHVM bug
+        protected $_bindInputArray = false;
+        public $nameQuote = '`';       /// string to use to quote identifiers and names
+        public $optionFlags = array(array(MYSQLI_READ_DEFAULT_GROUP,0));
+        public $arrayClass = 'ADORecordSet_array_mysqli';
+        public $multiQuery = false;
 
-        function __construct()
+        public function __construct()
         {
             // if(!extension_loaded("mysqli"))
             //trigger_error("You must have the mysqli extension installed.", E_USER_ERROR);
         }
 
-        function SetTransactionMode($transaction_mode)
+        public function setTransactionMode($transaction_mode)
         {
             $this->_transmode = $transaction_mode;
             if (empty($transaction_mode)) {
@@ -93,14 +93,14 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         // returns true or false
         // To add: parameter int $port,
         //         parameter string $socket
-        function _connect(
+        protected function _connect(
             $argHostname = null,
             $argUsername = null,
             $argPassword = null,
             $argDatabasename = null,
             $persist = false
         ) {
-        
+
             if (!extension_loaded("mysqli")) {
                 return null;
             }
@@ -155,26 +155,26 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
         // returns true or false
         // How to force a persistent connection
-        function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
+        protected function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
         {
             return $this->_connect($argHostname, $argUsername, $argPassword, $argDatabasename, true);
         }
 
         // When is this used? Close old connection first?
         // In _connect(), check $this->forceNewConnect?
-        function _nconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
+        protected function _nconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
         {
             $this->forceNewConnect = true;
             return $this->_connect($argHostname, $argUsername, $argPassword, $argDatabasename);
         }
 
-        function IfNull($field, $ifNull)
+        public function ifNull($field, $ifNull)
         {
             return " IFNULL($field, $ifNull) "; // if MySQL
         }
 
         // do not use $ADODB_COUNTRECS
-        function GetOne($sql, $inputarr = false)
+        public function getOne($sql, $inputarr = false)
         {
             global $ADODB_GETONE_EOF;
 
@@ -191,7 +191,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return $ret;
         }
 
-        function ServerInfo()
+        public function serverInfo()
         {
             $arr['description'] = $this->GetOne("select version()");
             $arr['version'] = ADOConnection::_findvers($arr['description']);
@@ -199,7 +199,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
 
-        function BeginTrans()
+        public function beginTrans()
         {
             if ($this->transOff) {
                 return true;
@@ -212,7 +212,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return true;
         }
 
-        function CommitTrans($ok = true)
+        public function commitTrans($ok = true)
         {
             if ($this->transOff) {
                 return true;
@@ -231,7 +231,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return true;
         }
 
-        function RollbackTrans()
+        public function rollbackTrans()
         {
             if ($this->transOff) {
                 return true;
@@ -245,7 +245,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return true;
         }
 
-        function RowLock($tables, $where = '', $col = '1 as adodbignore')
+        public function rowLock($tables, $where = '', $col = '1 as adodbignore')
         {
             if ($this->transCnt==0) {
                 $this->BeginTrans();
@@ -258,18 +258,18 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         /**
-     * Quotes a string to be sent to the database
-     * When there is no active connection,
-     * @param string $s The string to quote
-     * @param boolean $magic_quotes If false, use mysqli_real_escape_string()
-     *     if you are quoting a string extracted from a POST/GET variable,
-     *     then pass get_magic_quotes_gpc() as the second parameter. This will
-     *     ensure that the variable is not quoted twice, once by qstr() and
-     *     once by the magic_quotes_gpc.
-     *     Eg. $s = $db->qstr(_GET['name'],get_magic_quotes_gpc());
-     * @return string Quoted string
-     */
-        function qstr($s, $magic_quotes = false)
+         * Quotes a string to be sent to the database
+         * When there is no active connection,
+         * @param string $s The string to quote
+         * @param boolean $magic_quotes If false, use mysqli_real_escape_string()
+         *     if you are quoting a string extracted from a POST/GET variable,
+         *     then pass get_magic_quotes_gpc() as the second parameter. This will
+         *     ensure that the variable is not quoted twice, once by qstr() and
+         *     once by the magic_quotes_gpc.
+         *     Eg. $s = $db->qstr(_GET['name'],get_magic_quotes_gpc());
+         * @return string Quoted string
+         */
+        public function qStr($s, $magic_quotes = false)
         {
             if (is_null($s)) {
                 return 'NULL';
@@ -291,7 +291,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return "'$s'";
         }
 
-        function _insertid()
+        protected function _insertid()
         {
             /*
             * mysqli_insert_id does not return the last_insert_id
@@ -310,7 +310,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // Only works for INSERT, UPDATE and DELETE query's
-        function _affectedrows()
+        protected function _affectedRows()
         {
             $result =  @mysqli_affected_rows($this->_connectionID);
             if ($result == -1) {
@@ -323,13 +323,13 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
         // See http://www.mysql.com/doc/M/i/Miscellaneous_functions.html
         // Reference on Last_Insert_ID on the recommended way to simulate sequences
-        var $_genIDSQL = "update %s set id=LAST_INSERT_ID(id+1);";
-        var $_genSeqSQL = "create table if not exists %s (id int not null)";
-        var $_genSeqCountSQL = "select count(*) from %s";
-        var $_genSeq2SQL = "insert into %s values (%s)";
-        var $_dropSeqSQL = "drop table if exists %s";
+        protected $_genIDSQL = "update %s set id=LAST_INSERT_ID(id+1);";
+        protected $_genSeqSQL = "create table if not exists %s (id int not null)";
+        protected $_genSeqCountSQL = "select count(*) from %s";
+        protected $_genSeq2SQL = "insert into %s values (%s)";
+        protected $_dropSeqSQL = "drop table if exists %s";
 
-        function CreateSequence($seqname = 'adodbseq', $startID = 1)
+        public function createSequence($seqname = 'adodbseq', $startID = 1)
         {
             if (empty($this->_genSeqSQL)) {
                 return false;
@@ -343,7 +343,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return $this->Execute(sprintf($this->_genSeq2SQL, $seqname, $startID-1));
         }
 
-        function GenID($seqname = 'adodbseq', $startID = 1)
+        public function genId($seqname = 'adodbseq', $startID = 1)
         {
             // post-nuke sets hasGenID to false
             if (!$this->hasGenID) {
@@ -375,7 +375,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return $this->genID;
         }
 
-        function MetaDatabases()
+        public function metaDatabases()
         {
             $query = "SHOW DATABASES";
             $ret = $this->Execute($query);
@@ -394,7 +394,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
 
-        function MetaIndexes($table, $primary = false, $owner = false)
+        public function metaIndexes($table, $primary = false, $owner = false)
         {
             // save old fetch mode
             global $ADODB_FETCH_MODE;
@@ -447,7 +447,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
 
         // Format date column in sql string given an input format that understands Y M D
-        function SQLDate($fmt, $col = false)
+        public function sqlDate($fmt, $col = false)
         {
             if (!$col) {
                 $col = $this->sysTimeStamp;
@@ -532,7 +532,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
         // returns concatenated string
         // much easier to run "mysqld --ansi" or "mysqld --sql-mode=PIPES_AS_CONCAT" and use || operator
-        function Concat()
+        public function concat()
         {
             $s = "";
             $arr = func_get_args();
@@ -547,7 +547,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // dayFraction is a day in floating point
-        function OffsetDate($dayFraction, $date = false)
+        public function offsetDate($dayFraction, $date = false)
         {
             if (!$date) {
                 $date = $this->sysDate;
@@ -559,7 +559,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
     //      return "from_unixtime(unix_timestamp($date)+$fraction)";
         }
 
-        function MetaProcedures($NamePattern = false, $catalog = null, $schemaPattern = null)
+        public function metaProcedures($NamePattern = false, $catalog = null, $schemaPattern = null)
         {
             // save old fetch mode
             global $ADODB_FETCH_MODE;
@@ -617,15 +617,15 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         /**
-     * Retrieves a list of tables based on given criteria
-     *
-     * @param string $ttype Table type = 'TABLE', 'VIEW' or false=both (default)
-     * @param string $showSchema schema name, false = current schema (default)
-     * @param string $mask filters the table by name
-     *
-     * @return array list of tables
-     */
-        function MetaTables($ttype = false, $showSchema = false, $mask = false)
+         * Retrieves a list of tables based on given criteria
+         *
+         * @param string $ttype Table type = 'TABLE', 'VIEW' or false=both (default)
+         * @param string $showSchema schema name, false = current schema (default)
+         * @param string $mask filters the table by name
+         *
+         * @return array list of tables
+         */
+        public function metaTables($ttype = false, $showSchema = false, $mask = false)
         {
             $save = $this->metaTablesSQL;
             if ($showSchema && is_string($showSchema)) {
@@ -645,9 +645,9 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // "Innox - Juan Carlos Gonzalez" <jgonzalez#innox.com.mx>
-        function MetaForeignKeys($table, $owner = false, $upper = false, $associative = false)
+        public function metaForeignKeys($table, $owner = false, $upper = false, $associative = false)
         {
-        
+
             global $ADODB_FETCH_MODE;
 
             if ($ADODB_FETCH_MODE == ADODB_FETCH_ASSOC
@@ -657,20 +657,23 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
             $savem = $ADODB_FETCH_MODE;
             $this->setFetchMode(ADODB_FETCH_ASSOC);
-        
+
             if (!empty($owner)) {
                 $table = "$owner.$table";
             }
-        
+
             $a_create_table = $this->getRow(sprintf('SHOW CREATE TABLE %s', $table));
-        
+
             $this->setFetchMode($savem);
-        
-            $create_sql = isset($a_create_table["Create Table"]) ? $a_create_table["Create Table"] : $a_create_table["Create View"];
+
+            $create_sql = isset($a_create_table["Create Table"])
+                ? $a_create_table["Create Table"]
+                : $a_create_table["Create View"];
 
             $matches = array();
 
-            if (!preg_match_all("/FOREIGN KEY \(`(.*?)`\) REFERENCES `(.*?)` \(`(.*?)`\)/", $create_sql, $matches)) {
+            $regex = "/FOREIGN KEY \(`(.*?)`\) REFERENCES `(.*?)` \(`(.*?)`\)/";
+            if (!preg_match_all($regex, $create_sql, $matches)) {
                 return false;
             }
             $foreign_keys = array();
@@ -701,7 +704,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return $foreign_keys;
         }
 
-        function MetaColumns($table, $normalize = true)
+        public function metaColumns($table, $normalize = true)
         {
             $false = false;
             if (!$this->metaColumnsSQL) {
@@ -778,7 +781,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // returns true or false
-        function SelectDB($dbName)
+        public function selectDb($dbName)
         {
     //      $this->_connectionID = $this->mysqli_resolve_link($this->_connectionID);
             $this->database = $dbName;
@@ -795,14 +798,14 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // parameters use PostgreSQL convention, not MySQL
-        function SelectLimit(
+        public function selectLimit(
             $sql,
             $nrows = -1,
             $offset = -1,
             $inputarr = false,
             $secs = 0
         ) {
-        
+
             $offsetStr = ($offset >= 0) ? "$offset," : '';
             if ($nrows < 0) {
                 $nrows = '18446744073709551615';
@@ -818,7 +821,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
 
-        function Prepare($sql)
+        public function prepare($sql)
         {
             return $sql;
             $stmt = $this->_connectionID->prepare($sql);
@@ -831,7 +834,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
 
         // returns queryID or false
-        function _query($sql, $inputarr)
+        protected function _query($sql, $inputarr)
         {
             global $ADODB_COUNTRECS;
             // Move to the next recordset, or return false if there is none. In a stored proc
@@ -864,23 +867,22 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
                 return $ret;
             }
 
-            /*
-            if (!$mysql_res =  mysqli_query($this->_connectionID, $sql, ($ADODB_COUNTRECS) ? MYSQLI_STORE_RESULT : MYSQLI_USE_RESULT)) {
-			if ($this->debug) ADOConnection::outp("Query: " . $sql . " failed. " . $this->ErrorMsg());
-			return false;
-            }
-
             return $mysql_res;
-            */
 
             if ($this->multiQuery) {
                 $rs = mysqli_multi_query($this->_connectionID, $sql.';');
                 if ($rs) {
-                    $rs = ($ADODB_COUNTRECS) ? @mysqli_store_result($this->_connectionID) : @mysqli_use_result($this->_connectionID);
+                    $rs = ($ADODB_COUNTRECS)
+                        ? @mysqli_store_result($this->_connectionID)
+                        : @mysqli_use_result($this->_connectionID);
                     return $rs ? $rs : true; // mysqli_more_results( $this->_connectionID )
                 }
             } else {
-                $rs = mysqli_query($this->_connectionID, $sql, $ADODB_COUNTRECS ? MYSQLI_STORE_RESULT : MYSQLI_USE_RESULT);
+                $rs = mysqli_query(
+                    $this->_connectionID,
+                    $sql,
+                    $ADODB_COUNTRECS ? MYSQLI_STORE_RESULT : MYSQLI_USE_RESULT
+                );
 
                 if ($rs) {
                     return $rs;
@@ -896,7 +898,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         /*	Returns: the last error message from previous database operation	*/
-        function ErrorMsg()
+        public function errorMsg()
         {
             if (empty($this->_connectionID)) {
                 $this->_errorMsg = @mysqli_connect_error();
@@ -907,7 +909,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         /*	Returns: the last error number from previous database operation	*/
-        function ErrorNo()
+        public function errorNo()
         {
             if (empty($this->_connectionID)) {
                 return @mysqli_connect_errno();
@@ -917,7 +919,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // returns true or false
-        function _close()
+        protected function _close()
         {
             if ($this->_connectionID) {
                 mysqli_close($this->_connectionID);
@@ -926,17 +928,17 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         /*
-        * Maximum size of C field
-        */
-        function CharMax()
+         * Maximum size of C field
+         */
+        public function charMax()
         {
             return 255;
         }
 
         /*
-        * Maximum size of X field
-        */
-        function TextMax()
+         * Maximum size of X field
+         */
+        public function textMax()
         {
             return 4294967295;
         }
@@ -949,7 +951,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         // Under Windows, the functions should work with MySQL 4.1.11 and above, the set of charsets supported
         // depends on compile flags of mysql distribution
 
-        function GetCharSet()
+        public function getCharSet()
         {
             //we will use ADO's builtin property charSet
             if (!method_exists($this->_connectionID, 'character_set_name')) {
@@ -965,7 +967,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         // SetCharSet - switch the client encoding
-        function SetCharSet($charset_name)
+        public function setCharSet($charset_name)
         {
             if (!method_exists($this->_connectionID, 'set_charset')) {
                 return false;
@@ -987,10 +989,10 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
     class ADORecordSet_mysqli extends ADORecordSet
     {
 
-        var $databaseType = "mysqli";
-        var $canSeek = true;
+        public $databaseType = "mysqli";
+        public $canSeek = true;
 
-        function __construct($queryID, $mode = false)
+        public function __construct($queryID, $mode = false)
         {
             if ($mode === false) {
                 global $ADODB_FETCH_MODE;
@@ -1014,7 +1016,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             parent::__construct($queryID);
         }
 
-        function _initrs()
+        protected function _initrs()
         {
             global $ADODB_COUNTRECS;
 
@@ -1042,7 +1044,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
     131072 = MYSQLI_BINCMP_FLAG
     */
 
-        function FetchField($fieldOffset = -1)
+        public function fetchField($fieldOffset = -1)
         {
             $fieldnr = $fieldOffset;
             if ($fieldOffset != -1) {
@@ -1075,7 +1077,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return $a;
         }
 
-        function GetRowAssoc($upper = ADODB_ASSOC_CASE)
+        public function getRowAssoc($upper = ADODB_ASSOC_CASE)
         {
             if ($this->fetchMode == MYSQLI_ASSOC && $upper == ADODB_ASSOC_CASE_LOWER) {
                 return $this->fields;
@@ -1085,7 +1087,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
         /* Use associative array to get fields array */
-        function Fields($colname)
+        public function fields($colname)
         {
             if ($this->fetchMode != MYSQLI_NUM) {
                 return @$this->fields[$colname];
@@ -1101,7 +1103,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return $this->fields[$this->bind[strtoupper($colname)]];
         }
 
-        function _seek($row)
+        protected function _seek($row)
         {
             if ($this->_numOfRows == 0 || $row < 0) {
                 return false;
@@ -1113,7 +1115,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         }
 
 
-        function NextRecordSet()
+        public function nextRecordSet()
         {
             global $ADODB_COUNTRECS;
 
@@ -1142,7 +1144,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         // 10% speedup to move MoveNext to child class
         // This is the only implementation that works now (23-10-2003).
         // Other functions return no or the wrong results.
-        function MoveNext()
+        public function moveNext()
         {
             if ($this->EOF) {
                 return false;
@@ -1158,17 +1160,18 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
             return false;
         }
 
-        function _fetch()
+        protected function _fetch()
         {
             $this->fields = mysqli_fetch_array($this->_queryID, $this->fetchMode);
             $this->_updatefields();
             return is_array($this->fields);
         }
 
-        function _close()
+        protected function _close()
         {
-            //if results are attached to this pointer from Stored Proceedure calls, the next standard query will die 2014
-            //only a problem with persistant connections
+            // if results are attached to this pointer from Stored Proceedure
+            // calls, the next standard query will die 2014
+            // only a problem with persistant connections
 
             if ($this->connection->_connectionID) {
                 while (mysqli_more_results($this->connection->_connectionID)) {
@@ -1211,7 +1214,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
     255 = MYSQLI_TYPE_GEOMETRY
     */
 
-        function MetaType($t, $len = -1, $fieldobj = false)
+        public function metaType($t, $len = -1, $fieldobj = false)
         {
             if (is_object($t)) {
                 $fieldobj = $t;
@@ -1238,6 +1241,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
                     if ($len <= $this->blobSize) {
                         return 'C';
                     }
+                    // Fallthrough
 
                 case 'TEXT':
                 case 'LONGTEXT':
@@ -1306,7 +1310,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 class ADORecordSet_array_mysqli extends ADORecordSet_array
 {
 
-    function MetaType($t, $len = -1, $fieldobj = false)
+    public function metaType($t, $len = -1, $fieldobj = false)
     {
         if (is_object($t)) {
             $fieldobj = $t;
@@ -1333,6 +1337,7 @@ class ADORecordSet_array_mysqli extends ADORecordSet_array
                 if ($len <= $this->blobSize) {
                     return 'C';
                 }
+                // Fallthrough
 
             case 'TEXT':
             case 'LONGTEXT':
