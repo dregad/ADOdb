@@ -19,15 +19,15 @@ if (!defined('ADODB_DIR')) {
 
 class ADODB2_mysql extends ADODB_DataDict
 {
-    var $databaseType = 'mysql';
-    var $alterCol = ' MODIFY COLUMN';
-    var $alterTableAddIndex = true;
-    var $dropTable = 'DROP TABLE IF EXISTS %s'; // requires mysql 3.22 or later
+    public $databaseType = 'mysql';
+    public $alterCol = ' MODIFY COLUMN';
+    public $alterTableAddIndex = true;
+    public $dropTable = 'DROP TABLE IF EXISTS %s'; // requires mysql 3.22 or later
 
-    var $dropIndex = 'DROP INDEX %s ON %s';
-    var $renameColumn = 'ALTER TABLE %s CHANGE COLUMN %s %s %s';    // needs column-definition!
+    public $dropIndex = 'DROP INDEX %s ON %s';
+    public $renameColumn = 'ALTER TABLE %s CHANGE COLUMN %s %s %s';    // needs column-definition!
 
-    function MetaType($t, $len = -1, $fieldobj = false)
+    public function metaType($t, $len = -1, $fieldobj = false)
     {
         if (is_object($t)) {
             $fieldobj = $t;
@@ -48,14 +48,15 @@ class ADODB2_mysql extends ADODB_DataDict
                 if ($len <= $this->blobSize) {
                     return 'C';
                 }
+                // Fallthrough
 
             case 'TEXT':
             case 'LONGTEXT':
             case 'MEDIUMTEXT':
                 return 'X';
 
-        // php_mysql extension always returns 'blob' even if 'text'
-        // so we have to check whether binary...
+            // php_mysql extension always returns 'blob' even if 'text'
+            // so we have to check whether binary...
             case 'IMAGE':
             case 'LONGBLOB':
             case 'BLOB':
@@ -91,7 +92,7 @@ class ADODB2_mysql extends ADODB_DataDict
         }
     }
 
-    function ActualType($meta)
+    public function actualType($meta)
     {
         switch (strtoupper($meta)) {
             case 'C':
@@ -138,7 +139,7 @@ class ADODB2_mysql extends ADODB_DataDict
     }
 
     // return string must begin with space
-    function _CreateSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
+    protected function _createSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
     {
         $suffix = '';
         if ($funsigned) {
@@ -160,27 +161,27 @@ class ADODB2_mysql extends ADODB_DataDict
     }
 
     /*
-	CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name [(create_definition,...)]
-		[table_options] [select_statement]
-		create_definition:
-		col_name type [NOT NULL | NULL] [DEFAULT default_value] [AUTO_INCREMENT]
-		[PRIMARY KEY] [reference_definition]
-		or PRIMARY KEY (index_col_name,...)
-		or KEY [index_name] (index_col_name,...)
-		or INDEX [index_name] (index_col_name,...)
-		or UNIQUE [INDEX] [index_name] (index_col_name,...)
-		or FULLTEXT [INDEX] [index_name] (index_col_name,...)
-		or [CONSTRAINT symbol] FOREIGN KEY [index_name] (index_col_name,...)
-		[reference_definition]
-		or CHECK (expr)
-	*/
+    CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name [(create_definition,...)]
+        [table_options] [select_statement]
+        create_definition:
+        col_name type [NOT NULL | NULL] [DEFAULT default_value] [AUTO_INCREMENT]
+        [PRIMARY KEY] [reference_definition]
+        or PRIMARY KEY (index_col_name,...)
+        or KEY [index_name] (index_col_name,...)
+        or INDEX [index_name] (index_col_name,...)
+        or UNIQUE [INDEX] [index_name] (index_col_name,...)
+        or FULLTEXT [INDEX] [index_name] (index_col_name,...)
+        or [CONSTRAINT symbol] FOREIGN KEY [index_name] (index_col_name,...)
+        [reference_definition]
+        or CHECK (expr)
+    */
 
     /*
-	CREATE [UNIQUE|FULLTEXT] INDEX index_name
-		ON tbl_name (col_name[(length)],... )
-	*/
+    CREATE [UNIQUE|FULLTEXT] INDEX index_name
+        ON tbl_name (col_name[(length)],... )
+    */
 
-    function _IndexSQL($idxname, $tabname, $flds, $idxoptions)
+    protected function _indexSQL($idxname, $tabname, $flds, $idxoptions)
     {
         $sql = array();
 
