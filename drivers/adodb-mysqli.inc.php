@@ -65,7 +65,7 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
         public $substr = "substring";
         public $port = 3306; //Default to 3306 to fix HHVM bug
         public $socket = ''; //Default to empty string to fix HHVM bug
-        protected $_bindInputArray = false;
+        public $_bindInputArray = false;
         public $nameQuote = '`';       /// string to use to quote identifiers and names
         public $optionFlags = array(array(MYSQLI_READ_DEFAULT_GROUP,0));
         public $arrayClass = 'ADORecordSet_array_mysqli';
@@ -323,11 +323,11 @@ if (! defined("_ADODB_MYSQLI_LAYER")) {
 
         // See http://www.mysql.com/doc/M/i/Miscellaneous_functions.html
         // Reference on Last_Insert_ID on the recommended way to simulate sequences
-        protected $_genIDSQL = "update %s set id=LAST_INSERT_ID(id+1);";
-        protected $_genSeqSQL = "create table if not exists %s (id int not null)";
-        protected $_genSeqCountSQL = "select count(*) from %s";
-        protected $_genSeq2SQL = "insert into %s values (%s)";
-        protected $_dropSeqSQL = "drop table if exists %s";
+        public $_genIDSQL = "update %s set id=LAST_INSERT_ID(id+1);";
+        public $_genSeqSQL = "create table if not exists %s (id int not null)";
+        public $_genSeqCountSQL = "select count(*) from %s";
+        public $_genSeq2SQL = "insert into %s values (%s)";
+        public $_dropSeqSQL = "drop table if exists %s";
 
         public function createSequence($seqname = 'adodbseq', $startID = 1)
         {

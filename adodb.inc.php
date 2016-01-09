@@ -526,24 +526,24 @@ if (!defined('_ADODB_LAYER')) {
         //
         // PRIVATE VARS
         //
-        protected $_oldRaiseFn =  false;
-        protected $_transOK = null;
-        protected $_connectionID  = false;  // The returned link identifier whenever a
+        public $_oldRaiseFn =  false;
+        public $_transOK = null;
+        public $_connectionID  = false;  // The returned link identifier whenever a
                                             // successful database connection is made.
-        protected $_errorMsg = false;       // A variable which was used to keep the returned
+        public $_errorMsg = false;       // A variable which was used to keep the returned
                                             // last error message.  The value will
                                             // then returned by the errorMsg() function
-        protected $_errorCode = false;      // Last error code, not guaranteed to be used - only by oci8
-        protected $_queryID = false;        // This variable keeps the last created result link identifier
+        public $_errorCode = false;      // Last error code, not guaranteed to be used - only by oci8
+        public $_queryID = false;        // This variable keeps the last created result link identifier
 
-        protected $_isPersistentConnection = false; // A boolean variable to state whether its a
+        public $_isPersistentConnection = false; // A boolean variable to state whether its a
                                                     // persistent connection or normal connection.
-        protected $_bindInputArray = false; // set to true if ADOConnection.Execute()
+        public $_bindInputArray = false; // set to true if ADOConnection.Execute()
                                             // permits binding of array parameters.
-        protected $_evalAll = false;
-        protected $_affected = false;
-        protected $_logsql = false;
-        protected $_transmode = '';         // transaction mode
+        public $_evalAll = false;
+        public $_affected = false;
+        public $_logsql = false;
+        public $_transmode = '';         // transaction mode
 
 
         /**
@@ -3048,7 +3048,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
             }
 
             $regex = "|^([0-9]{4})[-/\.]?([0-9]{1,2})[-/\.]?([0-9]{1,2})[ ,-]*"
-                - "(([0-9]{1,2}):?([0-9]{1,2}):?([0-9\.]{1,4}))?|"
+                - "(([0-9]{1,2}):?([0-9]{1,2}):?([0-9\.]{1,4}))?|";
             if (!preg_match($regex, $v, $rr)) {
                 return false;
             }
@@ -3515,21 +3515,21 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
         /**
          *  private variables
          */
-        protected $_numOfRows = -1;  /** number of rows, or -1 */
-        protected $_numOfFields = -1;     /** number of fields in recordset */
-        protected $_queryID = -1;         /** This variable keeps the result link identifier. */
-        protected $_currentRow = -1;  /** This variable keeps the current row in the Recordset.   */
-        protected $_closed = false;   /** has recordset been closed */
-        protected $_inited = false;   /** Init() should only be called once */
-        protected $_obj;              /** Used by FetchObj */
-        protected $_names;            /** Used by FetchObj */
+        public $_numOfRows = -1;  /** number of rows, or -1 */
+        public $_numOfFields = -1;     /** number of fields in recordset */
+        public $_queryID = -1;         /** This variable keeps the result link identifier. */
+        public $_currentRow = -1;  /** This variable keeps the current row in the Recordset.   */
+        public $_closed = false;   /** has recordset been closed */
+        public $_inited = false;   /** Init() should only be called once */
+        public $_obj;              /** Used by FetchObj */
+        public $_names;            /** Used by FetchObj */
 
-        protected $_currentPage = -1;     /** Added by Iván Oliva to implement recordset pagination */
-        protected $_atFirstPage = false;  /** Added by Iván Oliva to implement recordset pagination */
-        protected $_atLastPage = false;   /** Added by Iván Oliva to implement recordset pagination */
-        protected $_lastPageNo = -1;
-        protected $_maxRecordCount = 0;
-        protected $datetime = false;
+        public $_currentPage = -1;     /** Added by Iván Oliva to implement recordset pagination */
+        public $_atFirstPage = false;  /** Added by Iván Oliva to implement recordset pagination */
+        public $_atLastPage = false;   /** Added by Iván Oliva to implement recordset pagination */
+        public $_lastPageNo = -1;
+        public $_maxRecordCount = 0;
+        public $datetime = false;
 
         /**
          * Constructor
