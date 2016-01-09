@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="ADOdb">
+	<description>The coding standard for ADOdb library (derived from PSR-2).</description>
+
+	<arg value="p"/>
+
+	<rule ref="PSR2">
+		<!-- Relaxing the rules a little bit for now, to avoid complex or
+		     breaking changes that should go in next major release
+		-->
+
+		<!-- allow files to both declare symbols and execute code -->
+		<exclude name="PSR1.Files.SideEffects"/>
+
+		<!-- Don't enforce PSR-0 -->
+		<exclude name="PSR1.Classes.ClassDeclaration"/>
+
+		<!-- Relax class naming convention -->
+		<exclude name="Squiz.Classes.ValidClassName"/>
+
+		<!-- Allow leading underscore in class properties and methods -->
+		<exclude name="PSR2.Classes.PropertyDeclaration.Underscore"/>
+		<exclude name="PSR2.Methods.MethodDeclaration.Underscore"/>
+	</rule>
+
+
+</ruleset>
