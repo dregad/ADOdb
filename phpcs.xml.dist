@@ -2,7 +2,17 @@
 <ruleset name="ADOdb">
 	<description>The coding standard for ADOdb library (derived from PSR-2).</description>
 
+	<!-- show report in color, with progress -->
+	<arg name="report-width" value="auto"/>
+	<arg name="colors"/>
 	<arg value="p"/>
+
+	<!-- files to process by default -->
+	<arg name="extensions" value="php"/>
+	<file>.</file>
+	<exclude-pattern>./tests/</exclude-pattern>
+
+	<arg name="encoding" value="utf-8"/>
 
 	<rule ref="PSR2">
 		<!-- Relaxing the rules a little bit for now, to avoid complex or
