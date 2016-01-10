@@ -43,21 +43,26 @@
 */
 
 // security - hide paths
-if (!defined('ADODB_DIR')) die();
+if (!defined('ADODB_DIR')) {
+    die();
+}
 
 // one useful constant
-if (!defined('SINGLEQUOTE')) define('SINGLEQUOTE', "'");
+if (!defined('SINGLEQUOTE')) {
+    define('SINGLEQUOTE', "'");
+}
 
 include_once(ADODB_DIR.'/drivers/adodb-mssql.inc.php');
 
-class ADODB_mssql_n extends ADODB_mssql {
-	var $databaseType = "mssql_n";
+class ADODB_mssql_n extends ADODB_mssql
+{
+    var $databaseType = "mssql_n";
 
-	function _query($sql,$inputarr=false)
-	{
+    function _query($sql, $inputarr = false)
+    {
         $sql = $this->_appendN($sql);
-		return ADODB_mssql::_query($sql,$inputarr);
-	}
+        return ADODB_mssql::_query($sql, $inputarr);
+    }
 
          /**
      * This function will intercept all the literals used in the SQL, prepending the "N" char to them
@@ -76,43 +81,42 @@ class ADODB_mssql_n extends ADODB_mssql {
      *
      * @return mixed
      */
-    function _appendN($inboundData) {
+    function _appendN($inboundData)
+    {
 
         $inboundIsArray  = false;
 
-        if (is_array($inboundData))
-        {
+        if (is_array($inboundData)) {
             $inboundIsArray = true;
             $inboundArray   = $inboundData;
-        } else
+        } else {
             $inboundArray = (array)$inboundData;
+        }
 
         /*
          * All changes will be placed here
          */
         $outboundArray = $inboundArray;
 
-        foreach($inboundArray as $inboundKey=>$inboundValue)
-        {
-
-            if (is_resource($inboundValue))
-            {
+        foreach ($inboundArray as $inboundKey => $inboundValue) {
+            if (is_resource($inboundValue)) {
                 /*
                 * Prepared statement resource
                 */
-                if ($this->debug)
+                if ($this->debug) {
                     ADOConnection::outp("{$this->databaseType} index $inboundKey value is resource, continue");
+                }
 
                 continue;
             }
 
-            if (strpos($inboundValue, SINGLEQUOTE) === false)
-            {
-                /*
+            if (strpos($inboundValue, SINGLEQUOTE) === false) {
+            /*
                 * Check we have something to manipulate
                 */
-                if ($this->debug)
+                if ($this->debug) {
                     ADOConnection::outp("{$this->databaseType} index $inboundKey value $inboundValue has no single quotes, continue");
+                }
                 continue;
             }
 
@@ -120,10 +124,10 @@ class ADODB_mssql_n extends ADODB_mssql {
             * Check we haven't an odd number of single quotes (this can cause problems below
             * and should be considered one wrong SQL). Exit with debug info.
             */
-            if ((substr_count($inboundValue, SINGLEQUOTE) & 1))
-            {
-                if ($this->debug)
+            if ((substr_count($inboundValue, SINGLEQUOTE) & 1)) {
+                if ($this->debug) {
                     ADOConnection::outp("{$this->databaseType} internal transformation: not converted. Wrong number of quotes (odd)");
+                }
 
                 break;
             }
@@ -133,10 +137,10 @@ class ADODB_mssql_n extends ADODB_mssql {
             *  backslashes use (bad magic_quotes_sybase?). Exit with debug info.
             */
             $regexp = '/(\\\\' . SINGLEQUOTE . '[^' . SINGLEQUOTE . '])/';
-            if (preg_match($regexp, $inboundValue))
-            {
-                if ($this->debug)
+            if (preg_match($regexp, $inboundValue)) {
+                if ($this->debug) {
                     ADOConnection::outp("{$this->databaseType} internal transformation: not converted. Found bad use of backslash + single quote");
+                }
 
                 break;
             }
@@ -148,14 +152,15 @@ class ADODB_mssql_n extends ADODB_mssql {
             $regexp = '/(' . SINGLEQUOTE . SINGLEQUOTE . ')/';
             preg_match_all($regexp, $inboundValue, $list_of_pairs);
 
-            if ($list_of_pairs)
-            {
-                foreach (array_unique($list_of_pairs[0]) as $key=>$value)
+            if ($list_of_pairs) {
+                foreach (array_unique($list_of_pairs[0]) as $key => $value) {
                     $pairs['<@#@#@PAIR-'.$key.'@#@#@>'] = $value;
+                }
 
 
-                if (!empty($pairs))
+                if (!empty($pairs)) {
                     $inboundValue = str_replace($pairs, array_keys($pairs), $inboundValue);
+                }
 
             }
 
@@ -166,28 +171,29 @@ class ADODB_mssql_n extends ADODB_mssql {
             $regexp = '/(N?' . SINGLEQUOTE . '.*?' . SINGLEQUOTE . ')/is';
             preg_match_all($regexp, $inboundValue, $list_of_literals);
 
-           if ($list_of_literals)
-           {
-                foreach (array_unique($list_of_literals[0]) as $key=>$value)
+            if ($list_of_literals) {
+                foreach (array_unique($list_of_literals[0]) as $key => $value) {
                     $literals['<#@#@#LITERAL-'.$key.'#@#@#>'] = $value;
+                }
 
 
-                if (!empty($literals))
+                if (!empty($literals)) {
                     $inboundValue = str_replace($literals, array_keys($literals), $inboundValue);
+                }
             }
 
             /*
             * Analyse literals to prepend the N char to them if their contents aren't numeric
             */
-            if (!empty($literals))
-            {
-                foreach ($literals as $key=>$value) {
-                    if (!is_numeric(trim($value, SINGLEQUOTE)))
+            if (!empty($literals)) {
+                foreach ($literals as $key => $value) {
+                    if (!is_numeric(trim($value, SINGLEQUOTE))) {
                         /*
                         * Non numeric string, prepend our dear N, whilst
                         * Trimming potentially existing previous "N"
                         */
                         $literals[$key] = 'N' . trim($value, 'N');
+                    }
 
                 }
             }
@@ -195,8 +201,9 @@ class ADODB_mssql_n extends ADODB_mssql {
             /*
             * Re-apply literals to the text
             */
-            if (!empty($literals))
+            if (!empty($literals)) {
                 $inboundValue = str_replace(array_keys($literals), $literals, $inboundValue);
+            }
 
 
             /*
@@ -208,28 +215,32 @@ class ADODB_mssql_n extends ADODB_mssql {
             /*
             * Re-apply pairs of single-quotes to the text
             */
-            if (!empty($pairs))
+            if (!empty($pairs)) {
                 $inboundValue = str_replace(array_keys($pairs), $pairs, $inboundValue);
+            }
 
 
             /*
             * Print transformation if debug = on
             */
-            if (strcmp($inboundValue,$inboundArray[$inboundKey]) <> 0 && $this->debug)
+            if (strcmp($inboundValue, $inboundArray[$inboundKey]) <> 0 && $this->debug) {
                 ADOConnection::outp("{$this->databaseType} internal transformation: {$inboundArray[$inboundKey]} to {$inboundValue}");
+            }
 
-            if (strcmp($inboundValue,$inboundArray[$inboundKey]) <> 0)
+            if (strcmp($inboundValue, $inboundArray[$inboundKey]) <> 0) {
                 /*
                 * Place the transformed value into the outbound array
                 */
                 $outboundArray[$inboundKey] = $inboundValue;
+            }
         }
 
         /*
          * Any transformations are in the $outboundArray
          */
-        if ($inboundIsArray)
+        if ($inboundIsArray) {
             return $outboundArray;
+        }
 
         /*
          * We passed a string in originally
@@ -237,9 +248,9 @@ class ADODB_mssql_n extends ADODB_mssql {
         return $outboundArray[0];
 
     }
-
 }
 
-class ADORecordset_mssql_n extends ADORecordset_mssql {
-	var $databaseType = "mssql_n";
+class ADORecordset_mssql_n extends ADORecordset_mssql
+{
+    var $databaseType = "mssql_n";
 }

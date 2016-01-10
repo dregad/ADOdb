@@ -4,153 +4,180 @@ include_once('adodb-replicate.inc.php');
 
 set_time_limit(0);
 
-function IndexFilter($dtable, $idxname,$flds,$options)
+function IndexFilter($dtable, $idxname, $flds, $options)
 {
-	if (strlen($idxname) > 28) $idxname = substr($idxname,0,24).rand(1000,9999);
-	return $idxname;
+    if (strlen($idxname) > 28) {
+        $idxname = substr($idxname, 0, 24).rand(1000, 9999);
+    }
+    return $idxname;
 }
 
 function SelFilter($table, &$arr, $delfirst)
 {
-	return true;
+    return true;
 }
 
 function updatefilter($table, $fld, $val)
 {
-	return "nvl($fld, $val)";
+    return "nvl($fld, $val)";
 }
 
 
-function FieldFilter(&$fld,$mode)
+function FieldFilter(&$fld, $mode)
 {
-	$uf = strtoupper($fld);
-	switch($uf) {
-		case 'SIZEFLD':
-			return 'Size';
+    $uf = strtoupper($fld);
+    switch ($uf) {
+        case 'SIZEFLD':
+            return 'Size';
 
-		case 'GROUPFLD':
-			return 'Group';
+        case 'GROUPFLD':
+            return 'Group';
 
-		case 'GROUP':
-			if ($mode == 'SELECT') $fld = '"Group"';
-			return 'GroupFld';
-		case 'SIZE':
-			if ($mode == 'SELECT') $fld = '"Size"';
-			return 'SizeFld';
-	}
-	return $fld;
+        case 'GROUP':
+            if ($mode == 'SELECT') {
+                $fld = '"Group"';
+            }
+            return 'GroupFld';
+        case 'SIZE':
+            if ($mode == 'SELECT') {
+                $fld = '"Size"';
+            }
+            return 'SizeFld';
+    }
+    return $fld;
 }
 
 function ParseTable(&$table, &$pkey)
 {
-	$table = trim($table);
-	if (strlen($table) == 0) return false;
-	if (strpos($table, '#') !== false) {
-		$at = strpos($table, '#');
-		$table = trim(substr($table,0,$at));
-		if (strlen($table) == 0) return false;
-	}
+    $table = trim($table);
+    if (strlen($table) == 0) {
+        return false;
+    }
+    if (strpos($table, '#') !== false) {
+        $at = strpos($table, '#');
+        $table = trim(substr($table, 0, $at));
+        if (strlen($table) == 0) {
+            return false;
+        }
+    }
 
-	$tabarr = explode(',',$table);
-	if (sizeof($tabarr) == 1) {
-		$table = $tabarr[0];
-		$pkey = '';
-		echo "No primary key for $table ****  **** <br>";
-	} else {
-		$table = trim($tabarr[0]);
-		$pkey = trim($tabarr[1]);
-		if (strpos($pkey,' ') !== false) echo "Bad PKEY for $table $pkey<br>";
-	}
+    $tabarr = explode(',', $table);
+    if (sizeof($tabarr) == 1) {
+        $table = $tabarr[0];
+        $pkey = '';
+        echo "No primary key for $table ****  **** <br>";
+    } else {
+        $table = trim($tabarr[0]);
+        $pkey = trim($tabarr[1]);
+        if (strpos($pkey, ' ') !== false) {
+            echo "Bad PKEY for $table $pkey<br>";
+        }
+    }
 
-	return true;
+    return true;
 }
 
 global $TARR;
 
 function TableStats($rep, $table, $pkey)
 {
-global $TARR;
+    global $TARR;
 
-	if (empty($TARR)) $TARR = array();
-	$cnt = $rep->connSrc->GetOne("select count(*) from $table");
-	if (isset($TARR[$table])) echo "<h1>Table $table repeated twice</h1>";
-	$TARR[$table] = $cnt;
+    if (empty($TARR)) {
+        $TARR = array();
+    }
+    $cnt = $rep->connSrc->GetOne("select count(*) from $table");
+    if (isset($TARR[$table])) {
+        echo "<h1>Table $table repeated twice</h1>";
+    }
+    $TARR[$table] = $cnt;
 
-	if ($pkey) {
-		$ok = $rep->connSrc->SelectLimit("select $pkey from $table",1);
-		if (!$ok) echo "<h1>$table: $pkey does not exist</h1>";
-	} else
-		echo "<h1>$table: no primary key</h1>";
+    if ($pkey) {
+        $ok = $rep->connSrc->SelectLimit("select $pkey from $table", 1);
+        if (!$ok) {
+            echo "<h1>$table: $pkey does not exist</h1>";
+        }
+    } else {
+        echo "<h1>$table: no primary key</h1>";
+    }
 }
 
 function CreateTable($rep, $table)
 {
 ## CREATE TABLE
-	#$DB2->Execute("drop table $table");
+    #$DB2->Execute("drop table $table");
 
-	$rep->execute = true;
-	$ok = $rep->CopyTableStruct($table);
-	if ($ok) echo "Table Created<br>\n";
-	else {
-		echo "<hr>Error: Cannot Create Table<hr>\n";
-	}
-	flush();@ob_flush();
+    $rep->execute = true;
+    $ok = $rep->CopyTableStruct($table);
+    if ($ok) {
+        echo "Table Created<br>\n";
+    } else {
+        echo "<hr>Error: Cannot Create Table<hr>\n";
+    }
+    flush();
+    @ob_flush();
 }
 
 function CopyData($rep, $table, $pkey)
 {
-	$dtable = $table;
+    $dtable = $table;
 
-	$rep->execute = true;
-	$rep->deleteFirst = true;
+    $rep->execute = true;
+    $rep->deleteFirst = true;
 
-	$secs = time();
-	$rows = $rep->ReplicateData($table,$dtable,array($pkey));
-	$secs = time() - $secs;
-	if (!$rows || !$rows[0] || !$rows[1] || $rows[1] != $rows[2]+$rows[3]) {
-		echo "<hr>Error: "; var_dump($rows);  echo " (secs=$secs) <hr>\n";
-	} else
-		echo date('H:i:s'),': ',$rows[1]," record(s) copied, ",$rows[2]," inserted, ",$rows[3]," updated (secs=$secs)<br>\n";
-	flush();@ob_flush();
+    $secs = time();
+    $rows = $rep->ReplicateData($table, $dtable, array($pkey));
+    $secs = time() - $secs;
+    if (!$rows || !$rows[0] || !$rows[1] || $rows[1] != $rows[2]+$rows[3]) {
+        echo "<hr>Error: ";
+        var_dump($rows);
+        echo " (secs=$secs) <hr>\n";
+    } else {
+        echo date('H:i:s'),': ',$rows[1]," record(s) copied, ",$rows[2]," inserted, ",$rows[3]," updated (secs=$secs)<br>\n";
+    }
+    flush();
+    @ob_flush();
 }
 
 function MergeDataJohnTest($rep, $table, $pkey)
 {
-	$rep->SwapDBs();
+    $rep->SwapDBs();
 
-	$dtable = $table;
-	$rep->oracleSequence = 'LGBSEQUENCE';
+    $dtable = $table;
+    $rep->oracleSequence = 'LGBSEQUENCE';
 
 #	$rep->MergeSrcSetup($table, array($pkey),'UpdatedOn','CopiedFlag');
-	if (strpos($rep->connDest->databaseType,'mssql') !== false)  {  # oracle ==> mssql
-		$ignoreflds = array($pkey);
-		$ignoreflds[] = 'MSSQL_ID';
-		$set = 'MSSQL_ID=nvl($INSERT_ID,MSSQL_ID)';
-		$pkeyarr = array(array($pkey),false,array('MSSQL_ID'));# array('MSSQL_ID', 'ORA_ID'));
-	} else {  # mssql ==> oracle
-		$ignoreflds = array($pkey);
-		$ignoreflds[] = 'ORA_ID';
-		$set = '';
-		#$set = 'ORA_ID=isnull($INSERT_ID,ORA_ID)';
-		$pkeyarr = array(array($pkey),array('MSSQL_ID'));
-	}
-	$rep->execute = true;
-	#$rep->updateFirst = false;
-	$ok = $rep->Merge($table, $dtable, $pkeyarr, $ignoreflds, $set, 'UpdatedOn','CopiedFlag',array('Y','N','P','='), 'CopyDate');
-	var_dump($ok);
+    if (strpos($rep->connDest->databaseType, 'mssql') !== false) {    # oracle ==> mssql
+        $ignoreflds = array($pkey);
+        $ignoreflds[] = 'MSSQL_ID';
+        $set = 'MSSQL_ID=nvl($INSERT_ID,MSSQL_ID)';
+        $pkeyarr = array(array($pkey),false,array('MSSQL_ID'));# array('MSSQL_ID', 'ORA_ID'));
+    } else {  # mssql ==> oracle
+        $ignoreflds = array($pkey);
+        $ignoreflds[] = 'ORA_ID';
+        $set = '';
+        #$set = 'ORA_ID=isnull($INSERT_ID,ORA_ID)';
+        $pkeyarr = array(array($pkey),array('MSSQL_ID'));
+    }
+    $rep->execute = true;
+    #$rep->updateFirst = false;
+    $ok = $rep->Merge($table, $dtable, $pkeyarr, $ignoreflds, $set, 'UpdatedOn', 'CopiedFlag', array('Y','N','P','='), 'CopyDate');
+    var_dump($ok);
 
-	#$rep->connSrc->Execute("update JohnTest set name='Apple' where id=4");
+    #$rep->connSrc->Execute("update JohnTest set name='Apple' where id=4");
 }
 
 $DB = ADONewConnection('odbtp');
 #$ok = $DB->Connect('localhost','root','','northwind');
-$ok = $DB->Connect('192.168.0.1','DRIVER={SQL Server};SERVER=(local);UID=sa;PWD=natsoft;DATABASE=OIR;','','');
+$ok = $DB->Connect('192.168.0.1', 'DRIVER={SQL Server};SERVER=(local);UID=sa;PWD=natsoft;DATABASE=OIR;', '', '');
 $DB->_bindInputArray = false;
 
 $DB2 = ADONewConnection('oci8');
-$ok2 = $DB2->Connect('192.168.0.2','tnb','natsoft','RAPTOR','');
+$ok2 = $DB2->Connect('192.168.0.2', 'tnb', 'natsoft', 'RAPTOR', '');
 
-if (!$ok || !$ok2) die("Failed connection DB=$ok DB2=$ok2<br>");
+if (!$ok || !$ok2) {
+    die("Failed connection DB=$ok DB2=$ok2<br>");
+}
 
 $tables =
 "
@@ -371,51 +398,57 @@ tblInstallation,ID_TI
 ";
 
 
-$tables = explode("\n",$tables);
+$tables = explode("\n", $tables);
 
-$rep = new ADODB_Replicate($DB,$DB2);
+$rep = new ADODB_Replicate($DB, $DB2);
 $rep->fieldFilter = 'FieldFilter';
 $rep->selFilter = 'SELFILTER';
 $rep->indexFilter = 'IndexFilter';
 
 if (1) {
-	$rep->debug = 1;
-	$DB->debug=1;
-	$DB2->debug=1;
+    $rep->debug = 1;
+    $DB->debug=1;
+    $DB2->debug=1;
 }
 
 #	$rep->SwapDBs();
 
 $cnt = sizeof($tables);
-foreach($tables as $k => $table) {
-	$pkey = '';
-	if (!ParseTable($table, $pkey)) continue;
+foreach ($tables as $k => $table) {
+    $pkey = '';
+    if (!ParseTable($table, $pkey)) {
+        continue;
+    }
 
-	#######################
+    #######################
 
-	$kcnt = $k+1;
-	echo "<h1>($kcnt/$cnt) $table -- $pkey</h1>\n";
-	flush();@ob_flush();
+    $kcnt = $k+1;
+    echo "<h1>($kcnt/$cnt) $table -- $pkey</h1>\n";
+    flush();
+    @ob_flush();
 
-	CreateTable($rep,$table);
-
-
-	# COPY DATA
+    CreateTable($rep, $table);
 
 
-	TableStats($rep, $table, $pkey);
+    # COPY DATA
 
-	if ($table == 'JohnTest') MergeDataJohnTest($rep, $table, $pkey);
-	else CopyData($rep, $table, $pkey);
+
+    TableStats($rep, $table, $pkey);
+
+    if ($table == 'JohnTest') {
+        MergeDataJohnTest($rep, $table, $pkey);
+    } else {
+        CopyData($rep, $table, $pkey);
+    }
 
 }
 
 
 if (!empty($TARR)) {
-	ksort($TARR);
-	adodb_pr($TARR);
-	asort($TARR);
-	adodb_pr($TARR);
+    ksort($TARR);
+    adodb_pr($TARR);
+    asort($TARR);
+    adodb_pr($TARR);
 }
 
 echo "<hr>",date('H:i:s'),": Done</hr>";
