@@ -43,19 +43,19 @@ $db->CacheExecute($sql);
 
 class ADODB_Cache_MemCache
 {
-    var $createdir = false; // create caching directory structure?
+    public $createdir = false; // create caching directory structure?
 
     //-----------------------------
     // memcache specific variables
 
-    var $hosts;     // array of hosts
-    var $port = 11211;
-    var $compress = false; // memcache compression with zlib
+    public $hosts;     // array of hosts
+    public $port = 11211;
+    public $compress = false; // memcache compression with zlib
 
-    var $_connected = false;
-    var $_memcache = false;
+    public $_connected = false;
+    public $_memcache = false;
 
-    function __construct(&$obj)
+    protected function __construct(&$obj)
     {
         $this->hosts = $obj->memCacheHost;
         $this->port = $obj->memCachePort;
@@ -63,7 +63,7 @@ class ADODB_Cache_MemCache
     }
 
     // implement as lazy connection. The connection only occurs on CacheExecute call
-    function connect(&$err)
+    public function connect(&$err)
     {
         if (!function_exists('memcache_pconnect')) {
             $err = 'Memcache module PECL extension not found!';
@@ -92,7 +92,7 @@ class ADODB_Cache_MemCache
     }
 
     // returns true or false. true if successful save
-    function writecache($filename, $contents, $debug, $secs2cache)
+    public function writecache($filename, $contents, $debug, $secs2cache)
     {
         if (!$this->_connected) {
             $err = '';
@@ -115,7 +115,7 @@ class ADODB_Cache_MemCache
     }
 
     // returns a recordset
-    function readcache($filename, &$err, $secs2cache, $rsClass)
+    public function readcache($filename, &$err, $secs2cache, $rsClass)
     {
         $false = false;
         if (!$this->_connected) {
@@ -166,7 +166,7 @@ class ADODB_Cache_MemCache
         return $rs;
     }
 
-    function flushall($debug = false)
+    public function flushall($debug = false)
     {
         if (!$this->_connected) {
             $err = '';
@@ -191,7 +191,7 @@ class ADODB_Cache_MemCache
         return $del;
     }
 
-    function flushcache($filename, $debug = false)
+    public function flushcache($filename, $debug = false)
     {
         if (!$this->_connected) {
             $err = '';
@@ -217,7 +217,7 @@ class ADODB_Cache_MemCache
     }
 
     // not used for memcache
-    function createdir($dir, $hash)
+    public function createdir($dir, $hash)
     {
         return true;
     }

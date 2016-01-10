@@ -4,7 +4,7 @@ include_once('adodb-replicate.inc.php');
 
 set_time_limit(0);
 
-function IndexFilter($dtable, $idxname, $flds, $options)
+public function indexFilter($dtable, $idxname, $flds, $options)
 {
     if (strlen($idxname) > 28) {
         $idxname = substr($idxname, 0, 24).rand(1000, 9999);
@@ -12,18 +12,18 @@ function IndexFilter($dtable, $idxname, $flds, $options)
     return $idxname;
 }
 
-function SelFilter($table, &$arr, $delfirst)
+public function selFilter($table, &$arr, $delfirst)
 {
     return true;
 }
 
-function updatefilter($table, $fld, $val)
+public function updatefilter($table, $fld, $val)
 {
     return "nvl($fld, $val)";
 }
 
 
-function FieldFilter(&$fld, $mode)
+public function fieldFilter(&$fld, $mode)
 {
     $uf = strtoupper($fld);
     switch ($uf) {
@@ -47,7 +47,7 @@ function FieldFilter(&$fld, $mode)
     return $fld;
 }
 
-function ParseTable(&$table, &$pkey)
+public function parseTable(&$table, &$pkey)
 {
     $table = trim($table);
     if (strlen($table) == 0) {
@@ -79,7 +79,7 @@ function ParseTable(&$table, &$pkey)
 
 global $TARR;
 
-function TableStats($rep, $table, $pkey)
+public function tableStats($rep, $table, $pkey)
 {
     global $TARR;
 
@@ -102,7 +102,7 @@ function TableStats($rep, $table, $pkey)
     }
 }
 
-function CreateTable($rep, $table)
+public function createTable($rep, $table)
 {
 ## CREATE TABLE
     #$DB2->Execute("drop table $table");
@@ -118,7 +118,7 @@ function CreateTable($rep, $table)
     @ob_flush();
 }
 
-function CopyData($rep, $table, $pkey)
+public function copyData($rep, $table, $pkey)
 {
     $dtable = $table;
 
@@ -139,7 +139,7 @@ function CopyData($rep, $table, $pkey)
     @ob_flush();
 }
 
-function MergeDataJohnTest($rep, $table, $pkey)
+public function mergeDataJohnTest($rep, $table, $pkey)
 {
     $rep->SwapDBs();
 

@@ -29,36 +29,36 @@ if (! defined("_ADODB_CSV_LAYER")) {
 
     class ADODB_csv extends ADOConnection
     {
-        var $databaseType = 'csv';
-        var $databaseProvider = 'csv';
-        var $hasInsertID = true;
-        var $hasAffectedRows = true;
-        var $fmtTimeStamp = "'Y-m-d H:i:s'";
-        var $_affectedrows=0;
-        var $_insertid=0;
-        var $_url;
-        var $replaceQuote = "''"; // string to use to replace quotes
-        var $hasTransactions = false;
-        var $_errorNo = false;
+        public $databaseType = 'csv';
+        public $databaseProvider = 'csv';
+        public $hasInsertID = true;
+        public $hasAffectedRows = true;
+        public $fmtTimeStamp = "'Y-m-d H:i:s'";
+        public $_affectedrows=0;
+        public $_insertid=0;
+        public $_url;
+        public $replaceQuote = "''"; // string to use to replace quotes
+        public $hasTransactions = false;
+        public $_errorNo = false;
 
-        function _insertid()
+        protected function _insertid()
         {
             return $this->_insertid;
         }
 
-        function _affectedrows()
+        protected function _affectedrows()
         {
             return $this->_affectedrows;
         }
 
-        function MetaDatabases()
+        public function metaDatabases()
         {
             return false;
         }
 
 
         // returns true or false
-        function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
+        protected function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
         {
             if (strtolower(substr($argHostname, 0, 7)) !== 'http://') {
                 return false;
@@ -68,7 +68,7 @@ if (! defined("_ADODB_CSV_LAYER")) {
         }
 
         // returns true or false
-        function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
+        protected function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
         {
             if (strtolower(substr($argHostname, 0, 7)) !== 'http://') {
                 return false;
@@ -77,14 +77,14 @@ if (! defined("_ADODB_CSV_LAYER")) {
             return true;
         }
 
-        function MetaColumns($table, $normalize = true)
+        public function metaColumns($table, $normalize = true)
         {
             return false;
         }
 
 
         // parameters use PostgreSQL convention, not MySQL
-        function SelectLimit($sql, $nrows = -1, $offset = -1, $inputarr = false, $secs2cache = 0)
+        public function selectLimit($sql, $nrows = -1, $offset = -1, $inputarr = false, $secs2cache = 0)
         {
             global $ADODB_FETCH_MODE;
 
@@ -122,7 +122,7 @@ if (! defined("_ADODB_CSV_LAYER")) {
         }
 
         // returns queryID or false
-        function _Execute($sql, $inputarr = false)
+        protected function _execute($sql, $inputarr = false)
         {
             global $ADODB_FETCH_MODE;
 
@@ -185,19 +185,19 @@ if (! defined("_ADODB_CSV_LAYER")) {
         }
 
         /*	Returns: the last error message from previous database operation	*/
-        function ErrorMsg()
+        public function errorMsg()
         {
             return $this->_errorMsg;
         }
 
         /*	Returns: the last error number from previous database operation	*/
-        function ErrorNo()
+        public function errorNo()
         {
             return $this->_errorNo;
         }
 
         // returns true or false
-        function _close()
+        protected function _close()
         {
             return true;
         }
@@ -206,7 +206,7 @@ if (! defined("_ADODB_CSV_LAYER")) {
     class ADORecordset_csv extends ADORecordset
     {
 
-        function _close()
+        protected function _close()
         {
             return true;
         }

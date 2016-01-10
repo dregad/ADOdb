@@ -20,25 +20,25 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
 
     class ADODB_fbsql extends ADOConnection
     {
-        var $databaseType = 'fbsql';
-        var $hasInsertID = true;
-        var $hasAffectedRows = true;
-        var $metaTablesSQL = "SHOW TABLES";
-        var $metaColumnsSQL = "SHOW COLUMNS FROM %s";
-        var $fmtTimeStamp = "'Y-m-d H:i:s'";
-        var $hasLimit = false;
+        public $databaseType = 'fbsql';
+        public $hasInsertID = true;
+        public $hasAffectedRows = true;
+        public $metaTablesSQL = "SHOW TABLES";
+        public $metaColumnsSQL = "SHOW COLUMNS FROM %s";
+        public $fmtTimeStamp = "'Y-m-d H:i:s'";
+        public $hasLimit = false;
 
-        function _insertid()
+        protected function _insertid()
         {
             return fbsql_insert_id($this->_connectionID);
         }
 
-        function _affectedrows()
+        protected function _affectedrows()
         {
             return fbsql_affected_rows($this->_connectionID);
         }
 
-        function MetaDatabases()
+        public function metaDatabases()
         {
             $qid = fbsql_list_dbs($this->_connectionID);
             $arr = array();
@@ -52,7 +52,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
         }
 
         // returns concatenated string
-        function Concat()
+        public function concat()
         {
             $s = "";
             $arr = func_get_args();
@@ -67,7 +67,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
         }
 
         // returns true or false
-        function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
+        protected function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
         {
             $this->_connectionID = fbsql_connect($argHostname, $argUsername, $argPassword);
             if ($this->_connectionID === false) {
@@ -80,7 +80,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
         }
 
         // returns true or false
-        function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
+        protected function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
         {
             $this->_connectionID = fbsql_pconnect($argHostname, $argUsername, $argPassword);
             if ($this->_connectionID === false) {
@@ -92,7 +92,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
             return true;
         }
 
-        function MetaColumns($table, $normalize = true)
+        public function metaColumns($table, $normalize = true)
         {
             if ($this->metaColumnsSQL) {
 
@@ -130,7 +130,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
         }
 
         // returns true or false
-        function SelectDB($dbName)
+        public function selectDB($dbName)
         {
             $this->database = $dbName;
             if ($this->_connectionID) {
@@ -142,26 +142,26 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
 
 
         // returns queryID or false
-        function _query($sql, $inputarr = false)
+        protected function _query($sql, $inputarr = false)
         {
             return fbsql_query("$sql;", $this->_connectionID);
         }
 
         /*	Returns: the last error message from previous database operation	*/
-        function ErrorMsg()
+        public function errorMsg()
         {
             $this->_errorMsg = @fbsql_error($this->_connectionID);
             return $this->_errorMsg;
         }
 
         /*	Returns: the last error number from previous database operation	*/
-        function ErrorNo()
+        public function errorNo()
         {
             return @fbsql_errno($this->_connectionID);
         }
 
         // returns true or false
-        function _close()
+        protected function _close()
         {
             return @fbsql_close($this->_connectionID);
         }
@@ -174,10 +174,10 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
     class ADORecordSet_fbsql extends ADORecordSet
     {
 
-        var $databaseType = "fbsql";
-        var $canSeek = true;
+        public $databaseType = "fbsql";
+        public $canSeek = true;
 
-        function __construct($queryID, $mode = false)
+        protected function __construct($queryID, $mode = false)
         {
             if (!$mode) {
                 global $ADODB_FETCH_MODE;
@@ -198,7 +198,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
             return parent::__construct($queryID);
         }
 
-        function _initrs()
+        protected function _initrs()
         {
             global $ADODB_COUNTRECS;
             $this->_numOfRows = ($ADODB_COUNTRECS) ? @fbsql_num_rows($this->_queryID):-1;
@@ -207,7 +207,7 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
 
 
 
-        function FetchField($fieldOffset = -1)
+        public function fetchField($fieldOffset = -1)
         {
             if ($fieldOffset != -1) {
                 $o =  @fbsql_fetch_field($this->_queryID, $fieldOffset);
@@ -222,23 +222,23 @@ if (! defined("_ADODB_FBSQL_LAYER")) {
             return $o;
         }
 
-        function _seek($row)
+        protected function _seek($row)
         {
             return @fbsql_data_seek($this->_queryID, $row);
         }
 
-        function _fetch($ignore_fields = false)
+        protected function _fetch($ignore_fields = false)
         {
             $this->fields = @fbsql_fetch_array($this->_queryID, $this->fetchMode);
             return ($this->fields == true);
         }
 
-        function _close()
+        protected function _close()
         {
             return @fbsql_free_result($this->_queryID);
         }
 
-        function MetaType($t, $len = -1, $fieldobj = false)
+        public function metaType($t, $len = -1, $fieldobj = false)
         {
             if (is_object($t)) {
                 $fieldobj = $t;

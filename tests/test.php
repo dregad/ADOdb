@@ -20,7 +20,7 @@ $ADODB_FLUSH = true;
 define('ADODB_ASSOC_CASE',0);
 
 
-function getmicrotime()
+public function getmicrotime()
 {
 	$t = microtime();
 	$t = explode(' ',$t);
@@ -32,13 +32,13 @@ if (PHP_VERSION < 5) include_once('../adodb-pear.inc.php');
 //--------------------------------------------------------------------------------------
 //define('ADODB_ASSOC_CASE',1);
 //
-function Err($msg)
+public function err($msg)
 {
 	print "<b>$msg</b><br>";
 	flush();
 }
 
-function CheckWS($conn)
+public function checkWS($conn)
 {
 global $ADODB_EXTENSION;
 
@@ -53,7 +53,7 @@ global $ADODB_EXTENSION;
 	}
 }
 
-function do_strtolower(&$arr)
+public function do_strtolower(&$arr)
 {
 	foreach($arr as $k => $v) {
 		if (is_object($v)) $arr[$k] = adodb_pr($v,true);
@@ -62,12 +62,12 @@ function do_strtolower(&$arr)
 }
 
 
-function CountExecs($db, $sql, $inputarray)
+public function countExecs($db, $sql, $inputarray)
 {
 global $EXECS;  $EXECS++;
 }
 
-function CountCachedExecs($db, $secs2cache, $sql, $inputarray)
+public function countCachedExecs($db, $secs2cache, $sql, $inputarray)
 {
 global $CACHED; $CACHED++;
 }
@@ -75,7 +75,7 @@ global $CACHED; $CACHED++;
 // the table creation code is specific to the database, so we allow the user
 // to define their own table creation stuff
 
-function testdb(&$db,$createtab="create table ADOXYZ (id int, firstname char(24), lastname char(24), created date)")
+public function testdb(&$db,$createtab="create table ADOXYZ (id int, firstname char(24), lastname char(24), created date)")
 {
 GLOBAL $ADODB_vers,$ADODB_CACHE_DIR,$ADODB_FETCH_MODE,$ADODB_COUNTRECS;
 
@@ -1687,7 +1687,7 @@ END Adodb;
 	flush();
 }
 
-function adodb_test_err($dbms, $fn, $errno, $errmsg, $p1=false, $p2=false)
+public function adodb_test_err($dbms, $fn, $errno, $errmsg, $p1=false, $p2=false)
 {
 global $TESTERRS,$ERRNO;
 

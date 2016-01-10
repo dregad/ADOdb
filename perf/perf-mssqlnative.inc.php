@@ -25,8 +25,8 @@ if (!defined('ADODB_DIR')) {
 */
 class perf_mssqlnative extends adodb_perf
 {
-    var $sql1 = 'cast(sql1 as text)';
-    var $createTableSQL = "CREATE TABLE adodb_logsql (
+    public $sql1 = 'cast(sql1 as text)';
+    public $createTableSQL = "CREATE TABLE adodb_logsql (
 		  created datetime NOT NULL,
 		  sql0 varchar(250) NOT NULL,
 		  sql1 varchar(4000) NOT NULL,
@@ -35,7 +35,7 @@ class perf_mssqlnative extends adodb_perf
 		  timer decimal(16,6) NOT NULL
 		)";
 
-    var $settings = array(
+    public $settings = array(
     'Ratios',
         'data cache hit ratio' => array('RATIO',
             "select round((a.cntr_value*100.0)/b.cntr_value,2) from master.dbo.sysperfinfo a, master.dbo.sysperfinfo b where a.counter_name = 'Buffer cache hit ratio' and b.counter_name='Buffer cache hit ratio base'",
@@ -70,7 +70,7 @@ class perf_mssqlnative extends adodb_perf
     );
 
 
-    function __construct(&$conn)
+    protected function __construct(&$conn)
     {
         if ($conn->dataProvider == 'odbc') {
             $this->sql1 = 'sql1';
@@ -79,7 +79,7 @@ class perf_mssqlnative extends adodb_perf
         $this->conn =& $conn;
     }
 
-    function Explain($sql, $partial = false)
+    public function explain($sql, $partial = false)
     {
 
         $save = $this->conn->LogSQL(false);
@@ -124,7 +124,7 @@ class perf_mssqlnative extends adodb_perf
         return $s;
     }
 
-    function Tables($orderby = '1')
+    public function tables($orderby = '1')
     {
         global $ADODB_FETCH_MODE;
 
@@ -150,13 +150,13 @@ class perf_mssqlnative extends adodb_perf
         return $s.'</table>';
     }
 
-    function sp_who()
+    public function sp_who()
     {
         $arr = $this->conn->GetArray('sp_who');
         return sizeof($arr);
     }
 
-    function HealthCheck($cli = false)
+    public function healthCheck($cli = false)
     {
 
         $this->conn->Execute('dbcc traceon(3604)');

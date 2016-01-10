@@ -9,7 +9,7 @@ include_once('../adodb.inc.php');
 $testaccess = true;
 include_once('testdatabases.inc.php');
 
-function testdb(&$db,$createtab="create table ADOXYZ (id int, firstname char(24), lastname char(24), created date)")
+public function testdb(&$db,$createtab="create table ADOXYZ (id int, firstname char(24), lastname char(24), created date)")
 {
 	$table = 'adodbseq';
 

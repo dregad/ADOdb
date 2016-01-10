@@ -30,7 +30,7 @@ if (!defined('ADODB_DB2OCI')) {
  * @param array  $arr parameters
  * @return array
  */
-    function _colonparser($sql, $arr)
+    protected function _colonparser($sql, $arr)
     {
         $lensql = strlen($sql);
         $arrsize = sizeof($arr);
@@ -134,18 +134,18 @@ if (!defined('ADODB_DB2OCI')) {
 
     class ADODB_db2oci extends ADODB_db2
     {
-        var $databaseType = "db2oci";
-        var $sysTimeStamp = 'sysdate';
-        var $sysDate = 'trunc(sysdate)';
-        var $_bindInputArray = true;
+        public $databaseType = "db2oci";
+        public $sysTimeStamp = 'sysdate';
+        public $sysDate = 'trunc(sysdate)';
+        public $_bindInputArray = true;
 
-        function Param($name, $type = 'C')
+        public function param($name, $type = 'C')
         {
             return ':'.$name;
         }
 
 
-        function MetaTables($ttype = false, $schema = false, $mask = false)
+        public function metaTables($ttype = false, $schema = false, $mask = false)
         {
             global $ADODB_FETCH_MODE;
 
@@ -194,7 +194,7 @@ if (!defined('ADODB_DB2OCI')) {
             return $arr2;
         }
 
-        function _Execute($sql, $inputarr = false)
+        protected function _execute($sql, $inputarr = false)
         {
             if ($inputarr) {
                 list($sql,$inputarr) = _colonparser($sql, $inputarr);
@@ -207,7 +207,7 @@ if (!defined('ADODB_DB2OCI')) {
     class ADORecordSet_db2oci extends ADORecordSet_db2
     {
 
-        var $databaseType = "db2oci";
+        public $databaseType = "db2oci";
     }
 
 } //define

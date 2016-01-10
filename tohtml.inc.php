@@ -40,7 +40,7 @@ $gSQLBlockRows=20; // max no of rows per table block
 // RETURNS: number of rows displayed
 
 
-function rs2html(&$rs, $ztabhtml = false, $zheaderarray = false, $htmlspecialchars = true, $echo = true)
+public function rs2html(&$rs, $ztabhtml = false, $zheaderarray = false, $htmlspecialchars = true, $echo = true)
 {
     $s ='';
     $rows=0;
@@ -143,7 +143,7 @@ function rs2html(&$rs, $ztabhtml = false, $zheaderarray = false, $htmlspecialcha
 				@fwrite($fd,$v);
 				@fclose($fd);
 				if (!function_exists ("mime_content_type")) {
-				  function mime_content_type ($file) {
+				  public function mime_content_type ($file) {
 				    return exec("file -bi ".escapeshellarg($file));
 				  }
 				}
@@ -204,7 +204,7 @@ function rs2html(&$rs, $ztabhtml = false, $zheaderarray = false, $htmlspecialcha
 }
 
 // pass in 2 dimensional array
-function arr2html(&$arr, $ztabhtml = '', $zheaderarray = '')
+public function arr2html(&$arr, $ztabhtml = '', $zheaderarray = '')
 {
     if (!$ztabhtml) {
         $ztabhtml = 'BORDER=1';

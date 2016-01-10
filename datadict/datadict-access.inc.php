@@ -20,11 +20,11 @@ if (!defined('ADODB_DIR')) {
 class ADODB2_access extends ADODB_DataDict
 {
 
-    var $databaseType = 'access';
-    var $seqField = false;
+    public $databaseType = 'access';
+    public $seqField = false;
 
 
-    function ActualType($meta)
+    public function actualType($meta)
     {
         switch ($meta) {
             case 'C':
@@ -70,7 +70,7 @@ class ADODB2_access extends ADODB_DataDict
     }
 
     // return string must begin with space
-    function _CreateSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
+    protected function _createSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
     {
         if ($fautoinc) {
             $ftype = 'COUNTER';
@@ -95,17 +95,17 @@ class ADODB2_access extends ADODB_DataDict
         return $suffix;
     }
 
-    function CreateDatabase($dbname, $options = false)
+    public function createDatabase($dbname, $options = false)
     {
         return array();
     }
 
 
-    function SetSchema($schema)
+    public function setSchema($schema)
     {
     }
 
-    function AlterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function alterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         if ($this->debug) {
             ADOConnection::outp("AlterColumnSQL not supported");
@@ -114,7 +114,7 @@ class ADODB2_access extends ADODB_DataDict
     }
 
 
-    function DropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function dropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         if ($this->debug) {
             ADOConnection::outp("DropColumnSQL not supported");

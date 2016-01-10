@@ -47,7 +47,7 @@ define('ADODB_SESSION', dirname(__FILE__));
 	3. After urldecode, run the serialized string through this function:
 
 */
-function adodb_unserialize($serialized_string)
+public function adodb_unserialize($serialized_string)
 {
     $variables = array( );
     $a = preg_split("/(\w+)\|/", $serialized_string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -61,7 +61,7 @@ function adodb_unserialize($serialized_string)
 	Thanks Joe Li. See http://phplens.com/lens/lensforum/msgs.php?id=11487&x=1
 	Since adodb 4.61.
 */
-function adodb_session_regenerate_id()
+public function adodb_session_regenerate_id()
 {
     $conn = ADODB_Session::_conn();
     if (!$conn) {
@@ -99,7 +99,7 @@ function adodb_session_regenerate_id()
     @return 0 if failure, 1 if errors, 2 if successful.
 	@author Markus Staab http://www.public-4u.de
 */
-function adodb_session_create_table($schemaFile = null, $conn = null)
+public function adodb_session_create_table($schemaFile = null, $conn = null)
 {
     // set default values
     if ($schemaFile===null) {
@@ -129,7 +129,7 @@ class ADODB_Session
 
     /*
 
-	function Lock($lock=null)
+	public function lock($lock=null)
 	{
 	static $_lock = false;
 
@@ -139,7 +139,7 @@ class ADODB_Session
 	*/
     /*!
 	*/
-    function driver($driver = null)
+    public function driver($driver = null)
     {
         static $_driver = 'mysql';
         static $set = false;
@@ -159,7 +159,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function host($host = null)
+    public function host($host = null)
     {
         static $_host = 'localhost';
         static $set = false;
@@ -179,7 +179,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function user($user = null)
+    public function user($user = null)
     {
         static $_user = 'root';
         static $set = false;
@@ -199,7 +199,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function password($password = null)
+    public function password($password = null)
     {
         static $_password = '';
         static $set = false;
@@ -219,7 +219,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function database($database = null)
+    public function database($database = null)
     {
         static $_database = 'xphplens_2';
         static $set = false;
@@ -239,7 +239,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function persist($persist = null)
+    public function persist($persist = null)
     {
         static $_persist = true;
 
@@ -252,7 +252,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function lifetime($lifetime = null)
+    public function lifetime($lifetime = null)
     {
         static $_lifetime;
         static $set = false;
@@ -280,7 +280,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function debug($debug = null)
+    public function debug($debug = null)
     {
         static $_debug = false;
         static $set = false;
@@ -305,7 +305,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function expireNotify($expire_notify = null)
+    public function expireNotify($expire_notify = null)
     {
         static $_expire_notify;
         static $set = false;
@@ -325,7 +325,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function table($table = null)
+    public function table($table = null)
     {
         static $_table = 'sessions';
         static $set = false;
@@ -345,7 +345,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function optimize($optimize = null)
+    public function optimize($optimize = null)
     {
         static $_optimize = false;
         static $set = false;
@@ -365,7 +365,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function syncSeconds($sync_seconds = null)
+    public function syncSeconds($sync_seconds = null)
     {
         static $_sync_seconds = 60;
         static $set = false;
@@ -385,7 +385,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function clob($clob = null)
+    public function clob($clob = null)
     {
         static $_clob = false;
         static $set = false;
@@ -405,7 +405,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function dataFieldName($data_field_name = null)
+    public function dataFieldName($data_field_name = null)
     {
         static $_data_field_name = 'data';
 
@@ -418,7 +418,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function filter($filter = null)
+    public function filter($filter = null)
     {
         static $_filter = array();
 
@@ -434,7 +434,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function encryptionKey($encryption_key = null)
+    public function encryptionKey($encryption_key = null)
     {
         static $_encryption_key = 'CRYPTED ADODB SESSIONS ROCK!';
 
@@ -451,14 +451,14 @@ class ADODB_Session
 
     /*!
 	*/
-    function _conn($conn = null)
+    protected function _conn($conn = null)
     {
         return $GLOBALS['ADODB_SESS_CONN'];
     }
 
     /*!
 	*/
-    function _crc($crc = null)
+    protected function _crc($crc = null)
     {
         static $_crc = false;
 
@@ -471,7 +471,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function _init()
+    protected function _init()
     {
         session_module_name('user');
         session_set_save_handler(
@@ -487,7 +487,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function _sessionKey()
+    protected function _sessionKey()
     {
         // use this function to create the encryption key for crypted sessions
         // crypt the used key, ADODB_Session::encryptionKey() as key and session_id() as salt
@@ -496,7 +496,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function _dumprs($rs)
+    protected function _dumprs($rs)
     {
         $conn   = ADODB_Session::_conn();
         $debug  = ADODB_Session::debug();
@@ -528,7 +528,7 @@ class ADODB_Session
     // public methods
     /////////////////////
 
-    function config($driver, $host, $user, $password, $database = false, $options = false)
+    public function config($driver, $host, $user, $password, $database = false, $options = false)
     {
         ADODB_Session::driver($driver);
         ADODB_Session::host($host);
@@ -556,7 +556,7 @@ class ADODB_Session
 
 		If $conn already exists, reuse that connection
 	*/
-    function open($save_path, $session_name, $persist = null)
+    public function open($save_path, $session_name, $persist = null)
     {
         $conn = ADODB_Session::_conn();
 
@@ -619,7 +619,7 @@ class ADODB_Session
     /*!
 		Close the connection
 	*/
-    function close()
+    public function close()
     {
 /*
 		$conn = ADODB_Session::_conn();
@@ -631,7 +631,7 @@ class ADODB_Session
     /*
 		Slurp in the session variables and return the serialized string
 	*/
-    function read($key)
+    public function read($key)
     {
         $conn   = ADODB_Session::_conn();
         $data   = ADODB_Session::dataFieldName();
@@ -685,7 +685,7 @@ class ADODB_Session
 
 		If the data has not been modified since the last read(), we do not write.
 	*/
-    function write($key, $val)
+    public function write($key, $val)
     {
         global $ADODB_SESSION_READONLY;
 
@@ -825,7 +825,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function destroy($key)
+    public function destroy($key)
     {
         $conn           = ADODB_Session::_conn();
         $table          = ADODB_Session::table();
@@ -870,7 +870,7 @@ class ADODB_Session
 
     /*!
 	*/
-    function gc($maxlifetime)
+    public function gc($maxlifetime)
     {
         $conn           = ADODB_Session::_conn();
         $debug          = ADODB_Session::debug();
@@ -984,13 +984,13 @@ if (empty($ADODB_SESSION_READONLY)) {
 }
 
 // for backwards compatability only
-function adodb_sess_open($save_path, $session_name, $persist = true)
+public function adodb_sess_open($save_path, $session_name, $persist = true)
 {
     return ADODB_Session::open($save_path, $session_name, $persist);
 }
 
 // for backwards compatability only
-function adodb_sess_gc($t)
+public function adodb_sess_gc($t)
 {
     return ADODB_Session::gc($t);
 }

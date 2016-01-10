@@ -31,7 +31,7 @@ $ADODB_PERF_MIN = 0.05; // log only if >= minimum number of secs to run
 
 
 // returns in K the memory of current process, or 0 if not known
-function adodb_getmem()
+public function adodb_getmem()
 {
     if (function_exists('memory_get_usage')) {
         return (integer) ((memory_get_usage()+512)/1024);
@@ -61,19 +61,19 @@ function adodb_getmem()
 }
 
 // avoids localization problems where , is used instead of .
-function adodb_round($n, $prec)
+public function adodb_round($n, $prec)
 {
     return number_format($n, $prec, '.', '');
 }
 
 /* obsolete: return microtime value as a float. Retained for backward compat */
-function adodb_microtime()
+public function adodb_microtime()
 {
     return microtime(true);
 }
 
 /* sql code timing */
-function adodb_log_sql(&$connx, $sql, $inputarr)
+public function adodb_log_sql(&$connx, $sql, $inputarr)
 {
     $perf_table = adodb_perf::table();
     $connx->fnExecute = false;
@@ -249,18 +249,18 @@ Each database parameter element in the array is itself an array consisting of:
 
 class adodb_perf
 {
-    var $conn;
-    var $color = '#F0F0F0';
-    var $table = '<table border=1 bgcolor=white>';
-    var $titles = '<tr><td><b>Parameter</b></td><td><b>Value</b></td><td><b>Description</b></td></tr>';
-    var $warnRatio = 90;
-    var $tablesSQL = false;
-    var $cliFormat = "%32s => %s \r\n";
-    var $sql1 = 'sql1';  // used for casting sql1 to text for mssql
-    var $explain = true;
-    var $helpurl = '<a href="http://adodb.sourceforge.net/docs-adodb.htm#logsql">LogSQL help</a>';
-    var $createTableSQL = false;
-    var $maxLength = 2000;
+    public $conn;
+    public $color = '#F0F0F0';
+    public $table = '<table border=1 bgcolor=white>';
+    public $titles = '<tr><td><b>Parameter</b></td><td><b>Value</b></td><td><b>Description</b></td></tr>';
+    public $warnRatio = 90;
+    public $tablesSQL = false;
+    public $cliFormat = "%32s => %s \r\n";
+    public $sql1 = 'sql1';  // used for casting sql1 to text for mssql
+    public $explain = true;
+    public $helpurl = '<a href="http://adodb.sourceforge.net/docs-adodb.htm#logsql">LogSQL help</a>';
+    public $createTableSQL = false;
+    public $maxLength = 2000;
 
     // Sets the tablename to be used
     static function table($newtable = false)
@@ -277,7 +277,7 @@ class adodb_perf
     }
 
     // returns array with info to calculate CPU Load
-    function _CPULoad()
+    protected function _cPULoad()
     {
 /*
 
@@ -371,7 +371,7 @@ processes 69293
     }
 
     /* NOT IMPLEMENTED */
-    function MemInfo()
+    public function memInfo()
     {
         /*
 
@@ -402,8 +402,8 @@ Committed_AS:   348732 kB
     /*
 		Remember that this is client load, not db server load!
 	*/
-    var $_lastLoad;
-    function CPULoad()
+    public $_lastLoad;
+    public function cPULoad()
     {
         $info = $this->_CPULoad();
         if (!$info) {
@@ -437,7 +437,7 @@ Committed_AS:   348732 kB
         }
     }
 
-    function Tracer($sql)
+    public function tracer($sql)
     {
         $perf_table = adodb_perf::table();
         $saveE = $this->conn->fnExecute;
@@ -478,12 +478,12 @@ Committed_AS:   348732 kB
 		If only a snippet of the $sql is passed in, then $partial will hold the crc32 of the
 			actual sql.
 	*/
-    function Explain($sql, $partial = false)
+    public function explain($sql, $partial = false)
     {
         return false;
     }
 
-    function InvalidSQL($numsql = 10)
+    public function invalidSQL($numsql = 10)
     {
 
         if (isset($_GET['sql'])) {
@@ -508,7 +508,7 @@ Committed_AS:   348732 kB
     /*
 		This script identifies the longest running SQL
 	*/
-    function _SuspiciousSQL($numsql = 10)
+    protected function _suspiciousSQL($numsql = 10)
     {
         global $ADODB_FETCH_MODE;
 
@@ -575,18 +575,18 @@ Committed_AS:   348732 kB
 
     }
 
-    function CheckMemory()
+    public function checkMemory()
     {
         return '';
     }
 
 
-    function SuspiciousSQL($numsql = 10)
+    public function suspiciousSQL($numsql = 10)
     {
         return adodb_perf::_SuspiciousSQL($numsql);
     }
 
-    function ExpensiveSQL($numsql = 10)
+    public function expensiveSQL($numsql = 10)
     {
         return adodb_perf::_ExpensiveSQL($numsql);
     }
@@ -597,7 +597,7 @@ Committed_AS:   348732 kB
 		expensive few SQL statements. Tuning these statements can often
 		make huge improvements in overall system performance.
 	*/
-    function _ExpensiveSQL($numsql = 10)
+    protected function _expensiveSQL($numsql = 10)
     {
         global $ADODB_FETCH_MODE;
 
@@ -666,7 +666,7 @@ Committed_AS:   348732 kB
     /*
 		Raw function to return parameter value from $settings.
 	*/
-    function DBParameter($param)
+    public function dBParameter($param)
     {
         if (empty($this->settings[$param])) {
             return false;
@@ -678,7 +678,7 @@ Committed_AS:   348732 kB
     /*
 		Raw function returning array of poll paramters
 	*/
-    function PollParameters()
+    public function pollParameters()
     {
         $arr[0] = (float)$this->DBParameter('data cache hit ratio');
         $arr[1] = (float)$this->DBParameter('data reads');
@@ -690,7 +690,7 @@ Committed_AS:   348732 kB
     /*
 		Low-level Get Database Parameter
 	*/
-    function _DBParameter($sql)
+    protected function _dBParameter($sql)
     {
         $savelog = $this->conn->LogSQL(false);
         if (is_array($sql)) {
@@ -753,7 +753,7 @@ Committed_AS:   348732 kB
     /*
 		Warn if cache ratio falls below threshold. Displayed in "Description" column.
 	*/
-    function WarnCacheRatio($val)
+    public function warnCacheRatio($val)
     {
         if ($val < $this->warnRatio) {
              return '<font color=red><b>Cache ratio should be at least '.$this->warnRatio.'%</b></font>';
@@ -762,7 +762,7 @@ Committed_AS:   348732 kB
         }
     }
 
-    function clearsql()
+    public function clearsql()
     {
         $perf_table = adodb_perf::table();
         $this->conn->Execute("delete from $perf_table where created<".$this->conn->sysTimeStamp);
@@ -772,7 +772,7 @@ Committed_AS:   348732 kB
     /***********************************************************************************************/
 
 
-    function UI($pollsecs = 5)
+    public function uI($pollsecs = 5)
     {
         global $ADODB_LOG_CONN;
 
@@ -893,7 +893,7 @@ Committed_AS:   348732 kB
     /*
 		Runs in infinite loop, returning real-time statistics
 	*/
-    function Poll($secs = 5)
+    public function poll($secs = 5)
     {
         $this->conn->fnExecute = false;
         //$this->conn->debug=1;
@@ -942,7 +942,7 @@ Committed_AS:   348732 kB
     /*
 		Returns basic health check in a command line interface
 	*/
-    function HealthCheckCLI()
+    public function healthCheckCLI()
     {
         return $this->HealthCheck(true);
     }
@@ -951,7 +951,7 @@ Committed_AS:   348732 kB
     /*
 		Returns basic health check as HTML
 	*/
-    function HealthCheck($cli = false)
+    public function healthCheck($cli = false)
     {
         $saveE = $this->conn->fnExecute;
         $this->conn->fnExecute = false;
@@ -1041,7 +1041,7 @@ Committed_AS:   348732 kB
         return $html;
     }
 
-    function Tables($orderby = '1')
+    public function tables($orderby = '1')
     {
         if (!$this->tablesSQL) {
             return false;
@@ -1055,7 +1055,7 @@ Committed_AS:   348732 kB
     }
 
 
-    function CreateLogTable()
+    public function createLogTable()
     {
         if (!$this->createTableSQL) {
             return false;
@@ -1069,7 +1069,7 @@ Committed_AS:   348732 kB
         return ($ok) ? true : false;
     }
 
-    function DoSQLForm()
+    public function doSQLForm()
     {
 
 
@@ -1156,13 +1156,13 @@ foreach ($sqla as $sqls) {
 } // foreach
     }
 
-    function SplitSQL($sql)
+    public function splitSQL($sql)
     {
         $arr = explode(';', $sql);
         return $arr;
     }
 
-    function undomq($m)
+    public function undomq($m)
     {
         if (get_magic_quotes_gpc()) {
             // undo the damage
@@ -1199,7 +1199,7 @@ foreach ($sqla as $sqls) {
      * @author Markus Staab
      * @return Returns <code>true</code> on success and <code>false</code> on error
      */
-    function OptimizeTables()
+    public function optimizeTables()
     {
         $args = func_get_args();
         $numArgs = func_num_args();
@@ -1232,7 +1232,7 @@ foreach ($sqla as $sqls) {
      * @author Markus Staab
      * @return Returns <code>true</code> on success and <code>false</code> on error
      */
-    function OptimizeTable($table, $mode = ADODB_OPT_LOW)
+    public function optimizeTable($table, $mode = ADODB_OPT_LOW)
     {
         ADOConnection::outp(sprintf("<p>%s: '%s' not implemented for driver '%s'</p>", __CLASS__, __FUNCTION__, $this->conn->databaseType));
         return false;
@@ -1246,7 +1246,7 @@ foreach ($sqla as $sqls) {
      * @author Markus Staab
      * @return Returns <code>true</code> on success and <code>false</code> on error
      */
-    function optimizeDatabase()
+    public function optimizeDatabase()
     {
         $conn = $this->conn;
         if (!$conn) {

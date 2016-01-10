@@ -24,7 +24,7 @@ if (!defined('ADODB_DIR')) {
     die();
 }
 
-function Lens_ParseTest()
+public function Lens_ParseTest()
 {
     $str = "`zcol ACOL` NUMBER(32,2) DEFAULT "
         . "'The \"cow\" (and Jim''s dog) jumps over the moon' PRIMARY, "
@@ -39,7 +39,7 @@ function Lens_ParseTest()
 
 
 if (!function_exists('ctype_alnum')) {
-    function ctype_alnum($text)
+    public function ctype_alnum($text)
     {
         return preg_match('/^[a-z0-9]*$/i', $text);
     }
@@ -59,7 +59,7 @@ if (!function_exists('ctype_alnum')) {
     @param tokenchars     Include the following characters in tokens apart from A-Z and 0-9
     @returns 2 dimensional array containing parsed tokens.
 */
-function Lens_ParseArgs($args, $endstmtchar = ',', $tokenchars = '_.-')
+public function Lens_ParseArgs($args, $endstmtchar = ',', $tokenchars = '_.-')
 {
     $pos = 0;
     $intoken = false;

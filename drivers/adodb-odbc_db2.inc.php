@@ -101,21 +101,21 @@ if (!defined('ADODB_ODBC_DB2')) {
 
     class ADODB_ODBC_DB2 extends ADODB_odbc
     {
-        var $databaseType = "db2";
-        var $concat_operator = '||';
-        var $sysTime = 'CURRENT TIME';
-        var $sysDate = 'CURRENT DATE';
-        var $sysTimeStamp = 'CURRENT TIMESTAMP';
+        public $databaseType = "db2";
+        public $concat_operator = '||';
+        public $sysTime = 'CURRENT TIME';
+        public $sysDate = 'CURRENT DATE';
+        public $sysTimeStamp = 'CURRENT TIMESTAMP';
         // The complete string representation of a timestamp has the form
         // yyyy-mm-dd-hh.mm.ss.nnnnnn.
-        var $fmtTimeStamp = "'Y-m-d-H.i.s'";
-        var $ansiOuter = true;
-        var $identitySQL = 'values IDENTITY_VAL_LOCAL()';
-        var $_bindInputArray = true;
-         var $hasInsertID = true;
-        var $rsPrefix = 'ADORecordset_odbc_';
+        public $fmtTimeStamp = "'Y-m-d-H.i.s'";
+        public $ansiOuter = true;
+        public $identitySQL = 'values IDENTITY_VAL_LOCAL()';
+        public $_bindInputArray = true;
+         public $hasInsertID = true;
+        public $rsPrefix = 'ADORecordset_odbc_';
 
-        function __construct()
+        protected function __construct()
         {
             if (strncmp(PHP_OS, 'WIN', 3) === 0) {
                 $this->curmode = SQL_CUR_USE_ODBC;
@@ -123,12 +123,12 @@ if (!defined('ADODB_ODBC_DB2')) {
             parent::__construct();
         }
 
-        function IfNull($field, $ifNull)
+        public function ifNull($field, $ifNull)
         {
             return " COALESCE($field, $ifNull) "; // if DB2 UDB
         }
 
-        function ServerInfo()
+        public function serverInfo()
         {
             //odbc_setoption($this->_connectionID,1,101 /*SQL_ATTR_ACCESS_MODE*/, 1 /*SQL_MODE_READ_ONLY*/);
             $vers = $this->GetOne('select versionnumber from sysibm.sysversions');
@@ -136,12 +136,12 @@ if (!defined('ADODB_ODBC_DB2')) {
             return array('description'=>'DB2 ODBC driver', 'version'=>$vers);
         }
 
-        function _insertid()
+        protected function _insertid()
         {
             return $this->GetOne($this->identitySQL);
         }
 
-        function RowLock($tables, $where, $col = '1 as adodbignore')
+        public function rowLock($tables, $where, $col = '1 as adodbignore')
         {
             if ($this->_autocommit) {
                 $this->BeginTrans();
@@ -149,7 +149,7 @@ if (!defined('ADODB_ODBC_DB2')) {
             return $this->GetOne("select $col from $tables where $where for update");
         }
 
-        function MetaTables($ttype = false, $showSchema = false, $qtable = "%", $qschema = "%")
+        public function metaTables($ttype = false, $showSchema = false, $qtable = "%", $qschema = "%")
         {
             global $ADODB_FETCH_MODE;
 
@@ -205,7 +205,7 @@ if (!defined('ADODB_ODBC_DB2')) {
             return $arr2;
         }
 
-        function MetaIndexes($table, $primary = false, $owner = false)
+        public function metaIndexes($table, $primary = false, $owner = false)
         {
             // save old fetch mode
             global $ADODB_FETCH_MODE;
@@ -247,7 +247,7 @@ if (!defined('ADODB_ODBC_DB2')) {
         }
 
         // Format date column in sql string given an input format that understands Y M D
-        function SQLDate($fmt, $col = false)
+        public function sQLDate($fmt, $col = false)
         {
         // use right() and replace() ?
             if (!$col) {
@@ -312,7 +312,7 @@ if (!defined('ADODB_ODBC_DB2')) {
         }
 
 
-        function SelectLimit($sql, $nrows = -1, $offset = -1, $inputArr = false, $secs2cache = 0)
+        public function selectLimit($sql, $nrows = -1, $offset = -1, $inputArr = false, $secs2cache = 0)
         {
             $nrows = (integer) $nrows;
             if ($offset <= 0) {
@@ -339,9 +339,9 @@ if (!defined('ADODB_ODBC_DB2')) {
     class ADORecordSet_odbc_db2 extends ADORecordSet_odbc
     {
 
-        var $databaseType = "db2";
+        public $databaseType = "db2";
 
-        function MetaType($t, $len = -1, $fieldobj = false)
+        public function metaType($t, $len = -1, $fieldobj = false)
         {
             if (is_object($t)) {
                 $fieldobj = $t;

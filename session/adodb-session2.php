@@ -77,7 +77,7 @@ define('ADODB_SESSION2', ADODB_SESSION);
 	3. After urldecode, run the serialized string through this function:
 
 */
-function adodb_unserialize($serialized_string)
+public function adodb_unserialize($serialized_string)
 {
     $variables = array( );
     $a = preg_split("/(\w+)\|/", $serialized_string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -91,7 +91,7 @@ function adodb_unserialize($serialized_string)
 	Thanks Joe Li. See http://phplens.com/lens/lensforum/msgs.php?id=11487&x=1
 	Since adodb 4.61.
 */
-function adodb_session_regenerate_id()
+public function adodb_session_regenerate_id()
 {
     $conn = ADODB_Session::_conn();
     if (!$conn) {
@@ -129,7 +129,7 @@ function adodb_session_regenerate_id()
     @return 0 if failure, 1 if errors, 2 if successful.
 	@author Markus Staab http://www.public-4u.de
 */
-function adodb_session_create_table($schemaFile = null, $conn = null)
+public function adodb_session_create_table($schemaFile = null, $conn = null)
 {
     // set default values
     if ($schemaFile===null) {
@@ -159,7 +159,7 @@ class ADODB_Session
 
     /*
 
-	function Lock($lock=null)
+	public function lock($lock=null)
 	{
 	static $_lock = false;
 
@@ -995,13 +995,13 @@ if (empty($ADODB_SESSION_READONLY)) {
 }
 
 // for backwards compatability only
-function adodb_sess_open($save_path, $session_name, $persist = true)
+public function adodb_sess_open($save_path, $session_name, $persist = true)
 {
     return ADODB_Session::open($save_path, $session_name, $persist);
 }
 
 // for backwards compatability only
-function adodb_sess_gc($t)
+public function adodb_sess_gc($t)
 {
     return ADODB_Session::gc($t);
 }

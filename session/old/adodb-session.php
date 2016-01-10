@@ -79,7 +79,7 @@ To force non-persistent connections, call adodb_session_open first before sessio
 
 	 To do this, define a notification function, say NotifyFn:
 
-	 	function NotifyFn($expireref, $sesskey)
+	 	public function notifyFn($expireref, $sesskey)
 	 	{
 	 	}
 
@@ -112,7 +112,7 @@ if (!defined('ADODB_SESSION')) {
  /*
 	Thanks Joe Li. See http://phplens.com/lens/lensforum/msgs.php?id=11487&x=1
 */
-    function adodb_session_regenerate_id()
+    public function adodb_session_regenerate_id()
     {
         $conn = ADODB_Session::_conn();
         if (!$conn) {
@@ -207,7 +207,7 @@ if (!defined('ADODB_SESSION')) {
 
 	If $ADODB_SESS_CONN already exists, reuse that connection
 \****************************************************************************************/
-    function adodb_sess_open($save_path, $session_name, $persist = true)
+    public function adodb_sess_open($save_path, $session_name, $persist = true)
     {
         global $ADODB_SESS_CONN;
         if (isset($ADODB_SESS_CONN)) {
@@ -252,7 +252,7 @@ if (!defined('ADODB_SESSION')) {
 /****************************************************************************************\
 	Close the connection
 \****************************************************************************************/
-    function adodb_sess_close()
+    public function adodb_sess_close()
     {
         global $ADODB_SESS_CONN;
 
@@ -265,7 +265,7 @@ if (!defined('ADODB_SESSION')) {
 /****************************************************************************************\
 	Slurp in the session variables and return the serialized string
 \****************************************************************************************/
-    function adodb_sess_read($key)
+    public function adodb_sess_read($key)
     {
         global $ADODB_SESS_CONN,$ADODB_SESSION_TBL,$ADODB_SESSION_CRC;
 
@@ -293,7 +293,7 @@ if (!defined('ADODB_SESSION')) {
 
 	If the data has not been modified since adodb_sess_read(), we do not write.
 \****************************************************************************************/
-    function adodb_sess_write($key, $val)
+    public function adodb_sess_write($key, $val)
     {
         global
         $ADODB_SESS_CONN,
@@ -344,7 +344,7 @@ if (!defined('ADODB_SESSION')) {
         return !empty($rs);
     }
 
-    function adodb_sess_destroy($key)
+    public function adodb_sess_destroy($key)
     {
         global $ADODB_SESS_CONN, $ADODB_SESSION_TBL,$ADODB_SESSION_EXPIRE_NOTIFY;
 
@@ -372,7 +372,7 @@ if (!defined('ADODB_SESSION')) {
         return $rs ? true : false;
     }
 
-    function adodb_sess_gc($maxlifetime)
+    public function adodb_sess_gc($maxlifetime)
     {
         global $ADODB_SESS_DEBUG, $ADODB_SESS_CONN, $ADODB_SESSION_TBL,$ADODB_SESSION_EXPIRE_NOTIFY;
 

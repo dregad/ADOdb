@@ -176,7 +176,7 @@ if (!defined('_ADODB_LAYER')) {
     /**
         Accepts $src and $dest arrays, replacing string $data
     */
-    function ADODB_str_replace($src, $dest, $data)
+    public function ADODB_str_replace($src, $dest, $data)
     {
         if (ADODB_PHPVER >= 0x4050) {
             return str_replace($src, $dest, $data);
@@ -192,7 +192,7 @@ if (!defined('_ADODB_LAYER')) {
         return $data;
     }
 
-    function ADODB_Setup()
+    public function ADODB_Setup()
     {
         global
         $ADODB_vers,        // database version
@@ -261,25 +261,25 @@ if (!defined('_ADODB_LAYER')) {
         public $type="";
 /*
 		// additional fields by dannym... (danny_milo@yahoo.com)
-		var $not_null = false;
+		public $not_null = false;
 		// actually, this has already been built-in in the postgres, fbsql AND mysql module? ^-^
 		// so we can as well make not_null standard (leaving it at "false" does not harm anyways)
 
-		var $has_default = false; // this one I have done only in mysql and postgres for now ...
+		public $has_default = false; // this one I have done only in mysql and postgres for now ...
 			// others to come (dannym)
-		var $default_value; // default, if any, and supported. Check has_default first.
+		public $default_value; // default, if any, and supported. Check has_default first.
 */
     }
 
 
-    function _adodb_safedate($s)
+    protected function _adodb_safedate($s)
     {
         return str_replace(array("'", '\\'), '', $s);
     }
 
     // parse date string to prevent injection attack
     // date string will have one quote at beginning e.g. '3434343'
-    function _adodb_safedateq($s)
+    protected function _adodb_safedateq($s)
     {
         $len = strlen($s);
         if ($s[0] !== "'") {
@@ -306,7 +306,7 @@ if (!defined('_ADODB_LAYER')) {
 
     // for transaction handling
 
-    function ADODB_TransMonitor($dbms, $fn, $errno, $errmsg, $p1, $p2, &$thisConnection)
+    public function ADODB_TransMonitor($dbms, $fn, $errno, $errmsg, $p1, $p2, &$thisConnection)
     {
         //print "Errorno ($fn errno=$errno m=$errmsg) ";
         $thisConnection->_transOK = false;
@@ -4956,7 +4956,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
      *
      * @deprecated
      */
-    function ADOLoadDB($dbType)
+    public function aDOLoadDB($dbType)
     {
         return ADOLoadCode($dbType);
     }
@@ -4964,7 +4964,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
     /**
      * Load the code for a specific database driver. Private function. Do not use.
      */
-    function ADOLoadCode($dbType)
+    public function aDOLoadCode($dbType)
     {
         global $ADODB_LASTDB;
 
@@ -5014,7 +5014,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
     /**
      * synonym for ADONewConnection for people like me who cannot remember the correct name
      */
-    function newADOConnection($db = '')
+    public function newADOConnection($db = '')
     {
         $tmp = ADONewConnection($db);
         return $tmp;
@@ -5028,7 +5028,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
      *
      * @return the freshly created instance of the Connection class.
      */
-    function ADONewConnection($db = '')
+    public function aDONewConnection($db = '')
     {
         global $ADODB_NEWCONNECTION, $ADODB_LASTDB;
 
@@ -5251,7 +5251,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
 
 
     // $perf == true means called by NewPerfMonitor(), otherwise for data dictionary
-    function _adodb_getdriver($provider, $drivername, $perf = false)
+    protected function _adodb_getdriver($provider, $drivername, $perf = false)
     {
         switch ($provider) {
             case 'odbtp':
@@ -5305,7 +5305,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
         return $drivername;
     }
 
-    function newPerfMonitor(&$conn)
+    public function newPerfMonitor(&$conn)
     {
         $drivername = _adodb_getdriver($conn->dataProvider, $conn->databaseType, true);
         if (!$drivername || $drivername == 'generic') {
@@ -5322,7 +5322,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
         return $perf;
     }
 
-    function newDataDictionary(&$conn, $drivername = false)
+    public function newDataDictionary(&$conn, $drivername = false)
     {
         if (!$drivername) {
             $drivername = _adodb_getdriver($conn->dataProvider, $conn->databaseType);
@@ -5355,7 +5355,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
     /**
      * Perform a print_r, with pre tags for better formatting.
      */
-    function ADOdb_pr($var, $as_string = false)
+    public function ADOdb_pr($var, $as_string = false)
     {
         if ($as_string) {
             ob_start();
@@ -5383,7 +5383,7 @@ http://www.stanford.edu/dept/itss/docs/oracle/10g/server.101/b10759/statements_1
      *                      $exception->trace array (assumes that print is true then).
      * @param levels        Number of levels to display
      */
-    function ADOdb_backtrace($printOrArr = true, $levels = 9999, $ishtml = null)
+    public function ADOdb_backtrace($printOrArr = true, $levels = 9999, $ishtml = null)
     {
         global $ADODB_INCLUDED_LIB;
         if (empty($ADODB_INCLUDED_LIB)) {

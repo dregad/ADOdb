@@ -22,9 +22,9 @@ if (!defined('ADODB_DIR')) {
 class perf_mysql extends adodb_perf
 {
 
-    var $tablesSQL = 'show table status';
+    public $tablesSQL = 'show table status';
 
-    var $createTableSQL = "CREATE TABLE adodb_logsql (
+    public $createTableSQL = "CREATE TABLE adodb_logsql (
 		  created datetime NOT NULL,
 		  sql0 varchar(250) NOT NULL,
 		  sql1 text NOT NULL,
@@ -33,7 +33,7 @@ class perf_mysql extends adodb_perf
 		  timer decimal(16,6) NOT NULL
 		)";
 
-    var $settings = array(
+    public $settings = array(
     'Ratios',
         'MyISAM cache hit ratio' => array('RATIO',
             '=GetKeyHitRatio',
@@ -86,12 +86,12 @@ class perf_mysql extends adodb_perf
         false
     );
 
-    function __construct(&$conn)
+    protected function __construct(&$conn)
     {
         $this->conn = $conn;
     }
 
-    function Explain($sql, $partial = false)
+    public function explain($sql, $partial = false)
     {
 
         if (strtoupper(substr(trim($sql), 0, 6)) !== 'SELECT') {
@@ -125,7 +125,7 @@ class perf_mysql extends adodb_perf
         return $s;
     }
 
-    function Tables()
+    public function tables()
     {
         if (!$this->tablesSQL) {
             return false;
@@ -140,7 +140,7 @@ class perf_mysql extends adodb_perf
         return $html;
     }
 
-    function GetReads()
+    public function getReads()
     {
         global $ADODB_FETCH_MODE;
         $save = $ADODB_FETCH_MODE;
@@ -175,7 +175,7 @@ class perf_mysql extends adodb_perf
         return $val;
     }
 
-    function GetWrites()
+    public function getWrites()
     {
         global $ADODB_FETCH_MODE;
         $save = $ADODB_FETCH_MODE;
@@ -216,7 +216,7 @@ class perf_mysql extends adodb_perf
         return $val;
     }
 
-    function FindDBHitRatio()
+    public function findDBHitRatio()
     {
         // first find out type of table
         //$this->conn->debug=1;
@@ -252,7 +252,7 @@ class perf_mysql extends adodb_perf
 
     }
 
-    function GetQHitRatio()
+    public function getQHitRatio()
     {
         //Total number of queries = Qcache_inserts + Qcache_hits + Qcache_not_cached
         $hits = $this->_DBParameter(array("show status","Qcache_hits"));
@@ -278,7 +278,7 @@ class perf_mysql extends adodb_perf
 		0.00 reads/s, 0.00 creates/s, 0.00 writes/s
 		No buffer pool activity since the last printout
 	*/
-    function GetInnoDBHitRatio()
+    public function getInnoDBHitRatio()
     {
         global $ADODB_FETCH_MODE;
 
@@ -315,7 +315,7 @@ class perf_mysql extends adodb_perf
         return 0;
     }
 
-    function GetKeyHitRatio()
+    public function getKeyHitRatio()
     {
         $hits = $this->_DBParameter(array("show status","Key_read_requests"));
         $reqs = $this->_DBParameter(array("show status","Key_reads"));
@@ -327,13 +327,13 @@ class perf_mysql extends adodb_perf
     }
 
     // start hack
-    var $optimizeTableLow = 'CHECK TABLE %s FAST QUICK';
-    var $optimizeTableHigh = 'OPTIMIZE TABLE %s';
+    public $optimizeTableLow = 'CHECK TABLE %s FAST QUICK';
+    public $optimizeTableHigh = 'OPTIMIZE TABLE %s';
 
     /**
      * @see adodb_perf#optimizeTable
      */
-    function optimizeTable($table, $mode = ADODB_OPT_LOW)
+    public function optimizeTable($table, $mode = ADODB_OPT_LOW)
     {
         if (!is_string($table)) {
             return false;

@@ -27,7 +27,7 @@
 	Example:
 
 	// ucwords() every element in the recordset
-	function do_ucwords(&$arr,$rs)
+	public function do_ucwords(&$arr,$rs)
 	{
 		foreach($arr as $k => $v) {
 			$arr[$k] = ucwords($v);
@@ -35,7 +35,7 @@
 	}
 	$rs = RSFilter($rs,'do_ucwords');
  */
-function RSFilter($rs, $fn)
+public function rSFilter($rs, $fn)
 {
     if ($rs->databaseType != 'array') {
         if (!$rs->connection) {

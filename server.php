@@ -46,13 +46,13 @@ $sep = ' :::: ';
 include('./adodb.inc.php');
 include_once(ADODB_DIR.'/adodb-csvlib.inc.php');
 
-function err($s)
+public function err($s)
 {
     die('**** '.$s.' ');
 }
 
 // undo stupid magic quotes
-function undomq(&$m)
+public function undomq(&$m)
 {
     if (get_magic_quotes_gpc()) {
         // undo the damage

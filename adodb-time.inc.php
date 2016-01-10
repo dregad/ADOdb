@@ -312,7 +312,7 @@ If the function is defined (somewhere in an include), then you can correct for d
 In this example, we apply daylights savings in June or July, adding one hour. This is extremely
 unrealistic as it does not take into account time-zone, geographic location, current year.
 
-function adodb_daylight_sv(&$arr, $is_gmt)
+public function adodb_daylight_sv(&$arr, $is_gmt)
 {
 	if ($is_gmt) return;
 	$m = $arr['mon'];
@@ -422,7 +422,7 @@ if (!defined('ADODB_ALLOW_NEGATIVE_TS')) {
     define('ADODB_NO_NEGATIVE_TS', 1);
 }
 
-function adodb_date_test_date($y1, $m, $d = 13)
+public function adodb_date_test_date($y1, $m, $d = 13)
 {
     $h = round(rand()% 24);
     $t = adodb_mktime($h, 0, 0, $m, $d, $y1);
@@ -439,7 +439,7 @@ function adodb_date_test_date($y1, $m, $d = 13)
     return true;
 }
 
-function adodb_date_test_strftime($fmt)
+public function adodb_date_test_strftime($fmt)
 {
     $s1 = strftime($fmt);
     $s2 = adodb_strftime($fmt);
@@ -455,7 +455,7 @@ function adodb_date_test_strftime($fmt)
 /**
      Test Suite
 */
-function adodb_date_test()
+public function adodb_date_test()
 {
 
     for ($m=-24; $m<=24; $m++) {
@@ -669,7 +669,7 @@ function adodb_date_test()
     }
 }
 
-function adodb_time()
+public function adodb_time()
 {
     $d = new DateTime();
     return $d->format('U');
@@ -679,7 +679,7 @@ function adodb_time()
     Returns day of week, 0 = Sunday,... 6=Saturday.
     Algorithm from PEAR::Date_Calc
 */
-function adodb_dow($year, $month, $day)
+public function adodb_dow($year, $month, $day)
 {
 /*
 Pope Gregory removed 10 days - October 5 to October 14 - from the year 1582 and
@@ -720,7 +720,7 @@ Thursday, October 4, 1582 (Julian) was followed immediately by Friday, October 1
  Checks for leap year, returns true if it is. No 2-digit year check. Also
  handles julian calendar correctly.
 */
-function _adodb_is_leap_year($year)
+protected function _adodb_is_leap_year($year)
 {
     if ($year % 4 != 0) {
         return false;
@@ -740,7 +740,7 @@ function _adodb_is_leap_year($year)
 /**
  checks for leap year, returns true if it is. Has 2-digit year check
 */
-function adodb_is_leap_year($year)
+public function adodb_is_leap_year($year)
 {
     return  _adodb_is_leap_year(adodb_year_digit_check($year));
 }
@@ -749,7 +749,7 @@ function adodb_is_leap_year($year)
     Fix 2-digit years. Works for any century.
     Assumes that if 2-digit is more than 30 years in future, then previous century.
 */
-function adodb_year_digit_check($y)
+public function adodb_year_digit_check($y)
 {
     if ($y < 100) {
 
@@ -775,7 +775,7 @@ function adodb_year_digit_check($y)
     return $y;
 }
 
-function adodb_get_gmt_diff_ts($ts)
+public function adodb_get_gmt_diff_ts($ts)
 {
     if (0 <= $ts && $ts <= 0x7FFFFFFF) { // check if number in 32-bit signed range) {
         $arr = getdate($ts);
@@ -792,7 +792,7 @@ function adodb_get_gmt_diff_ts($ts)
 /**
  get local time zone offset from GMT. Does not handle historical timezones before 1970.
 */
-function adodb_get_gmt_diff($y, $m, $d)
+public function adodb_get_gmt_diff($y, $m, $d)
 {
     static $TZ,$tzo;
     global $ADODB_DATETIME_CLASS;
@@ -835,7 +835,7 @@ function adodb_get_gmt_diff($y, $m, $d)
 /**
     Returns an array with date info.
 */
-function adodb_getdate($d = false, $fast = false)
+public function adodb_getdate($d = false, $fast = false)
 {
     if ($d === false) {
         return getdate();
@@ -852,7 +852,7 @@ function adodb_getdate($d = false, $fast = false)
 
 /*
 // generate $YRS table for _adodb_getdate()
-function adodb_date_gentable($out=true)
+public function adodb_date_gentable($out=true)
 {
 
 	for ($i=1970; $i >= 1600; $i-=10) {
@@ -874,7 +874,7 @@ echo "<hr />$i ";
 $_month_table_normal = array("",31,28,31,30,31,30,31,31,30,31,30,31);
 $_month_table_leaf = array("",31,29,31,30,31,30,31,31,30,31,30,31);
 
-function adodb_validdate($y, $m, $d)
+public function adodb_validdate($y, $m, $d)
 {
     global $_month_table_normal,$_month_table_leaf;
 
@@ -908,7 +908,7 @@ function adodb_validdate($y, $m, $d)
     $fast flag, which if set to true, will return fewer array values,
     and is much faster as it does not calculate dow, etc.
 */
-function _adodb_getdate($origd = false, $fast = false, $is_gmt = false)
+protected function _adodb_getdate($origd = false, $fast = false, $is_gmt = false)
 {
     static $YRS;
     global $_month_table_normal,$_month_table_leaf;
@@ -1122,7 +1122,7 @@ function _adodb_getdate($origd = false, $fast = false, $is_gmt = false)
 			else
 				$dates .= sprintf('%s%04d',($gmt<0)?'+':'-',abs($gmt)/36);
 			break;*/
-function adodb_tz_offset($gmt, $isphp5)
+public function adodb_tz_offset($gmt, $isphp5)
 {
     $zhrs = abs($gmt)/3600;
     $hrs = floor($zhrs);
@@ -1134,13 +1134,13 @@ function adodb_tz_offset($gmt, $isphp5)
 }
 
 
-function adodb_gmdate($fmt, $d = false)
+public function adodb_gmdate($fmt, $d = false)
 {
     return adodb_date($fmt, $d, true);
 }
 
 // accepts unix timestamp and iso date format in $d
-function adodb_date2($fmt, $d = false, $is_gmt = false)
+public function adodb_date2($fmt, $d = false, $is_gmt = false)
 {
     if ($d !== false) {
         if (!preg_match(
@@ -1170,7 +1170,7 @@ function adodb_date2($fmt, $d = false, $is_gmt = false)
 /**
     Return formatted date based on timestamp $d
 */
-function adodb_date($fmt, $d = false, $is_gmt = false)
+public function adodb_date($fmt, $d = false, $is_gmt = false)
 {
     static $daylight;
     global $ADODB_DATETIME_CLASS;
@@ -1444,7 +1444,7 @@ function adodb_date($fmt, $d = false, $is_gmt = false)
     Returns a timestamp given a GMT/UTC time.
     Note that $is_dst is not implemented and is ignored.
 */
-function adodb_gmmktime($hr, $min, $sec, $mon = false, $day = false, $year = false, $is_dst = false)
+public function adodb_gmmktime($hr, $min, $sec, $mon = false, $day = false, $year = false, $is_dst = false)
 {
     return adodb_mktime($hr, $min, $sec, $mon, $day, $year, $is_dst, true);
 }
@@ -1455,7 +1455,7 @@ function adodb_gmmktime($hr, $min, $sec, $mon = false, $day = false, $year = fal
 
     Not a very fast algorithm - O(n) operation. Could be optimized to O(1).
 */
-function adodb_mktime($hr, $min, $sec, $mon = false, $day = false, $year = false, $is_dst = false, $is_gmt = false)
+public function adodb_mktime($hr, $min, $sec, $mon = false, $day = false, $year = false, $is_dst = false, $is_gmt = false)
 {
     if (!defined('ADODB_TEST_DATES')) {
 
@@ -1569,13 +1569,13 @@ function adodb_mktime($hr, $min, $sec, $mon = false, $day = false, $year = false
     return $ret;
 }
 
-function adodb_gmstrftime($fmt, $ts = false)
+public function adodb_gmstrftime($fmt, $ts = false)
 {
     return adodb_strftime($fmt, $ts, true);
 }
 
 // hack - convert to adodb_date
-function adodb_strftime($fmt, $ts = false, $is_gmt = false)
+public function adodb_strftime($fmt, $ts = false, $is_gmt = false)
 {
     global $ADODB_DATE_LOCALE;
 

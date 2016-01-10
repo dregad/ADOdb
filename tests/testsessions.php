@@ -12,7 +12,7 @@
   Latest version is available at http://adodb.sourceforge.net
 */
 
-function NotifyExpire($ref,$key)
+public function notifyExpire($ref,$key)
 {
 	print "<p><b>Notify Expiring=$ref, sessionkey=$key</b></p>";
 }

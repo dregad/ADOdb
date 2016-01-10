@@ -21,12 +21,12 @@ include_once(ADODB_DIR."/drivers/adodb-ibase.inc.php");
 
 class ADODB_firebird extends ADODB_ibase
 {
-    var $databaseType = "firebird";
-    var $dialect = 3;
+    public $databaseType = "firebird";
+    public $dialect = 3;
 
-    var $sysTimeStamp = "CURRENT_TIMESTAMP"; //"cast('NOW' as timestamp)";
+    public $sysTimeStamp = "CURRENT_TIMESTAMP"; //"cast('NOW' as timestamp)";
 
-    function ServerInfo()
+    public function serverInfo()
     {
         $arr['dialect'] = $this->dialect;
         switch ($arr['dialect']) {
@@ -50,7 +50,7 @@ class ADODB_firebird extends ADODB_ibase
     // Note that Interbase 6.5 uses this ROWS instead - don't you love forking wars!
     // 		SELECT col1, col2 FROM table ROWS 5 -- get 5 rows
     //		SELECT col1, col2 FROM TABLE ORDER BY col1 ROWS 3 TO 7 -- first 5 skip 2
-    function SelectLimit($sql, $nrows = -1, $offset = -1, $inputarr = false, $secs = 0)
+    public function selectLimit($sql, $nrows = -1, $offset = -1, $inputarr = false, $secs = 0)
     {
         $nrows = (integer) $nrows;
         $offset = (integer) $offset;
@@ -75,5 +75,5 @@ class ADODB_firebird extends ADODB_ibase
 class ADORecordSet_firebird extends ADORecordSet_ibase
 {
 
-    var $databaseType = "firebird";
+    public $databaseType = "firebird";
 }

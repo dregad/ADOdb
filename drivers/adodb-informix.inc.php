@@ -24,11 +24,11 @@ include_once(ADODB_DIR.'/drivers/adodb-informix72.inc.php');
 
 class ADODB_informix extends ADODB_informix72
 {
-    var $databaseType = "informix";
-    var $hasTop = 'FIRST';
-    var $ansiOuter = true;
+    public $databaseType = "informix";
+    public $hasTop = 'FIRST';
+    public $ansiOuter = true;
 
-    function IfNull($field, $ifNull)
+    public function ifNull($field, $ifNull)
     {
         return " NVL($field, $ifNull) "; // if Informix 9.X or 10.X
     }
@@ -36,5 +36,5 @@ class ADODB_informix extends ADODB_informix72
 
 class ADORecordset_informix extends ADORecordset_informix72
 {
-    var $databaseType = "informix";
+    public $databaseType = "informix";
 }

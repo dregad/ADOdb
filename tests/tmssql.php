@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('mssql.datetimeconvert',0);
 
-function tmssql()
+public function tmssql()
 {
 	print "<h3>mssql</h3>";
 	$db = mssql_connect('JAGUAR\vsdotnet','adodb','natsoft') or die('No Connection');
@@ -20,7 +20,7 @@ function tmssql()
 
 }
 
-function tpear()
+public function tpear()
 {
 include_once('DB.php');
 
@@ -39,7 +39,7 @@ include_once('DB.php');
 	print "date=".$conn->GetOne('select getdate()')."<br>";
 }
 
-function tadodb()
+public function tadodb()
 {
 include_once('../adodb.inc.php');
 

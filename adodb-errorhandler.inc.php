@@ -34,7 +34,7 @@ if (!defined('ADODB_ERROR_HANDLER')) {
 * @param $p2        $fn specific parameter - see below
 * @param $thisConn  $current connection object - can be false if no connection object created
 */
-function ADODB_Error_Handler($dbms, $fn, $errno, $errmsg, $p1, $p2, &$thisConnection)
+public function ADODB_Error_Handler($dbms, $fn, $errno, $errmsg, $p1, $p2, &$thisConnection)
 {
     if (error_reporting() == 0) {
         return; // obey @ protocol

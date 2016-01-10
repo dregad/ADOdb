@@ -24,42 +24,42 @@ if (!defined('ADODB_DIR')) {
 
 class ADODB_sybase extends ADOConnection
 {
-    var $databaseType = "sybase";
-    var $dataProvider = 'sybase';
-    var $replaceQuote = "''"; // string to use to replace quotes
-    var $fmtDate = "'Y-m-d'";
-    var $fmtTimeStamp = "'Y-m-d H:i:s'";
-    var $hasInsertID = true;
-    var $hasAffectedRows = true;
-    var $metaTablesSQL="select name from sysobjects where type='U' or type='V'";
+    public $databaseType = "sybase";
+    public $dataProvider = 'sybase';
+    public $replaceQuote = "''"; // string to use to replace quotes
+    public $fmtDate = "'Y-m-d'";
+    public $fmtTimeStamp = "'Y-m-d H:i:s'";
+    public $hasInsertID = true;
+    public $hasAffectedRows = true;
+    public $metaTablesSQL="select name from sysobjects where type='U' or type='V'";
     // see http://sybooks.sybase.com/onlinebooks/group-aw/awg0800e/dbrfen8/@ebt-link;pt=5981;uf=0?target=0;window=new;showtoc=true;book=dbrfen8
-    var $metaColumnsSQL = "SELECT c.column_name, c.column_type, c.width FROM syscolumn c, systable t WHERE t.table_name='%s' AND c.table_id=t.table_id AND t.table_type='BASE'";
+    public $metaColumnsSQL = "SELECT c.column_name, c.column_type, c.width FROM syscolumn c, systable t WHERE t.table_name='%s' AND c.table_id=t.table_id AND t.table_type='BASE'";
     /*
 	"select c.name,t.name,c.length from
 	syscolumns c join systypes t on t.xusertype=c.xusertype join sysobjects o on o.id=c.id
 	where o.name='%s'";
 	*/
-    var $concat_operator = '+';
-    var $arrayClass = 'ADORecordSet_array_sybase';
-    var $sysDate = 'GetDate()';
-    var $leftOuter = '*=';
-    var $rightOuter = '=*';
+    public $concat_operator = '+';
+    public $arrayClass = 'ADORecordSet_array_sybase';
+    public $sysDate = 'GetDate()';
+    public $leftOuter = '*=';
+    public $rightOuter = '=*';
 
-    var $port;
+    public $port;
 
     // might require begintrans -- committrans
-    function _insertid()
+    protected function _insertid()
     {
         return $this->GetOne('select @@identity');
     }
       // might require begintrans -- committrans
-    function _affectedrows()
+    protected function _affectedrows()
     {
         return $this->GetOne('select @@rowcount');
     }
 
 
-    function BeginTrans()
+    public function beginTrans()
     {
 
         if ($this->transOff) {
@@ -71,7 +71,7 @@ class ADODB_sybase extends ADOConnection
         return true;
     }
 
-    function CommitTrans($ok = true)
+    public function commitTrans($ok = true)
     {
         if ($this->transOff) {
             return true;
@@ -86,7 +86,7 @@ class ADODB_sybase extends ADOConnection
         return true;
     }
 
-    function RollbackTrans()
+    public function rollbackTrans()
     {
         if ($this->transOff) {
             return true;
@@ -97,7 +97,7 @@ class ADODB_sybase extends ADOConnection
     }
 
     // http://www.isug.com/Sybase_FAQ/ASE/section6.1.html#6.1.4
-    function RowLock($tables, $where, $col = 'top 1 null as ignore')
+    public function rowLock($tables, $where, $col = 'top 1 null as ignore')
     {
         if (!$this->_hastrans) {
             $this->BeginTrans();
@@ -107,7 +107,7 @@ class ADODB_sybase extends ADOConnection
 
     }
 
-    function SelectDB($dbName)
+    public function selectDB($dbName)
     {
         $this->database = $dbName;
         $this->databaseName = $dbName; # obsolete, retained for compat with older adodb versions
@@ -122,7 +122,7 @@ class ADODB_sybase extends ADOConnection
 		Note: This function is NOT available for Microsoft SQL Server.	*/
 
 
-    function ErrorMsg()
+    public function errorMsg()
     {
         if ($this->_logsql) {
             return $this->_errorMsg;
@@ -136,7 +136,7 @@ class ADODB_sybase extends ADOConnection
     }
 
     // returns true or false
-    function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
+    protected function _connect($argHostname, $argUsername, $argPassword, $argDatabasename)
     {
         if (!function_exists('sybase_connect')) {
             return null;
@@ -163,7 +163,7 @@ class ADODB_sybase extends ADOConnection
     }
 
     // returns true or false
-    function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
+    protected function _pconnect($argHostname, $argUsername, $argPassword, $argDatabasename)
     {
         if (!function_exists('sybase_connect')) {
             return null;
@@ -190,7 +190,7 @@ class ADODB_sybase extends ADOConnection
     }
 
     // returns query ID if successful, otherwise false
-    function _query($sql, $inputarr = false)
+    protected function _query($sql, $inputarr = false)
     {
         global $ADODB_COUNTRECS;
 
@@ -202,7 +202,7 @@ class ADODB_sybase extends ADOConnection
     }
 
     // See http://www.isug.com/Sybase_FAQ/ASE/section6.2.html#6.2.12
-    function SelectLimit($sql, $nrows = -1, $offset = -1, $inputarr = false, $secs2cache = 0)
+    public function selectLimit($sql, $nrows = -1, $offset = -1, $inputarr = false, $secs2cache = 0)
     {
         if ($secs2cache > 0) {// we do not cache rowcount, so we have to load entire recordset
             $rs = ADOConnection::SelectLimit($sql, $nrows, $offset, $inputarr, $secs2cache);
@@ -225,17 +225,17 @@ class ADODB_sybase extends ADOConnection
     }
 
     // returns true or false
-    function _close()
+    protected function _close()
     {
         return @sybase_close($this->_connectionID);
     }
 
-    static function UnixDate($v)
+    static function unixDate($v)
     {
         return ADORecordSet_array_sybase::UnixDate($v);
     }
 
-    static function UnixTimeStamp($v)
+    static function unixTimeStamp($v)
     {
         return ADORecordSet_array_sybase::UnixTimeStamp($v);
     }
@@ -246,7 +246,7 @@ class ADODB_sybase extends ADOConnection
     # Used ASA SQL Reference Manual -- http://sybooks.sybase.com/onlinebooks/group-aw/awg0800e/dbrfen8/@ebt-link;pt=16756?target=%25N%15_12018_START_RESTART_N%25
     # to convert similar Microsoft SQL*Server (mssql) API into Sybase compatible version
     // Format date column in sql string given an input format that understands Y M D
-    function SQLDate($fmt, $col = false)
+    public function sQLDate($fmt, $col = false)
     {
         if (!$col) {
             $col = $this->sysTimeStamp;
@@ -312,7 +312,7 @@ class ADODB_sybase extends ADOConnection
     # Added 2003-10-07 by Chris Phillipson
     # Used ASA SQL Reference Manual -- http://sybooks.sybase.com/onlinebooks/group-aw/awg0800e/dbrfen8/@ebt-link;pt=5981;uf=0?target=0;window=new;showtoc=true;book=dbrfen8
     # to convert similar Microsoft SQL*Server (mssql) API into Sybase compatible version
-    function MetaPrimaryKeys($table, $owner = false)
+    public function metaPrimaryKeys($table, $owner = false)
     {
         $sql = "SELECT c.column_name " .
                "FROM syscolumn c, systable t " .
@@ -340,12 +340,12 @@ $ADODB_sybase_mths = array(
 class ADORecordset_sybase extends ADORecordSet
 {
 
-    var $databaseType = "sybase";
-    var $canSeek = true;
+    public $databaseType = "sybase";
+    public $canSeek = true;
     // _mths works only in non-localised system
-    var  $_mths = array('JAN'=>1,'FEB'=>2,'MAR'=>3,'APR'=>4,'MAY'=>5,'JUN'=>6,'JUL'=>7,'AUG'=>8,'SEP'=>9,'OCT'=>10,'NOV'=>11,'DEC'=>12);
+    public  $_mths = array('JAN'=>1,'FEB'=>2,'MAR'=>3,'APR'=>4,'MAY'=>5,'JUN'=>6,'JUL'=>7,'AUG'=>8,'SEP'=>9,'OCT'=>10,'NOV'=>11,'DEC'=>12);
 
-    function __construct($id, $mode = false)
+    protected function __construct($id, $mode = false)
     {
         if ($mode === false) {
             global $ADODB_FETCH_MODE;
@@ -363,7 +363,7 @@ class ADORecordset_sybase extends ADORecordSet
 		Get column information in the Recordset object. fetchField() can be used in order to obtain information about
 		fields in a certain query result. If the field offset isn't specified, the next field that wasn't yet retrieved by
 		fetchField() is retrieved.	*/
-    function FetchField($fieldOffset = -1)
+    public function fetchField($fieldOffset = -1)
     {
         if ($fieldOffset != -1) {
             $o = @sybase_fetch_field($this->_queryID, $fieldOffset);
@@ -377,19 +377,19 @@ class ADORecordset_sybase extends ADORecordSet
         return $o;
     }
 
-    function _initrs()
+    protected function _initrs()
     {
         global $ADODB_COUNTRECS;
         $this->_numOfRows = ($ADODB_COUNTRECS)? @sybase_num_rows($this->_queryID):-1;
         $this->_numOfFields = @sybase_num_fields($this->_queryID);
     }
 
-    function _seek($row)
+    protected function _seek($row)
     {
         return @sybase_data_seek($this->_queryID, $row);
     }
 
-    function _fetch($ignore_fields = false)
+    protected function _fetch($ignore_fields = false)
     {
         if ($this->fetchMode == ADODB_FETCH_NUM) {
             $this->fields = @sybase_fetch_row($this->_queryID);
@@ -413,18 +413,18 @@ class ADORecordset_sybase extends ADORecordSet
 
     /*	close() only needs to be called if you are worried about using too much memory while your script
 		is running. All associated result memory for the specified result identifier will automatically be freed.	*/
-    function _close()
+    protected function _close()
     {
         return @sybase_free_result($this->_queryID);
     }
 
     // sybase/mssql uses a default date like Dec 30 2000 12:00AM
-    static function UnixDate($v)
+    static function unixDate($v)
     {
         return ADORecordSet_array_sybase::UnixDate($v);
     }
 
-    static function UnixTimeStamp($v)
+    static function unixTimeStamp($v)
     {
         return ADORecordSet_array_sybase::UnixTimeStamp($v);
     }
@@ -434,7 +434,7 @@ class ADORecordSet_array_sybase extends ADORecordSet_array
 {
 
     // sybase/mssql uses a default date like Dec 30 2000 12:00AM
-    static function UnixDate($v)
+    static function unixDate($v)
     {
         global $ADODB_sybase_mths;
 
@@ -456,7 +456,7 @@ class ADORecordSet_array_sybase extends ADORecordSet_array
         return  adodb_mktime(0, 0, 0, $themth, $rr[2], $rr[3]);
     }
 
-    static function UnixTimeStamp($v)
+    static function unixTimeStamp($v)
     {
         global $ADODB_sybase_mths;
         //11.02.2001 Toni Tunkkari toni.tunkkari@finebyte.com

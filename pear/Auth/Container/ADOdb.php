@@ -38,20 +38,20 @@ class Auth_Container_ADOdb extends Auth_Container
      * Additional options for the storage container
      * @var array
      */
-    var $options = array();
+    public $options = array();
 
     /**
      * DB object
      * @var object
      */
-    var $db = null;
-    var $dsn = '';
+    public $db = null;
+    public $dsn = '';
 
     /**
      * User that is currently selected from the DB.
      * @var string
      */
-    var $activeUser = '';
+    public $activeUser = '';
 
     // {{{ Constructor
 
@@ -63,7 +63,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @param  string Connection data or DB object
      * @return object Returns an error object if something went wrong
      */
-    function __construct($dsn)
+    protected function __construct($dsn)
     {
         $this->_setDefaults();
 
@@ -89,7 +89,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @param  string DSN string
      * @return mixed  Object on error, otherwise bool
      */
-    function _connect($dsn)
+    protected function _connect($dsn)
     {
         if (is_string($dsn) || is_array($dsn)) {
             if (!$this->db) {
@@ -128,7 +128,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @access private
      * @return mixed True or a DB error object.
      */
-    function _prepare()
+    protected function _prepare()
     {
         if (!$this->db) {
             $res = $this->_connect($this->options['dsn']);
@@ -151,7 +151,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @return mixed  a DB_result object or DB_OK on success, a DB
      *                or PEAR error on failure
      */
-    function query($query)
+    public function query($query)
     {
         $err = $this->_prepare();
         if ($err !== true) {
@@ -169,7 +169,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @access private
      * @return void
      */
-    function _setDefaults()
+    protected function _setDefaults()
     {
         $this->options['db_type']   = 'mysql';
         $this->options['table']       = 'auth';
@@ -189,7 +189,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @access private
      * @param  array
      */
-    function _parseOptions($array)
+    protected function _parseOptions($array)
     {
         foreach ($array as $key => $value) {
             if (isset($this->options[$key])) {
@@ -222,7 +222,7 @@ class Auth_Container_ADOdb extends Auth_Container
      * @param   string Password
      * @return  mixed  Error object or boolean
      */
-    function fetchData($username, $password)
+    public function fetchData($username, $password)
     {
         // Prepare for a database query
         $err = $this->_prepare();
@@ -285,7 +285,7 @@ class Auth_Container_ADOdb extends Auth_Container
     // }}}
     // {{{ listUsers()
 
-    function listUsers()
+    public function listUsers()
     {
         $err = $this->_prepare();
         if ($err !== true) {
@@ -332,7 +332,7 @@ class Auth_Container_ADOdb extends Auth_Container
      *
      * @return mixed True on success, otherwise error object
      */
-    function addUser($username, $password, $additional = "")
+    public function addUser($username, $password, $additional = "")
     {
         if (function_exists($this->options['cryptType'])) {
             $cryptFunction = $this->options['cryptType'];
@@ -381,7 +381,7 @@ class Auth_Container_ADOdb extends Auth_Container
      *
      * @return mixed True on success, otherwise error object
      */
-    function removeUser($username)
+    public function removeUser($username)
     {
         $query = sprintf(
             "DELETE FROM %s WHERE %s = '%s'",
@@ -402,12 +402,12 @@ class Auth_Container_ADOdb extends Auth_Container
     // }}}
 }
 
-function showDbg($string)
+public function showDbg($string)
 {
     print "
 -- $string</P>";
 }
-function dump($var, $str, $vardump = false)
+public function dump($var, $str, $vardump = false)
 {
     print "<H4>$str</H4><pre>";
     ( !$vardump ) ? ( print_r($var)) : ( var_dump($var));

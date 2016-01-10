@@ -29,7 +29,7 @@ if (!defined('ADODB_DB2OCI')) {
  * @param array $p matched patterns
  * return string '?' if parameter replaced, :N if not
  */
-    function _colontrack($p)
+    protected function _colontrack($p)
     {
         global $_COLONARR, $_COLONSZ;
         $v = (integer) substr($p[1], 1);
@@ -46,7 +46,7 @@ if (!defined('ADODB_DB2OCI')) {
  * @param array  $arr parameters
  * @return array
  */
-    function _colonscope($sql, $arr)
+    protected function _colonscope($sql, $arr)
     {
         global $_COLONARR,$_COLONSZ;
 
@@ -68,11 +68,11 @@ if (!defined('ADODB_DB2OCI')) {
 
     class ADODB_db2oci extends ADODB_db2
     {
-        var $databaseType = "db2oci";
-        var $sysTimeStamp = 'sysdate';
-        var $sysDate = 'trunc(sysdate)';
+        public $databaseType = "db2oci";
+        public $sysTimeStamp = 'sysdate';
+        public $sysDate = 'trunc(sysdate)';
 
-        function _Execute($sql, $inputarr = false)
+        protected function _execute($sql, $inputarr = false)
         {
             if ($inputarr) {
                 list($sql,$inputarr) = _colonscope($sql, $inputarr);
@@ -85,7 +85,7 @@ if (!defined('ADODB_DB2OCI')) {
     class ADORecordSet_db2oci extends ADORecordSet_odbc
     {
 
-        var $databaseType = "db2oci";
+        public $databaseType = "db2oci";
     }
 
 } //define

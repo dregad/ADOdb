@@ -15,18 +15,18 @@
 class ADODB_pdo_oci extends ADODB_pdo_base
 {
 
-    var $concat_operator='||';
-    var $sysDate = "TRUNC(SYSDATE)";
-    var $sysTimeStamp = 'SYSDATE';
-    var $NLS_DATE_FORMAT = 'YYYY-MM-DD';  // To include time, use 'RRRR-MM-DD HH24:MI:SS'
-    var $random = "abs(mod(DBMS_RANDOM.RANDOM,10000001)/10000000)";
-    var $metaTablesSQL = "select table_name,table_type from cat where table_type in ('TABLE','VIEW')";
-    var $metaColumnsSQL = "select cname,coltype,width, SCALE, PRECISION, NULLS, DEFAULTVAL from col where tname='%s' order by colno";
+    public $concat_operator='||';
+    public $sysDate = "TRUNC(SYSDATE)";
+    public $sysTimeStamp = 'SYSDATE';
+    public $NLS_DATE_FORMAT = 'YYYY-MM-DD';  // To include time, use 'RRRR-MM-DD HH24:MI:SS'
+    public $random = "abs(mod(DBMS_RANDOM.RANDOM,10000001)/10000000)";
+    public $metaTablesSQL = "select table_name,table_type from cat where table_type in ('TABLE','VIEW')";
+    public $metaColumnsSQL = "select cname,coltype,width, SCALE, PRECISION, NULLS, DEFAULTVAL from col where tname='%s' order by colno";
 
-    var $_initdate = true;
-    var $_hasdual = true;
+    public $_initdate = true;
+    public $_hasdual = true;
 
-    function _init($parentDriver)
+    protected function _init($parentDriver)
     {
         $parentDriver->_bindInputArray = true;
         $parentDriver->_nestedSQL = true;
@@ -35,7 +35,7 @@ class ADODB_pdo_oci extends ADODB_pdo_base
         }
     }
 
-    function MetaTables($ttype = false, $showSchema = false, $mask = false)
+    public function metaTables($ttype = false, $showSchema = false, $mask = false)
     {
         if ($mask) {
             $save = $this->metaTablesSQL;
@@ -50,7 +50,7 @@ class ADODB_pdo_oci extends ADODB_pdo_base
         return $ret;
     }
 
-    function MetaColumns($table, $normalize = true)
+    public function metaColumns($table, $normalize = true)
     {
         global $ADODB_FETCH_MODE;
 

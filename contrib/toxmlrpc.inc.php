@@ -25,7 +25,7 @@ if (!defined('ADODB_DIR')) {
     /**
     * Builds an xmlrpc struct value out of an AdoDB recordset
     */
-function rs2xmlrpcval(&$adodbrs)
+public function rs2xmlrpcval(&$adodbrs)
 {
 
     $header = rs2xmlrpcval_header($adodbrs);
@@ -44,7 +44,7 @@ function rs2xmlrpcval(&$adodbrs)
     /**
     * Builds an xmlrpc struct value describing an AdoDB recordset
     */
-function rs2xmlrpcval_header($adodbrs)
+public function rs2xmlrpcval_header($adodbrs)
 {
     $numfields = $adodbrs->FieldCount();
     $numrecords = $adodbrs->RecordCount();
@@ -93,7 +93,7 @@ function rs2xmlrpcval_header($adodbrs)
     * Builds an xmlrpc struct value out of an AdoDB recordset
     * (data values only, no data definition)
     */
-function rs2xmlrpcval_body($adodbrs)
+public function rs2xmlrpcval_body($adodbrs)
 {
     $numfields = $adodbrs->FieldCount();
 
@@ -132,7 +132,7 @@ function rs2xmlrpcval_body($adodbrs)
     /**
     * Returns an xmlrpc struct value as string out of an AdoDB recordset
     */
-    function rs2xmlrpcstring(&$adodbrs)
+    public function rs2xmlrpcstring(&$adodbrs)
     {
         $xmlrpc = rs2xmlrpcval($adodbrs);
         if ($xmlrpc) {
@@ -147,7 +147,7 @@ function rs2xmlrpcval_body($adodbrs)
     *
     * @todo add some error checking on the input value
     */
-    function xmlrpcval2rs(&$xmlrpcval)
+    public function xmlrpcval2rs(&$xmlrpcval)
     {
 
         $fields_array = array();

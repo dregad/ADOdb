@@ -72,7 +72,7 @@ if (sizeof($_GET) || !isset($_SERVER['HTTP_HOST'])) {
 	ADOLoadCode2("oci8");
 }
 
-function ADOLoadCode2($d)
+public function aDOLoadCode2($d)
 {
 	ADOLoadCode($d);
 	$c = ADONewConnection($d);

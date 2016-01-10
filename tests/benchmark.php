@@ -34,7 +34,7 @@ set_time_limit(240); // increase timeout
 include("../tohtml.inc.php");
 include("../adodb.inc.php");
 
-function testdb(&$db,$createtab="create table ADOXYZ (id int, firstname char(24), lastname char(24), created date)")
+public function testdb(&$db,$createtab="create table ADOXYZ (id int, firstname char(24), lastname char(24), created date)")
 {
 GLOBAL $ADODB_version,$ADODB_FETCH_MODE;
 

@@ -16,7 +16,7 @@
  */
 
 error_reporting(E_ALL);
-function testsql()
+public function testsql()
 {
 
 

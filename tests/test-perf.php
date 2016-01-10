@@ -21,7 +21,7 @@ echo "<h1>Performance Monitoring</h1>";
 include_once('testdatabases.inc.php');
 
 
-function testdb($db)
+public function testdb($db)
 {
 	if (!$db) return;
 	echo "<font size=1>";print_r($db->ServerInfo()); echo " user=".$db->user."</font>";

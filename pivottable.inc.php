@@ -30,7 +30,7 @@
  * @returns			Sql generated
  */
 
-function PivotTableSQL(
+public function pivotTableSQL(
     &$db,
     $tables,
     $rowfields,

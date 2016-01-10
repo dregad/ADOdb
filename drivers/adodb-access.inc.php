@@ -25,17 +25,17 @@ if (!defined('_ADODB_ACCESS')) {
 
     class ADODB_access extends ADODB_odbc
     {
-        var $databaseType = 'access';
-        var $hasTop = 'top';        // support mssql SELECT TOP 10 * FROM TABLE
-        var $fmtDate = "#Y-m-d#";
-        var $fmtTimeStamp = "#Y-m-d h:i:sA#"; // note not comma
-        var $_bindInputArray = false; // strangely enough, setting to true does not work reliably
-        var $sysDate = "FORMAT(NOW,'yyyy-mm-dd')";
-        var $sysTimeStamp = 'NOW';
-        var $hasTransactions = false;
-        var $upperCase = 'ucase';
+        public $databaseType = 'access';
+        public $hasTop = 'top';        // support mssql SELECT TOP 10 * FROM TABLE
+        public $fmtDate = "#Y-m-d#";
+        public $fmtTimeStamp = "#Y-m-d h:i:sA#"; // note not comma
+        public $_bindInputArray = false; // strangely enough, setting to true does not work reliably
+        public $sysDate = "FORMAT(NOW,'yyyy-mm-dd')";
+        public $sysTimeStamp = 'NOW';
+        public $hasTransactions = false;
+        public $upperCase = 'ucase';
 
-        function __construct()
+        protected function __construct()
         {
             global $ADODB_EXTENSION;
 
@@ -43,22 +43,22 @@ if (!defined('_ADODB_ACCESS')) {
             parent::__construct();
         }
 
-        function Time()
+        public function time()
         {
             return time();
         }
 
-        function BeginTrans()
+        public function beginTrans()
         {
             return false;
         }
 
-        function IfNull($field, $ifNull)
+        public function ifNull($field, $ifNull)
         {
             return " IIF(IsNull($field), $ifNull, $field) "; // if Access
         }
     /*
-        function MetaTables()
+        public function metaTables()
         {
         global $ADODB_FETCH_MODE;
 
@@ -86,7 +86,7 @@ if (!defined('_ADODB_ACCESS')) {
     class ADORecordSet_access extends ADORecordSet_odbc
     {
 
-        var $databaseType = "access";
+        public $databaseType = "access";
     } // class
 
 }

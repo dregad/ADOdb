@@ -56,9 +56,9 @@ include_once(ADODB_DIR.'/drivers/adodb-mssql.inc.php');
 
 class ADODB_mssql_n extends ADODB_mssql
 {
-    var $databaseType = "mssql_n";
+    public $databaseType = "mssql_n";
 
-    function _query($sql, $inputarr = false)
+    protected function _query($sql, $inputarr = false)
     {
         $sql = $this->_appendN($sql);
         return ADODB_mssql::_query($sql, $inputarr);
@@ -81,7 +81,7 @@ class ADODB_mssql_n extends ADODB_mssql
      *
      * @return mixed
      */
-    function _appendN($inboundData)
+    protected function _appendN($inboundData)
     {
 
         $inboundIsArray  = false;
@@ -252,5 +252,5 @@ class ADODB_mssql_n extends ADODB_mssql
 
 class ADORecordset_mssql_n extends ADORecordset_mssql
 {
-    var $databaseType = "mssql_n";
+    public $databaseType = "mssql_n";
 }

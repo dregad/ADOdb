@@ -111,7 +111,7 @@ TS_SUBSEC   TS DEFTIMESTAMP
 
 }
 
-function printsqla($dbType,$sqla)
+public function printsqla($dbType,$sqla)
 {
 	print "<pre>";
 	//print_r($dict->MetaTables());

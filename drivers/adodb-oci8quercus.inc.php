@@ -28,8 +28,8 @@ include_once(ADODB_DIR.'/drivers/adodb-oci8.inc.php');
 
 class ADODB_oci8quercus extends ADODB_oci8
 {
-    var $databaseType = 'oci8quercus';
-    var $dataProvider = 'oci8';
+    public $databaseType = 'oci8quercus';
+    public $dataProvider = 'oci8';
 }
 
 /*--------------------------------------------------------------------------------------
@@ -39,9 +39,9 @@ class ADODB_oci8quercus extends ADODB_oci8
 class ADORecordset_oci8quercus extends ADORecordset_oci8
 {
 
-    var $databaseType = 'oci8quercus';
+    public $databaseType = 'oci8quercus';
 
-    function _FetchField($fieldOffset = -1)
+    protected function _fetchField($fieldOffset = -1)
     {
         global $QUERCUS;
         $fld = new ADOFieldObject;

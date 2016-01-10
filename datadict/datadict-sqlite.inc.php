@@ -21,16 +21,16 @@ if (!defined('ADODB_DIR')) {
 
 class ADODB2_sqlite extends ADODB_DataDict
 {
-    var $databaseType = 'sqlite';
-    var $seqField = false;
-    var $addCol=' ADD COLUMN';
-    var $dropTable = 'DROP TABLE IF EXISTS %s';
-    var $dropIndex = 'DROP INDEX IF EXISTS %s';
-    var $renameTable = 'ALTER TABLE %s RENAME TO %s';
+    public $databaseType = 'sqlite';
+    public $seqField = false;
+    public $addCol=' ADD COLUMN';
+    public $dropTable = 'DROP TABLE IF EXISTS %s';
+    public $dropIndex = 'DROP INDEX IF EXISTS %s';
+    public $renameTable = 'ALTER TABLE %s RENAME TO %s';
 
 
 
-    function ActualType($meta)
+    public function actualType($meta)
     {
         switch (strtoupper($meta)) {
             case 'C':
@@ -76,7 +76,7 @@ class ADODB2_sqlite extends ADODB_DataDict
     }
 
     // return string must begin with space
-    function _CreateSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
+    protected function _createSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
     {
         $suffix = '';
         if ($funsigned) {
@@ -97,7 +97,7 @@ class ADODB2_sqlite extends ADODB_DataDict
         return $suffix;
     }
 
-    function AlterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function alterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         if ($this->debug) {
             ADOConnection::outp("AlterColumnSQL not supported natively by SQLite");
@@ -105,7 +105,7 @@ class ADODB2_sqlite extends ADODB_DataDict
         return array();
     }
 
-    function DropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function dropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         if ($this->debug) {
             ADOConnection::outp("DropColumnSQL not supported natively by SQLite");
@@ -113,7 +113,7 @@ class ADODB2_sqlite extends ADODB_DataDict
         return array();
     }
 
-    function RenameColumnSQL($tabname, $oldcolumn, $newcolumn, $flds = '')
+    public function renameColumnSQL($tabname, $oldcolumn, $newcolumn, $flds = '')
     {
         if ($this->debug) {
             ADOConnection::outp("RenameColumnSQL not supported natively by SQLite");

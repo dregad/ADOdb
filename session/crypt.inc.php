@@ -2,7 +2,7 @@
 //	 Session Encryption by Ari Kuorikoski <ari.kuorikoski@finebyte.com>
 class MD5Crypt
 {
-    function keyED($txt, $encrypt_key)
+    public function keyED($txt, $encrypt_key)
     {
             $encrypt_key = md5($encrypt_key);
             $ctr=0;
@@ -17,7 +17,7 @@ class MD5Crypt
             return $tmp;
     }
 
-    function Encrypt($txt, $key)
+    public function encrypt($txt, $key)
     {
             srand((double)microtime()*1000000);
             $encrypt_key = md5(rand(0, 32000));
@@ -34,7 +34,7 @@ class MD5Crypt
             return base64_encode($this->keyED($tmp, $key));
     }
 
-    function Decrypt($txt, $key)
+    public function decrypt($txt, $key)
     {
             $txt = $this->keyED(base64_decode($txt), $key);
             $tmp = "";
@@ -46,7 +46,7 @@ class MD5Crypt
             return $tmp;
     }
 
-    function RandPass()
+    public function randPass()
     {
             $randomPassword = "";
             srand((double)microtime()*1000000);
@@ -66,7 +66,7 @@ class MD5Crypt
 
 class SHA1Crypt
 {
-    function keyED($txt, $encrypt_key)
+    public function keyED($txt, $encrypt_key)
     {
 
             $encrypt_key = sha1($encrypt_key);
@@ -84,7 +84,7 @@ class SHA1Crypt
 
     }
 
-    function Encrypt($txt, $key)
+    public function encrypt($txt, $key)
     {
 
             srand((double)microtime()*1000000);
@@ -112,7 +112,7 @@ class SHA1Crypt
 
 
 
-    function Decrypt($txt, $key)
+    public function decrypt($txt, $key)
     {
 
             $txt = $this->keyED(base64_decode($txt), $key);
@@ -134,7 +134,7 @@ class SHA1Crypt
 
 
 
-    function RandPass()
+    public function randPass()
     {
             $randomPassword = "";
             srand((double)microtime()*1000000);

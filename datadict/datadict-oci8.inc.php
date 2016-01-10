@@ -20,16 +20,16 @@ if (!defined('ADODB_DIR')) {
 class ADODB2_oci8 extends ADODB_DataDict
 {
 
-    var $databaseType = 'oci8';
-    var $seqField = false;
-    var $seqPrefix = 'SEQ_';
-    var $dropTable = "DROP TABLE %s CASCADE CONSTRAINTS";
-    var $trigPrefix = 'TRIG_';
-    var $alterCol = ' MODIFY ';
-    var $typeX = 'VARCHAR(4000)';
-    var $typeXL = 'CLOB';
+    public $databaseType = 'oci8';
+    public $seqField = false;
+    public $seqPrefix = 'SEQ_';
+    public $dropTable = "DROP TABLE %s CASCADE CONSTRAINTS";
+    public $trigPrefix = 'TRIG_';
+    public $alterCol = ' MODIFY ';
+    public $typeX = 'VARCHAR(4000)';
+    public $typeXL = 'CLOB';
 
-    function MetaType($t, $len = -1, $fieldobj = false)
+    public function metaType($t, $len = -1, $fieldobj = false)
     {
         if (is_object($t)) {
             $fieldobj = $t;
@@ -80,7 +80,7 @@ class ADODB2_oci8 extends ADODB_DataDict
         }
     }
 
-    function ActualType($meta)
+    public function actualType($meta)
     {
         switch ($meta) {
             case 'C':
@@ -127,7 +127,7 @@ class ADODB2_oci8 extends ADODB_DataDict
         }
     }
 
-    function CreateDatabase($dbname, $options = false)
+    public function createDatabase($dbname, $options = false)
     {
         $options = $this->_Options($options);
         $password = isset($options['PASSWORD']) ? $options['PASSWORD'] : 'tiger';
@@ -138,7 +138,7 @@ class ADODB2_oci8 extends ADODB_DataDict
         return $sql;
     }
 
-    function AddColumnSQL($tabname, $flds)
+    public function addColumnSQL($tabname, $flds)
     {
         $tabname = $this->TableName($tabname);
         $f = array();
@@ -153,7 +153,7 @@ class ADODB2_oci8 extends ADODB_DataDict
         return $sql;
     }
 
-    function AlterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function alterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         $tabname = $this->TableName($tabname);
         $f = array();
@@ -167,7 +167,7 @@ class ADODB2_oci8 extends ADODB_DataDict
         return $sql;
     }
 
-    function DropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function dropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         if (!is_array($flds)) {
             $flds = explode(',', $flds);
@@ -183,7 +183,7 @@ class ADODB2_oci8 extends ADODB_DataDict
         return $sql;
     }
 
-    function _DropAutoIncrement($t)
+    protected function _dropAutoIncrement($t)
     {
         if (strpos($t, '.') !== false) {
             $tarr = explode('.', $t);
@@ -193,7 +193,7 @@ class ADODB2_oci8 extends ADODB_DataDict
     }
 
     // return string must begin with space
-    function _CreateSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
+    protected function _createSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
     {
         $suffix = '';
 
@@ -229,7 +229,7 @@ begin
 select seqaddress.nextval into :new.A_ID from dual;
 end;
 */
-    function _Triggers($tabname, $tableoptions)
+    protected function _triggers($tabname, $tableoptions)
     {
         if (!$this->seqField) {
             return array();
@@ -296,7 +296,7 @@ end;
 
 
 
-    function _IndexSQL($idxname, $tabname, $flds, $idxoptions)
+    protected function _indexSQL($idxname, $tabname, $flds, $idxoptions)
     {
         $sql = array();
 
@@ -338,14 +338,14 @@ end;
         return $sql;
     }
 
-    function GetCommentSQL($table, $col)
+    public function getCommentSQL($table, $col)
     {
         $table = $this->connection->qstr($table);
         $col = $this->connection->qstr($col);
         return "select comments from USER_COL_COMMENTS where TABLE_NAME=$table and COLUMN_NAME=$col";
     }
 
-    function SetCommentSQL($table, $col, $cmt)
+    public function setCommentSQL($table, $col, $cmt)
     {
         $cmt = $this->connection->qstr($cmt);
         return  "COMMENT ON COLUMN $table.$col IS $cmt";

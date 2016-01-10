@@ -46,7 +46,7 @@ $ADODB_Last_PEAR_Error = false;
 * @param $p1        $fn specific parameter - see below
 * @param $P2        $fn specific parameter - see below
     */
-function ADODB_Error_PEAR($dbms, $fn, $errno, $errmsg, $p1 = false, $p2 = false)
+public function ADODB_Error_PEAR($dbms, $fn, $errno, $errmsg, $p1 = false, $p2 = false)
 {
     global $ADODB_Last_PEAR_Error;
 
@@ -86,7 +86,7 @@ function ADODB_Error_PEAR($dbms, $fn, $errno, $errmsg, $p1 = false, $p2 = false)
 * Returns last PEAR_Error object. This error might be for an error that
 * occured several sql statements ago.
 */
-function ADODB_PEAR_Error()
+public function ADODB_PEAR_Error()
 {
     global $ADODB_Last_PEAR_Error;
 

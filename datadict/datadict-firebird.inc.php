@@ -15,12 +15,12 @@
 class ADODB2_firebird extends ADODB_DataDict
 {
 
-    var $databaseType = 'firebird';
-    var $seqField = false;
-    var $seqPrefix = 'gen_';
-    var $blobSize = 40000;
+    public $databaseType = 'firebird';
+    public $seqField = false;
+    public $seqPrefix = 'gen_';
+    public $blobSize = 40000;
 
-    function ActualType($meta)
+    public function actualType($meta)
     {
         switch ($meta) {
             case 'C':
@@ -66,7 +66,7 @@ class ADODB2_firebird extends ADODB_DataDict
         }
     }
 
-    function NameQuote($name = null)
+    public function nameQuote($name = null)
     {
         if (!is_string($name)) {
             return false;
@@ -93,7 +93,7 @@ class ADODB2_firebird extends ADODB_DataDict
         return $quote . $name . $quote;
     }
 
-    function CreateDatabase($dbname, $options = false)
+    public function createDatabase($dbname, $options = false)
     {
         $options = $this->_Options($options);
         $sql = array();
@@ -103,7 +103,7 @@ class ADODB2_firebird extends ADODB_DataDict
         return $sql;
     }
 
-    function _DropAutoIncrement($t)
+    protected function _dropAutoIncrement($t)
     {
         if (strpos($t, '.') !== false) {
             $tarr = explode('.', $t);
@@ -113,7 +113,7 @@ class ADODB2_firebird extends ADODB_DataDict
     }
 
 
-    function _CreateSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
+    protected function _createSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
     {
         $suffix = '';
 
@@ -142,7 +142,7 @@ IF ( NEW."seqField" IS NULL OR NEW."seqField" = 0 ) THEN
   NEW."seqField" = GEN_ID("GEN_tabname", 1);
 end;
 */
-    function _Triggers($tabname, $tableoptions)
+    protected function _triggers($tabname, $tableoptions)
     {
         if (!$this->seqField) {
             return array();

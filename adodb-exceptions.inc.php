@@ -23,14 +23,14 @@ define('ADODB_ERROR_HANDLER', 'adodb_throw');
 
 class ADODB_Exception extends Exception
 {
-    var $dbms;
-    var $fn;
-    var $sql = '';
-    var $params = '';
-    var $host = '';
-    var $database = '';
+    public $dbms;
+    public $fn;
+    public $sql = '';
+    public $params = '';
+    public $host = '';
+    public $database = '';
 
-    function __construct($dbms, $fn, $errno, $errmsg, $p1, $p2, $thisConnection)
+    protected function __construct($dbms, $fn, $errno, $errmsg, $p1, $p2, $thisConnection)
     {
         switch ($fn) {
             case 'EXECUTE':
@@ -75,7 +75,7 @@ class ADODB_Exception extends Exception
 * @param $P2        $fn specific parameter - see below
 */
 
-function adodb_throw($dbms, $fn, $errno, $errmsg, $p1, $p2, $thisConnection)
+public function adodb_throw($dbms, $fn, $errno, $errmsg, $p1, $p2, $thisConnection)
 {
     global $ADODB_EXCEPTION;
 

@@ -57,48 +57,48 @@ First release
 
 class ADODB_Replicate
 {
-    var $connSrc;
-    var $connDest;
+    public $connSrc;
+    public $connDest;
 
-    var $connSrc2 = false;
-    var $connDest2 = false;
-    var $ddSrc;
-    var $ddDest;
+    public $connSrc2 = false;
+    public $connDest2 = false;
+    public $ddSrc;
+    public $ddDest;
 
-    var $execute = false;
-    var $debug = false;
-    var $deleteFirst = false;
-    var $commitReplicate = true; // commit at end of replicatedata
-    var $commitRecs = -1; // only commit at end of ReplicateData()
+    public $execute = false;
+    public $debug = false;
+    public $deleteFirst = false;
+    public $commitReplicate = true; // commit at end of replicatedata
+    public $commitRecs = -1; // only commit at end of ReplicateData()
 
-    var $selFilter = false;
-    var $fieldFilter = false;
-    var $indexFilter = false;
-    var $updateFilter = false;
-    var $insertFilter = false;
-    var $updateSrcFn = false;
+    public $selFilter = false;
+    public $fieldFilter = false;
+    public $indexFilter = false;
+    public $updateFilter = false;
+    public $insertFilter = false;
+    public $updateSrcFn = false;
 
-    var $limitRecs = false;
+    public $limitRecs = false;
 
-    var $neverAbort = true;
-    var $copyTableDefaults = false; // turn off because functions defined as defaults will not work when copied
-    var $errHandler = false; // name of error handler function, if used.
-    var $htmlSpecialChars = true;   // if execute false, then output with htmlspecialchars enabled.
+    public $neverAbort = true;
+    public $copyTableDefaults = false; // turn off because functions defined as defaults will not work when copied
+    public $errHandler = false; // name of error handler function, if used.
+    public $htmlSpecialChars = true;   // if execute false, then output with htmlspecialchars enabled.
                                     // Will autoconfigure itself. No need to modify
 
-    var $trgSuffix = '_mrgTr';
-    var $idxSuffix = '_mrgidx';
-    var $trLogic = '1 = 1';
-    var $datesAreTimeStamps = false;
+    public $trgSuffix = '_mrgTr';
+    public $idxSuffix = '_mrgidx';
+    public $trLogic = '1 = 1';
+    public $datesAreTimeStamps = false;
 
-    var $oracleSequence = false;
-    var $readUncommitted = false;  // read without obeying shared locks for fast select (mssql)
+    public $oracleSequence = false;
+    public $readUncommitted = false;  // read without obeying shared locks for fast select (mssql)
 
-    var $compat = false;
+    public $compat = false;
     // connSrc2 and connDest2 are only required if the db driver
     // does not allow updates back to src db in first connection (the select connection),
     // so we need 2nd connection
-    function __construct($connSrc, $connDest, $connSrc2 = false, $connDest2 = false)
+    protected function __construct($connSrc, $connDest, $connSrc2 = false, $connDest2 = false)
     {
 
         if (strpos($connSrc->databaseType, 'odbtp') !== false) {
@@ -120,7 +120,7 @@ class ADODB_Replicate
         $this->htmlSpecialChars = isset($_SERVER['HTTP_HOST']);
     }
 
-    function ExecSQL($sql)
+    public function execSQL($sql)
     {
         if (!is_array($sql)) {
             $sql[] = $sql;
@@ -151,7 +151,7 @@ class ADODB_Replicate
 		Also $table and desttable can have different names.
 	*/
 
-    function CopyTableStruct($table, $desttable = '')
+    public function copyTableStruct($table, $desttable = '')
     {
         $sql = $this->CopyTableStructSQL($table, $desttable);
         if (empty($sql)) {
@@ -160,7 +160,7 @@ class ADODB_Replicate
         return $this->ExecSQL($sql);
     }
 
-    function RunFieldFilter(&$fld, $mode = '')
+    public function runFieldFilter(&$fld, $mode = '')
     {
         if ($this->fieldFilter) {
             $fn = $this->fieldFilter;
@@ -170,7 +170,7 @@ class ADODB_Replicate
         }
     }
 
-    function RunUpdateFilter($table, $fld, $val)
+    public function runUpdateFilter($table, $fld, $val)
     {
         if ($this->updateFilter) {
             $fn = $this->updateFilter;
@@ -180,7 +180,7 @@ class ADODB_Replicate
         }
     }
 
-    function RunInsertFilter($table, $fld, &$val)
+    public function runInsertFilter($table, $fld, &$val)
     {
         if ($this->insertFilter) {
             $fn = $this->insertFilter;
@@ -197,7 +197,7 @@ class ADODB_Replicate
 		if the rec was modified after replicatedata retrieves the data but before we update back the src record,
 		we don't set the copiedflag='Y' yet.
 	*/
-    function RunUpdateSrcFn($srcdb, $table, $fldoffsets, $row, $where, $mode, $dest_insertid = null, $lastUpdateFld = '')
+    public function runUpdateSrcFn($srcdb, $table, $fldoffsets, $row, $where, $mode, $dest_insertid = null, $lastUpdateFld = '')
     {
         if (!$this->updateSrcFn) {
             return;
@@ -247,7 +247,7 @@ class ADODB_Replicate
 
     }
 
-    function CopyTableStructSQL($table, $desttable = '', $dropdest = false)
+    public function copyTableStructSQL($table, $desttable = '', $dropdest = false)
     {
         if (!$desttable) {
             $desttable = $table;
@@ -353,17 +353,17 @@ class ADODB_Replicate
         return $sqla;
     }
 
-    function _clearcache()
+    protected function _clearcache()
     {
 
     }
 
-    function _concat($v)
+    protected function _concat($v)
     {
         return $this->connDest->concat("' ", "chr(".ord($v).")", "'");
     }
 
-    function fixupbinary($v)
+    public function fixupbinary($v)
     {
         return str_replace(
             array("\r","\n"),
@@ -372,7 +372,7 @@ class ADODB_Replicate
         );
     }
 
-    function SwapDBs()
+    public function swapDBs()
     {
         $o = $this->connSrc;
         $this->connSrc = $this->connDest;
@@ -477,7 +477,7 @@ class ADODB_Replicate
 		$rep->filterSelect = 'filter';
 		$rep->ReplicateData(...);
 
-		function filter($table,& $fields, $deleteFirst)
+		public function filter($table,& $fields, $deleteFirst)
 		{
 			if ($table == 'SOMETABLE') {
 				if ($fields[2] == 'T') $fields[2] = 'Y';
@@ -498,7 +498,7 @@ class ADODB_Replicate
 
 		$rep->fieldFilter = 'ffilter';
 
-			function ffilter(&$fld,$mode)
+			public function ffilter(&$fld,$mode)
 			{
 				$uf = strtoupper($fld);
 				switch($uf) {
@@ -522,7 +522,7 @@ class ADODB_Replicate
 
 		$rep->updateFilter = 'ufilter';
 
-		function ufilter($table, $fld, $val)
+		public function ufilter($table, $fld, $val)
 		{
 			return "nvl($fld, $val)";
 		}
@@ -575,7 +575,7 @@ class ADODB_Replicate
 	*/
 
 
-    function ReplicateData(
+    public function replicateData(
         $table,
         $desttable = '',
         $uniqflds = array(),
@@ -1107,7 +1107,7 @@ word-wrap: break-word; /* Internet Explorer 5.5+ */
     }
     // trigger support only for sql server and oracle
     // need to add
-    function MergeSrcSetup(
+    public function mergeSrcSetup(
         $srcTable,
         $pkeys,
         $srcUpdateDateFld,
@@ -1247,7 +1247,7 @@ END;
 	*/
 
 
-    function Merge(
+    public function merge(
         $srcTable,
         $dstTable,
         $pkeys,
@@ -1344,7 +1344,7 @@ END;
 			$rep->MergeDone()
 	*/
 
-    function MergeDone(
+    public function mergeDone(
         $srcTable,
         $dstTable,
         $pkeys,
@@ -1380,7 +1380,7 @@ END;
             );
     }
 
-    function _doerr($reason, $selflds)
+    protected function _doerr($reason, $selflds)
     {
         $fn = $this->errHandler;
         if ($fn) {

@@ -24,7 +24,7 @@ if (!defined('ADODB_DIR')) {
 // SELECT * FROM TABLE(SNAPSHOT_APPL('SAMPLE', -1)) as t
 class perf_db2 extends adodb_perf
 {
-    var $createTableSQL = "CREATE TABLE adodb_logsql (
+    public $createTableSQL = "CREATE TABLE adodb_logsql (
 		  created TIMESTAMP NOT NULL,
 		  sql0 varchar(250) NOT NULL,
 		  sql1 varchar(4000) NOT NULL,
@@ -33,7 +33,7 @@ class perf_db2 extends adodb_perf
 		  timer decimal(16,6) NOT NULL
 		)";
 
-    var $settings = array(
+    public $settings = array(
     'Ratios',
         'data cache hit ratio' => array('RATIO',
             "SELECT
@@ -61,12 +61,12 @@ class perf_db2 extends adodb_perf
     );
 
 
-    function __construct(&$conn)
+    protected function __construct(&$conn)
     {
         $this->conn = $conn;
     }
 
-    function Explain($sql, $partial = false)
+    public function explain($sql, $partial = false)
     {
         $save = $this->conn->LogSQL(false);
         if ($partial) {
@@ -106,7 +106,7 @@ class perf_db2 extends adodb_perf
      * @param int $throwaway discarded variable to match the parent method
      * @return string The formatted table list
      */
-    function Tables($throwaway = 0)
+    public function tables($throwaway = 0)
     {
         $rs = $this->conn->Execute("select tabschema,tabname,card as rows,
 			npages pages_used,fpages pages_allocated, tbspace tablespace

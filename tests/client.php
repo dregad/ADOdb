@@ -21,7 +21,7 @@
 include('../adodb.inc.php');
 include('../tohtml.inc.php');
 
- function send2server($url,$sql)
+ public function send2server($url,$sql)
  {
 	$url .= '?sql='.urlencode($sql);
 	print "<p>$url</p>";
@@ -30,7 +30,7 @@ include('../tohtml.inc.php');
 	return $rs;
  }
 
- function print_pre($s)
+ public function print_pre($s)
  {
  	print "<pre>";print_r($s);print "</pre>";
  }

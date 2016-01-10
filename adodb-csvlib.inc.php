@@ -35,7 +35,7 @@ $ADODB_INCLUDED_CSV = 1;
      *
      * @return  the CSV formated data
      */
-function _rs2serialize(&$rs, $conn = false, $sql = '')
+protected function _rs2serialize(&$rs, $conn = false, $sql = '')
 {
     $max = ($rs) ? $rs->FieldCount() : 0;
 
@@ -98,7 +98,7 @@ function _rs2serialize(&$rs, $conn = false, $sql = '')
 *           error occurred in sql INSERT/UPDATE/DELETE,
 *           empty recordset is returned
 */
-function csv2rs($url, &$err, $timeout = 0, $rsclass = 'ADORecordSet_array')
+public function csv2rs($url, &$err, $timeout = 0, $rsclass = 'ADORecordSet_array')
 {
     $false = false;
     $err = false;
@@ -274,7 +274,7 @@ function csv2rs($url, &$err, $timeout = 0, $rsclass = 'ADORecordSet_array')
     * Save a file $filename and its $contents (normally for caching) with file locking
     * Returns true if ok, false if fopen/fwrite error, 0 if rename error (eg. file is locked)
     */
-function adodb_write_file($filename, $contents, $debug = false)
+public function adodb_write_file($filename, $contents, $debug = false)
 {
     # http://www.php.net/bugs.php?id=9203 Bug that flock fails on Windows
     # So to simulate locking, we assume that rename is an atomic operation.

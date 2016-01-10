@@ -22,13 +22,13 @@ if (! defined("_ADODB_PROXY_LAYER")) {
 
     class ADODB_proxy extends ADODB_csv
     {
-        var $databaseType = 'proxy';
-        var $databaseProvider = 'csv';
+        public $databaseType = 'proxy';
+        public $databaseProvider = 'csv';
     }
 
     class ADORecordset_proxy extends ADORecordset_csv
     {
-        var $databaseType = "proxy";
+        public $databaseType = "proxy";
     }
 
 } // define

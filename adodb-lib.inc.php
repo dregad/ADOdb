@@ -19,7 +19,7 @@ $ADODB_INCLUDED_LIB = 1;
   Less commonly used functions are placed here to reduce size of adodb.inc.php.
 */
 
-function adodb_strip_order_by($sql)
+public function adodb_strip_order_by($sql)
 {
     $rez = preg_match('/(\sORDER\s+BY\s(?:[^)](?!LIMIT))*)/is', $sql, $arr);
     if ($arr) {
@@ -51,7 +51,7 @@ if (false) {
     die(adodb_strip_order_by($sql));
 }
 
-function adodb_probetypes(&$array, &$types, $probe = 8)
+public function adodb_probetypes(&$array, &$types, $probe = 8)
 {
 // probe and guess the type
     $types = array();
@@ -108,7 +108,7 @@ function adodb_probetypes(&$array, &$types, $probe = 8)
 
 }
 
-function adodb_transpose(&$arr, &$newarr, &$hdr, &$fobjs)
+public function adodb_transpose(&$arr, &$newarr, &$hdr, &$fobjs)
 {
     $oldX = sizeof(reset($arr));
     $oldY = sizeof($arr);
@@ -139,7 +139,7 @@ function adodb_transpose(&$arr, &$newarr, &$hdr, &$fobjs)
 
 // Force key to upper.
 // See also http://www.php.net/manual/en/function.array-change-key-case.php
-function _array_change_key_case($an_array)
+protected function _array_change_key_case($an_array)
 {
     if (is_array($an_array)) {
         $new_array = array();
@@ -153,7 +153,7 @@ function _array_change_key_case($an_array)
     return $an_array;
 }
 
-function _adodb_replace(&$zthis, $table, $fieldArray, $keyCol, $autoQuote, $has_autoinc)
+protected function _adodb_replace(&$zthis, $table, $fieldArray, $keyCol, $autoQuote, $has_autoinc)
 {
     if (count($fieldArray) == 0) {
         return 0;
@@ -248,7 +248,7 @@ function _adodb_replace(&$zthis, $table, $fieldArray, $keyCol, $autoQuote, $has_
 }
 
 // Requires $ADODB_FETCH_MODE = ADODB_FETCH_NUM
-function _adodb_getmenu(
+protected function _adodb_getmenu(
     &$zthis,
     $name,
     $defstr = '',
@@ -360,7 +360,7 @@ function _adodb_getmenu(
 }
 
 // Requires $ADODB_FETCH_MODE = ADODB_FETCH_NUM
-function _adodb_getmenu_gp(
+protected function _adodb_getmenu_gp(
     &$zthis,
     $name,
     $defstr = '',
@@ -484,7 +484,7 @@ function _adodb_getmenu_gp(
 	$cnt = _adodb_getcount($conn, $sql);
 
 */
-function _adodb_getcount(&$zthis, $sql, $inputarr = false, $secs2cache = 0)
+protected function _adodb_getcount(&$zthis, $sql, $inputarr = false, $secs2cache = 0)
 {
     $qryRecs = 0;
 
@@ -598,7 +598,7 @@ function _adodb_getcount(&$zthis, $sql, $inputarr = false, $secs2cache = 0)
 	data will get out of synch. use CachePageExecute() only with tables that
 	rarely change.
 */
-function _adodb_pageexecute_all_rows(
+protected function _adodb_pageexecute_all_rows(
     &$zthis,
     $sql,
     $nrows,
@@ -661,7 +661,7 @@ function _adodb_pageexecute_all_rows(
 }
 
 // Iván Oliva version
-function _adodb_pageexecute_no_last_page(&$zthis, $sql, $nrows, $page, $inputarr = false, $secs2cache = 0)
+protected function _adodb_pageexecute_no_last_page(&$zthis, $sql, $nrows, $page, $inputarr = false, $secs2cache = 0)
 {
 
     $atfirstpage = false;
@@ -751,7 +751,7 @@ function _adodb_pageexecute_no_last_page(&$zthis, $sql, $nrows, $page, $inputarr
     return $rsreturn;
 }
 
-function _adodb_getupdatesql(&$zthis, &$rs, $arrFields, $forceUpdate = false, $magicq = false, $force = 2)
+protected function _adodb_getupdatesql(&$zthis, &$rs, $arrFields, $forceUpdate = false, $magicq = false, $force = 2)
 {
     global $ADODB_QUOTE_FIELDNAMES;
 
@@ -921,7 +921,7 @@ function _adodb_getupdatesql(&$zthis, &$rs, $arrFields, $forceUpdate = false, $m
     }
 }
 
-function adodb_key_exists($key, &$arr, $force = 2)
+public function adodb_key_exists($key, &$arr, $force = 2)
 {
     if ($force<=0) {
         // the following is the old behaviour where null or empty fields are ignored
@@ -945,7 +945,7 @@ function adodb_key_exists($key, &$arr, $force = 2)
  *
  *
  */
-function _adodb_getinsertsql(&$zthis, &$rs, $arrFields, $magicq = false, $force = 2)
+protected function _adodb_getinsertsql(&$zthis, &$rs, $arrFields, $magicq = false, $force = 2)
 {
     static $cacheRS = false;
     static $cacheSig = 0;
@@ -1123,7 +1123,7 @@ function _adodb_getinsertsql(&$zthis, &$rs, $arrFields, $magicq = false, $force 
  * @return string
  *
  */
-function _adodb_column_sql_oci8(&$zthis, $action, $type, $fname, $fnameq, $arrFields, $magicq)
+protected function _adodb_column_sql_oci8(&$zthis, $action, $type, $fname, $fnameq, $arrFields, $magicq)
 {
     $sql = '';
 
@@ -1190,7 +1190,7 @@ function _adodb_column_sql_oci8(&$zthis, $action, $type, $fname, $fnameq, $arrFi
     return $sql;
 }
 
-function _adodb_column_sql(&$zthis, $action, $type, $fname, $fnameq, $arrFields, $magicq, $recurse = true)
+protected function _adodb_column_sql(&$zthis, $action, $type, $fname, $fnameq, $arrFields, $magicq, $recurse = true)
 {
 
     if ($recurse) {
@@ -1255,7 +1255,7 @@ function _adodb_column_sql(&$zthis, $action, $type, $fname, $fnameq, $arrFields,
 
 
 
-function _adodb_debug_execute(&$zthis, $sql, $inputarr)
+protected function _adodb_debug_execute(&$zthis, $sql, $inputarr)
 {
     $ss = '';
     if ($inputarr) {
@@ -1337,7 +1337,7 @@ function _adodb_debug_execute(&$zthis, $sql, $inputarr)
 }
 
 # pretty print the debug_backtrace function
-function _adodb_backtrace($printOrArr = true, $levels = 9999, $skippy = 0, $ishtml = null)
+protected function _adodb_backtrace($printOrArr = true, $levels = 9999, $skippy = 0, $ishtml = null)
 {
     if (!function_exists('debug_backtrace')) {
         return '';
@@ -1423,7 +1423,7 @@ function _adodb_backtrace($printOrArr = true, $levels = 9999, $skippy = 0, $isht
     return $s;
 }
 /*
-function _adodb_find_from($sql)
+protected function _adodb_find_from($sql)
 {
 
 	$sql = str_replace(array("\n","\r"), ' ', $sql);

@@ -21,11 +21,11 @@ if (!defined('ADODB_DIR')) {
 class ADODB2_sapdb extends ADODB_DataDict
 {
 
-    var $databaseType = 'sapdb';
-    var $seqField = false;
-    var $renameColumn = 'RENAME COLUMN %s.%s TO %s';
+    public $databaseType = 'sapdb';
+    public $seqField = false;
+    public $renameColumn = 'RENAME COLUMN %s.%s TO %s';
 
-    function ActualType($meta)
+    public function actualType($meta)
     {
         switch ($meta) {
             case 'C':
@@ -70,7 +70,7 @@ class ADODB2_sapdb extends ADODB_DataDict
         }
     }
 
-    function MetaType($t, $len = -1, $fieldobj = false)
+    public function metaType($t, $len = -1, $fieldobj = false)
     {
         if (is_object($t)) {
             $fieldobj = $t;
@@ -103,7 +103,7 @@ class ADODB2_sapdb extends ADODB_DataDict
     }
 
     // return string must begin with space
-    function _CreateSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
+    protected function _createSuffix($fname, &$ftype, $fnotnull, $fdefault, $fautoinc, $fconstraint, $funsigned)
     {
         $suffix = '';
         if ($funsigned) {
@@ -123,7 +123,7 @@ class ADODB2_sapdb extends ADODB_DataDict
         return $suffix;
     }
 
-    function AddColumnSQL($tabname, $flds)
+    public function addColumnSQL($tabname, $flds)
     {
         $tabname = $this->TableName($tabname);
         $sql = array();
@@ -131,7 +131,7 @@ class ADODB2_sapdb extends ADODB_DataDict
         return array( 'ALTER TABLE ' . $tabname . ' ADD (' . implode(', ', $lines) . ')' );
     }
 
-    function AlterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function alterColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         $tabname = $this->TableName($tabname);
         $sql = array();
@@ -139,7 +139,7 @@ class ADODB2_sapdb extends ADODB_DataDict
         return array( 'ALTER TABLE ' . $tabname . ' MODIFY (' . implode(', ', $lines) . ')' );
     }
 
-    function DropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
+    public function dropColumnSQL($tabname, $flds, $tableflds = '', $tableoptions = '')
     {
         $tabname = $this->TableName($tabname);
         if (!is_array($flds)) {

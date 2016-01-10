@@ -48,35 +48,35 @@ if (!defined('ADODB_DIR')) {
 
 class ADODB_ads extends ADOConnection
 {
-    var $databaseType = "ads";
-    var $fmt = "'m-d-Y'";
-    var $fmtTimeStamp = "'Y-m-d H:i:s'";
-        var $concat_operator = '';
-    var $replaceQuote = "''"; // string to use to replace quotes
-    var $dataProvider = "ads";
-    var $hasAffectedRows = true;
-    var $binmode = ODBC_BINMODE_RETURN;
-    var $useFetchArray = false; // setting this to true will make array elements in FETCH_ASSOC mode case-sensitive
+    public $databaseType = "ads";
+    public $fmt = "'m-d-Y'";
+    public $fmtTimeStamp = "'Y-m-d H:i:s'";
+        public $concat_operator = '';
+    public $replaceQuote = "''"; // string to use to replace quotes
+    public $dataProvider = "ads";
+    public $hasAffectedRows = true;
+    public $binmode = ODBC_BINMODE_RETURN;
+    public $useFetchArray = false; // setting this to true will make array elements in FETCH_ASSOC mode case-sensitive
                         // breaking backward-compat
   //var $longreadlen = 8000; // default number of chars to return for a Blob/Long field
-    var $_bindInputArray = false;
-    var $curmode = SQL_CUR_USE_DRIVER; // See sqlext.h, SQL_CUR_DEFAULT == SQL_CUR_USE_DRIVER == 2L
-    var $_genSeqSQL = "create table %s (id integer)";
-    var $_autocommit = true;
-    var $_haserrorfunctions = true;
-    var $_has_stupid_odbc_fetch_api_change = true;
-    var $_lastAffectedRows = 0;
-    var $uCaseTables = true; // for meta* functions, uppercase table names
+    public $_bindInputArray = false;
+    public $curmode = SQL_CUR_USE_DRIVER; // See sqlext.h, SQL_CUR_DEFAULT == SQL_CUR_USE_DRIVER == 2L
+    public $_genSeqSQL = "create table %s (id integer)";
+    public $_autocommit = true;
+    public $_haserrorfunctions = true;
+    public $_has_stupid_odbc_fetch_api_change = true;
+    public $_lastAffectedRows = 0;
+    public $uCaseTables = true; // for meta* functions, uppercase table names
 
 
-    function __construct()
+    protected function __construct()
     {
         $this->_haserrorfunctions = ADODB_PHPVER >= 0x4050;
         $this->_has_stupid_odbc_fetch_api_change = ADODB_PHPVER >= 0x4200;
     }
 
   // returns true or false
-    function _connect($argDSN, $argUsername, $argPassword, $argDatabasename)
+    protected function _connect($argDSN, $argUsername, $argPassword, $argDatabasename)
     {
           global $php_errormsg;
 
@@ -104,7 +104,7 @@ class ADODB_ads extends ADOConnection
     }
 
   // returns true or false
-    function _pconnect($argDSN, $argUsername, $argPassword, $argDatabasename)
+    protected function _pconnect($argDSN, $argUsername, $argPassword, $argDatabasename)
     {
         global $php_errormsg;
 
@@ -138,7 +138,7 @@ class ADODB_ads extends ADOConnection
     }
 
   // returns the Server version and Description
-    function ServerInfo()
+    public function serverInfo()
     {
 
         if (!empty($this->host) && ADODB_PHPVER >= 0x4300) {
@@ -158,7 +158,7 @@ class ADODB_ads extends ADOConnection
 
 
         // returns true or false
-    function CreateSequence($seqname = 'adodbseq', $start = 1)
+    public function createSequence($seqname = 'adodbseq', $start = 1)
     {
             $res =  $this->Execute("CREATE TABLE $seqname ( ID autoinc( 1 ) ) IN DATABASE");
         if (!$res) {
@@ -171,7 +171,7 @@ class ADODB_ads extends ADOConnection
     }
 
         // returns true or false
-    function DropSequence($seqname = 'adodbseq')
+    public function dropSequence($seqname = 'adodbseq')
     {
             $res = $this->Execute("DROP TABLE $seqname");
         if (!$res) {
@@ -186,7 +186,7 @@ class ADODB_ads extends ADOConnection
   // returns the generated ID or false
         // checks if the table already exists, else creates the table and inserts a record into the table
         // and gets the ID number of the last inserted record.
-    function GenID($seqname = 'adodbseq', $start = 1)
+    public function genID($seqname = 'adodbseq', $start = 1)
     {
             $go = $this->Execute("select * from $seqname");
         if (!$go) {
@@ -211,7 +211,7 @@ class ADODB_ads extends ADOConnection
 
 
 
-    function ErrorMsg()
+    public function errorMsg()
     {
         if ($this->_haserrorfunctions) {
             if ($this->_errorMsg !== false) {
@@ -227,7 +227,7 @@ class ADODB_ads extends ADOConnection
     }
 
 
-    function ErrorNo()
+    public function errorNo()
     {
 
         if ($this->_haserrorfunctions) {
@@ -255,7 +255,7 @@ class ADODB_ads extends ADOConnection
 
 
 
-    function BeginTrans()
+    public function beginTrans()
     {
         if (!$this->hasTransactions) {
             return false;
@@ -268,7 +268,7 @@ class ADODB_ads extends ADOConnection
         return ads_autocommit($this->_connectionID, false);
     }
 
-    function CommitTrans($ok = true)
+    public function commitTrans($ok = true)
     {
         if ($this->transOff) {
             return true;
@@ -285,7 +285,7 @@ class ADODB_ads extends ADOConnection
         return $ret;
     }
 
-    function RollbackTrans()
+    public function rollbackTrans()
     {
         if ($this->transOff) {
             return true;
@@ -302,7 +302,7 @@ class ADODB_ads extends ADOConnection
 
   // Returns tables,Views or both on succesfull execution. Returns
         // tables by default on succesfull execustion.
-    function &MetaTables($ttype = false, $showSchema = false, $mask = false)
+    public function &MetaTables($ttype = false, $showSchema = false, $mask = false)
     {
           $recordSet1 = $this->Execute("select * from system.tables");
         if (!$recordSet1) {
@@ -340,7 +340,7 @@ class ADODB_ads extends ADOConnection
 
     }
 
-    function &MetaPrimaryKeys($table, $owner = false)
+    public function &MetaPrimaryKeys($table, $owner = false)
     {
         $recordSet = $this->Execute("select table_primary_key from system.tables where name='$table'");
         if (!$recordSet) {
@@ -384,7 +384,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 #define SQL_UNICODE_VARCHAR                     (-96)
 #define SQL_UNICODE_LONGVARCHAR                 (-97)
 */
-    function ODBCTypes($t)
+    public function oDBCTypes($t)
     {
         switch ((integer)$t) {
             case 1:
@@ -424,7 +424,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
         }
     }
 
-    function &MetaColumns($table, $normalize = true)
+    public function &MetaColumns($table, $normalize = true)
     {
         global $ADODB_FETCH_MODE;
 
@@ -545,7 +545,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
     }
 
         // Returns an array of columns names for a given table
-    function &MetaColumnNames($table, $numIndexes = false, $useattnum = false)
+    public function &MetaColumnNames($table, $numIndexes = false, $useattnum = false)
     {
             $recordSet = $this->Execute("select name from system.columns where parent='$table'");
         if (!$recordSet) {
@@ -563,7 +563,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
     }
 
 
-    function Prepare($sql)
+    public function prepare($sql)
     {
         if (! $this->_bindInputArray) {
             return $sql; // no binding
@@ -576,7 +576,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
     }
 
   /* returns queryID or false */
-    function _query($sql, $inputarr = false)
+    protected function _query($sql, $inputarr = false)
     {
         global $php_errormsg;
         if (isset($php_errormsg)) {
@@ -664,7 +664,7 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
     $conn->Execute('INSERT INTO blobtable (id, blobcol) VALUES (1, null)');
     $conn->UpdateBlob('blobtable','blobcol',$blob,'id=1');
    */
-    function UpdateBlob($table, $column, $val, $where, $blobtype = 'BLOB')
+    public function updateBlob($table, $column, $val, $where, $blobtype = 'BLOB')
     {
                 $sql = "UPDATE $table SET $column=? WHERE $where";
                 $stmtid = ads_prepare($this->_connectionID, $sql);
@@ -683,14 +683,14 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
     }
 
   // returns true or false
-    function _close()
+    protected function _close()
     {
         $ret = @ads_close($this->_connectionID);
         $this->_connectionID = false;
         return $ret;
     }
 
-    function _affectedrows()
+    protected function _affectedrows()
     {
         return $this->_lastAffectedRows;
     }
@@ -703,13 +703,13 @@ See http://msdn.microsoft.com/library/default.asp?url=/library/en-us/odbc/htm/od
 class ADORecordSet_ads extends ADORecordSet
 {
 
-    var $bind = false;
-    var $databaseType = "ads";
-    var $dataProvider = "ads";
-    var $useFetchArray;
-    var $_has_stupid_odbc_fetch_api_change;
+    public $bind = false;
+    public $databaseType = "ads";
+    public $dataProvider = "ads";
+    public $useFetchArray;
+    public $_has_stupid_odbc_fetch_api_change;
 
-    function __construct($id, $mode = false)
+    protected function __construct($id, $mode = false)
     {
         if ($mode === false) {
             global $ADODB_FETCH_MODE;
@@ -727,7 +727,7 @@ class ADORecordSet_ads extends ADORecordSet
 
 
   // returns the field object
-    function &FetchField($fieldOffset = -1)
+    public function &FetchField($fieldOffset = -1)
     {
 
         $off=$fieldOffset+1; // offsets begin at 1
@@ -745,7 +745,7 @@ class ADORecordSet_ads extends ADORecordSet
     }
 
   /* Use associative array to get fields array */
-    function Fields($colname)
+    public function fields($colname)
     {
         if ($this->fetchMode & ADODB_FETCH_ASSOC) {
             return $this->fields[$colname];
@@ -762,7 +762,7 @@ class ADORecordSet_ads extends ADORecordSet
     }
 
 
-    function _initrs()
+    protected function _initrs()
     {
         global $ADODB_COUNTRECS;
         $this->_numOfRows = ($ADODB_COUNTRECS) ? @ads_num_rows($this->_queryID) : -1;
@@ -775,13 +775,13 @@ class ADORecordSet_ads extends ADORecordSet
         $this->_has_stupid_odbc_fetch_api_change = ADODB_PHPVER >= 0x4200;
     }
 
-    function _seek($row)
+    protected function _seek($row)
     {
         return false;
     }
 
   // speed up SelectLimit() by switching to ADODB_FETCH_NUM as ADODB_FETCH_ASSOC is emulated
-    function &GetArrayLimit($nrows, $offset = -1)
+    public function &GetArrayLimit($nrows, $offset = -1)
     {
         if ($offset <= 0) {
             $rs =& $this->GetArray($nrows);
@@ -807,7 +807,7 @@ class ADORecordSet_ads extends ADORecordSet
     }
 
 
-    function MoveNext()
+    public function moveNext()
     {
         if ($this->_numOfRows != 0 && !$this->EOF) {
             $this->_currentRow++;
@@ -820,7 +820,7 @@ class ADORecordSet_ads extends ADORecordSet
         return false;
     }
 
-    function _fetch()
+    protected function _fetch()
     {
         $this->fields = false;
         if ($this->_has_stupid_odbc_fetch_api_change) {
@@ -838,7 +838,7 @@ class ADORecordSet_ads extends ADORecordSet
         return false;
     }
 
-    function _close()
+    protected function _close()
     {
         return @ads_free_result($this->_queryID);
     }

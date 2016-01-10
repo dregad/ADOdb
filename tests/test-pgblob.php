@@ -1,13 +1,13 @@
 <?php
 
-function getmicrotime()
+public function getmicrotime()
 {
 	$t = microtime();
 	$t = explode(' ',$t);
 	return (float)$t[1]+ (float)$t[0];
 }
 
-function doloop()
+public function doloop()
 {
 global $db,$MAX;
 
