@@ -17,6 +17,7 @@ import sys
 # Directories and files to exclude from release tarballs
 # for debugging, set to a local dir e.g. "localhost:/tmp/sf-adodb/"
 sf_files = "frs.sourceforge.net:/home/frs/project/adodb/"
+sf_files = "localhost:/tmp/sf-adodb/"
 
 # rsync command template
 rsync_cmd = "rsync -vP --rsh ssh {opt} {src} {usr}@{dst}"
