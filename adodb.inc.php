@@ -3850,6 +3850,7 @@ class ADORecordSet implements IteratorAggregate {
 
 	/**
 	 * @var ADOFieldObject[] Field metadata cache
+	 * @see fetchField()
 	 * @see fieldTypesArray()
 	 */
 	protected $fieldObjectsCache;
@@ -4694,9 +4695,30 @@ class ADORecordSet implements IteratorAggregate {
 	 *
 	 * @return ADOFieldObject|false
 	 */
-	function fetchField($fieldOffset)
+	protected function _fetchField($fieldOffset)
 	{
 		return false;
+	}
+
+	/**
+	 * Get a Field's metadata.
+	 *
+	 * Data is retrieved from cache {@see $fieldObjectsCache}. If the cache
+	 * is empty, it will be populated when the function is called for the
+	 * first time.
+	 *
+	 * @param int $fieldOffset The column position to access (0-based).
+	 *
+	 * @return ADOFieldObject|false
+	 */
+	function fetchField($fieldOffset = 0)
+	{
+		if (empty($this->fieldObjectsCache)) {
+			for ($i = 0; $i < $this->_numOfFields; $i++) {
+				$this->fieldObjectsCache[$i] = $this->_fetchField($i);
+			}
+		}
+		return $this->fieldObjectsCache[$fieldOffset];
 	}
 
 	/**

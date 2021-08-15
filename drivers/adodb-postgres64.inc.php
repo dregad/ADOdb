@@ -955,15 +955,16 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 	{
 		global $ADODB_COUNTRECS;
 		$qid = $this->_queryID;
-		$this->_numOfRows = ($ADODB_COUNTRECS)? @pg_num_rows($qid):-1;
+		$this->_numOfRows = $ADODB_COUNTRECS ? @pg_num_rows($qid) : -1;
 		$this->_numOfFields = @pg_num_fields($qid);
 
-		// cache types for blob decode check
-		// apparently pg_field_type actually performs an sql query on the database to get the type.
-		if (empty($this->connection->noBlobs))
-		for ($i=0, $max = $this->_numOfFields; $i < $max; $i++) {
-			if (pg_field_type($qid,$i) == 'bytea') {
-				$this->_blobArr[$i] = pg_field_name($qid,$i);
+		// Cache fields metadata
+		for ($i = 0; $i < $this->_numOfFields; $i++) {
+			$field = $this->_fetchField($i);
+			$this->fieldObjectsCache[$i] = $field;
+
+			if (empty($this->connection->noBlobs) && $field->type == 'bytea' ) {
+				$this->_blobArr[$i] = $field->name;
 			}
 		}
 	}
@@ -974,25 +975,25 @@ class ADORecordSet_postgres64 extends ADORecordSet{
 			return @$this->fields[$colname];
 		}
 
+		// Use associative bind array to get fields array
 		if (!$this->bind) {
 			$this->bind = array();
-			for ($i=0; $i < $this->_numOfFields; $i++) {
-				$o = $this->FetchField($i);
-				$this->bind[strtoupper($o->name)] = $i;
+			foreach ($this->fieldObjectsCache as $i => $field) {
+				$this->bind[strtoupper($field->name)] = $i;
 			}
 		}
 		return $this->fields[$this->bind[strtoupper($colname)]];
 	}
 
-	function fetchField($fieldOffset = 0)
+	protected function _fetchField($fieldOffset)
 	{
-		// offsets begin at 0
+		$field = new ADOFieldObject();
 
-		$o = new ADOFieldObject();
-		$o->name = @pg_field_name($this->_queryID, $fieldOffset);
-		$o->type = @pg_field_type($this->_queryID, $fieldOffset);
-		$o->max_length = @pg_field_size($this->_queryID, $fieldOffset);
-		return $o;
+		$field->name = @pg_field_name($this->_queryID, $fieldOffset);
+		$field->type = @pg_field_type($this->_queryID, $fieldOffset);
+		$field->max_length = @pg_field_size($this->_queryID, $fieldOffset);
+
+		return $field;
 	}
 
 	function _seek($row)

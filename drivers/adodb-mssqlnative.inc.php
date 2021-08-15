@@ -1176,7 +1176,7 @@ class ADORecordset_mssqlnative extends ADORecordSet {
 	* @param int $fieldOffset (optional default=-1 for all
 	* @return mixed an ADOFieldObject, or array of objects
 	*/
-	private function _fetchField($fieldOffset = -1)
+	protected function _fetchField($fieldOffset = -1)
 	{
 		if ($this->fieldObjectsRetrieved) {
 			if ($this->fieldObjectsCache) {
