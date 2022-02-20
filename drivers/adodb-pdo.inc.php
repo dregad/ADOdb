@@ -85,6 +85,7 @@ class ADODB_pdo extends ADOConnection {
 	var $_errormsg = false;
 	var $_errorno = false;
 
+	// @TODO merge conflict follow-up: master added $_stmt, pdo-preload-demo $stmt
 	var $_stmt = false;
 
 	/** @var ADODB_pdo_base */
@@ -112,23 +113,6 @@ class ADODB_pdo extends ADOConnection {
 	*/
 	public $bindParameterStyle = self::BIND_USE_BOTH;
 
-
-	function Time()
-	{
-		if (!empty($this->_driver->_hasdual)) {
-			$sql = "select $this->sysTimeStamp from dual";
-		}
-		else {
-			$sql = "select $this->sysTimeStamp";
-		}
-
-		$rs = $this->_Execute($sql);
-		if ($rs && !$rs->EOF) {
-			return $this->UnixTimeStamp(reset($rs->fields));
-		}
-
-		return false;
-	}
 
 	// returns true or false
 	function _connect($argDSN, $argUsername, $argPassword, $argDatabasename, $persist=false)
@@ -214,7 +198,6 @@ class ADODB_pdo extends ADOConnection {
 			return true;
 		}
 		
-		$this->_driver = new ADODB_pdo_base();
 		return false;
 	}
 
@@ -227,17 +210,6 @@ class ADODB_pdo extends ADOConnection {
 
 	/*------------------------------------------------------------------------------*/
 
-	/*
-	function SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0)
-	{
-		$save = $this->_driver->fetchMode;
-		$this->_driver->fetchMode = $this->fetchMode;
-		$this->_driver->debug = $this->debug;
-		$ret = $this->_driver->SelectLimit($sql,$nrows,$offset,$inputarr,$secs2cache);
-		$this->_driver->fetchMode = $save;
-		return $ret;
-	}
-	*/
 	
 	function InParameter(&$stmt,&$var,$name,$maxLen=4000,$type=false)
 	{
@@ -309,7 +281,13 @@ class ADODB_pdo extends ADOConnection {
 	}
 
 
-	
+	/**
+	 * Begin a Transaction.
+	 *
+	 * Must be followed by CommitTrans() or RollbackTrans().
+	 *
+	 * @return bool true if succeeded or false if database does not support transactions
+	 */
 	function beginTrans()
 	{
 
@@ -326,7 +304,17 @@ class ADODB_pdo extends ADOConnection {
 		return $this->_connectionID->beginTransaction();
 	}
 
-	function commitTrans($ok=true)
+	/**
+	 * Commits a transaction.
+	 *
+	 * If database does not support transactions, return true as data is
+	 * always committed.
+	 *
+	 * @param bool $ok True to commit, false to rollback the transaction.
+	 *
+	 * @return bool true if successful
+	 */
+	public function commitTrans($ok=true)
 	{
 
 		if (!$this->hasTransactions) {
@@ -348,7 +336,16 @@ class ADODB_pdo extends ADOConnection {
 		return $ret;
 	}
 
-	function RollbackTrans()
+	
+	/**
+	 * Rolls back a transaction.
+	 *
+	 * If database does not support transactions, return false as rollbacks
+	 * always fail.
+	 *
+	 * @return bool true if successful
+	 */
+	public function RollbackTrans()
 	{
 		if (!$this->hasTransactions) {
 			return false;
@@ -397,9 +394,7 @@ class ADODB_pdo extends ADOConnection {
 		}
 
 		if ($stmt) {
-			if ($this->_driver instanceof ADODB_pdo) {
-				$this->_driver->debug = $this->debug;
-			}
+			
 			if ($inputarr) {
 				$inputarr = $this->conformToBindParameterStyle($stmt->queryString, $inputarr);
 				$ok = $stmt->execute($inputarr);
@@ -454,8 +449,7 @@ class ADODB_pdo extends ADOConnection {
 	 * Quotes a string to be sent to the database.
 	 *
 	 * If we have an active connection, delegates quoting to the underlying
-	 * PDO object PDO::quote(). Otherwise, replace "'" by the value of
-	 * $replaceQuote (same behavior as mysqli driver).
+	 * PDO object PDO::quote(). Otherwise, delegate to parent method
 	 *
 	 * @param string  $s           The string to quote
 	 * @param bool   $magic_quotes This param is not used since 5.21.0.
@@ -463,12 +457,13 @@ class ADODB_pdo extends ADOConnection {
 	 *
 	 * @return string Quoted string
 	 */
-	function qStr($s, $magic_quotes = false)
+	public function qStr($s, $magic_quotes = false)
 	{
-		if ($this->_connectionID) {
+		if ($this->_connectionID) 
+		{
 			return $this->_connectionID->quote($s);
 		}
-		return "'" . str_replace("'", $this->replaceQuote, $s) . "'";
+		return parent::qStr($s,$magic_quotes);
 	}
 
 	/**
