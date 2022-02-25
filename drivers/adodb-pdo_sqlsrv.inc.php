@@ -76,7 +76,6 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 		$this->_connectionID->query("SET TRANSACTION ".$transaction_mode);
 	}
 
-
 	/**
 	 * List indexes on a table as an array.
 	 * @param table  table name to query
