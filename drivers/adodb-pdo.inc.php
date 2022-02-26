@@ -98,6 +98,11 @@ class ADODB_pdo extends ADOConnection {
 	var $_queryID;
 
 	/*
+	 * Holds the current database name
+	 */
+	protected $databaseName = '';
+
+	/*
 	* Describe parameters passed directly to the PDO driver
 	*
 	* @example $db->pdoParameters = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
@@ -161,6 +166,8 @@ class ADODB_pdo extends ADOConnection {
 		}
 
 		if ($argDatabasename) {
+			$this->databaseName = $argDatabasename;
+
 			switch($this->dsnType){
 				case 'sqlsrv':
 					$argDSN .= ';database='.$argDatabasename;
@@ -175,6 +182,9 @@ class ADODB_pdo extends ADOConnection {
 					$argDSN .= ';dbname='.$argDatabasename;
 			}
 		}
+		elseif (!$this->databaseName)
+			$this->databaseName = $this->getDatabasenameFromDsn($argDSN);
+
 		/*
 		* Configure for persistent connection if required,
 		* by adding the the pdo parameter into any provided
@@ -188,6 +198,7 @@ class ADODB_pdo extends ADOConnection {
 		/*
 		* Execute a connection
 		*/
+		
 		try {
 			$this->_connectionID = new \PDO($argDSN, $argUsername, $argPassword, $this->pdoParameters);
 		} catch (Exception $e) {
@@ -659,6 +670,22 @@ class ADODB_pdo extends ADOConnection {
 		$ADODB_FETCH_MODE = $savem;
 		return $arr;
 	}
+
+	/**
+	  * Gets the database name from the DSN
+	  *
+	  * @param	string	$dsnString
+	  *
+	  * @return string
+	  */
+	  protected function getDatabasenameFromDsn($dsnString){
+
+		$dsnArray = preg_split('/[;=]+/',$dsnString);
+		$dbIndex  = array_search('database',$dsnArray);
+
+		return $dsnArray[$dbIndex + 1];
+	}
+
 
 }
 
