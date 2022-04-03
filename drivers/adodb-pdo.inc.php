@@ -64,9 +64,11 @@ function adodb_pdo_type($t)
 
 /*----------------------------------------------------------------------------*/
 
-class ADODB_pdo extends ADOConnection 
-{
-	
+class ADODB_pdo extends ADOConnection {
+	const BIND_USE_QUESTION_MARKS = 0;
+	const BIND_USE_NAMED_PARAMETERS = 1;
+	const BIND_USE_BOTH = 2;
+
 	var $databaseType = "pdo";
 	var $dataProvider = "pdo";
 	var $fmtDate = "'Y-m-d'";
@@ -92,7 +94,17 @@ class ADODB_pdo extends ADOConnection
 	var $_errormsg = false;
 	var $_errorno = false;
 
-	var $stmt = false;
+	// @TODO merge conflict follow-up: master added $_stmt, pdo-preload-demo $stmt
+	var $_stmt = false;
+
+	/** @var ADODB_pdo_base */
+	var $_driver;
+
+	/** @var PDO */
+	var $_connectionID;
+
+	/** @var PDOStatement */
+	var $_queryID;
 
 	/*
 	 * Holds the current database name
@@ -105,6 +117,16 @@ class ADODB_pdo extends ADOConnection
 	* @example $db->pdoParameters = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
 	*/
 	public $pdoParameters = array();
+
+	/*
+	* Set which style is used to bind parameters
+	*
+	* BIND_USE_QUESTION_MARKS   = Use only question marks
+	* BIND_USE_NAMED_PARAMETERS = Use only named parameters
+	* BIND_USE_BOTH             = Use both question marks and named parameters (Default)
+	*/
+	public $bindParameterStyle = self::BIND_USE_BOTH;
+
 
 	/**
 	 * Connect to a database.
@@ -494,11 +516,7 @@ class ADODB_pdo extends ADOConnection
 		if ($stmt) {
 			
 			if ($inputarr) {
-
-				/*
-				* inputarr must be numeric
-				*/
-				$inputarr = array_values($inputarr);
+				$inputarr = $this->conformToBindParameterStyle($stmt->queryString, $inputarr);
 				$ok = $stmt->execute($inputarr);
 			}
 			else {
@@ -581,6 +599,59 @@ class ADODB_pdo extends ADOConnection
 			return $this->_connectionID->quote($s);
 		}
 		return parent::qStr($s,$magic_quotes);
+	}
+
+	/**
+	 * Make bind parameters conform to settings.
+	 *
+	 * @param string $sql
+	 * @param array $inputarr
+	 * @return array
+	 */
+	private function conformToBindParameterStyle($sql, $inputarr)
+	{
+		switch ($this->bindParameterStyle)
+		{
+			case self::BIND_USE_QUESTION_MARKS:
+			default:
+				$inputarr = array_values($inputarr);
+				break;
+
+			case self::BIND_USE_NAMED_PARAMETERS:
+				break;
+
+			case self::BIND_USE_BOTH:
+				// inputarr must be numeric if SQL contains a question mark
+				if ($this->containsQuestionMarkPlaceholder($sql)) {
+					$inputarr = array_values($inputarr);
+
+					if ($this->debug) {
+						ADOconnection::outp('improve the performance of this query by setting the bindParameterStyle to BIND_USE_QUESTION_MARKS');
+					}
+				}
+				break;
+		}
+
+		return $inputarr;
+	}
+
+	/**
+	 * Checks for the inclusion of a question mark placeholder.
+	 *
+	 * @param string $sql   SQL string
+	 * @return boolean      Returns true if a question mark placeholder is included
+	 */
+	private function containsQuestionMarkPlaceholder($sql)
+	{
+		$pattern = '/(.\?(:?.|$))/';
+		if (preg_match_all($pattern, $sql, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				if ($match[1] !== '`?`' && strpos($match[1], '??') === false) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -715,6 +786,9 @@ class ADORecordSet_pdo extends ADORecordSet {
 	var $bind = false;
 	var $databaseType = "pdo";
 	var $dataProvider = "pdo";
+
+	/** @var PDOStatement */
+	var $_queryID;
 
 	function __construct($id,$mode=false)
 	{
@@ -867,4 +941,7 @@ class ADORecordSet_pdo extends ADORecordSet {
 
 }
 
-class ADORecordSet_array_pdo extends ADORecordSet_array {}
+class ADORecordSet_array_pdo extends ADORecordSet_array {
+	/** @var PDOStatement */
+	var $_queryID;
+}

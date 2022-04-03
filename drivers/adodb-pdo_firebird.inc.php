@@ -50,10 +50,6 @@ class ADODB_pdo_firebird extends ADODB_pdo
 
 	var $arrayClass = 'ADORecordSet_array_pdo_firebird';
 
-
-
-	function _init($parentDriver){}
-
 	/**
 	 * Gets the version iformation from the server
 	 *
