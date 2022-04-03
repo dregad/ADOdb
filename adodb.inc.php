@@ -5773,7 +5773,6 @@ class ADORecordSet implements IteratorAggregate {
 			if ($pdoExtension)
 			{
 				$cls = 'ADODB_pdo_' . $pdoExtension;
-				$db = 'PDO';
 			}
 			else
 			{
