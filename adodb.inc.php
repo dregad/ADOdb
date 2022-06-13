@@ -5612,8 +5612,8 @@ class ADORecordSet implements IteratorAggregate {
 		* need to remove the driver portion of the file
 		*/
 		$pdoExtension = '';
-		$pdoSplit 	  = explode('\\',$db);
-		
+		$pdoSplit = preg_split('/^pdo[_\\\]/i',$db);
+				
 		if (count($pdoSplit) > 1)
 		{
 			$extSplit = explode('://',$pdoSplit[1]);
@@ -5627,6 +5627,8 @@ class ADORecordSet implements IteratorAggregate {
 			* Carry on as normal
 			*/
 		}
+		else if (strcasecmp($db,'pdo') == 0 && count($pdoSplit) == 1)
+			die('PDO drivers now require the driver name to be passed in the format PDO\<drivername>');
 
 		
 		/*
