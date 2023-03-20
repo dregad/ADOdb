@@ -31,3 +31,9 @@ parameters:
 		- pear/
 		- adodb-pear.inc.php
 		- session/old/
+
+	ignoreErrors:
+		# mcrypt moved to PECL, not bundled with PHP since 7.2.0
+		- '#Function mcrypt_\w+ not found#'
+		- '#Instantiated class PEAR_Error not found#'
+		- '#Function adodb_daylight_sv not found#'
