@@ -13,3 +13,21 @@ parameters:
 	excludePaths:
 		- vendor/
 		- test/
+
+		# Ignore obsolete / legacy drivers and files
+		- drivers/adodb-ads.inc.php
+		- datadict/datadict-mssql.inc.php
+		- drivers/adodb-mssql.inc.php
+		- drivers/adodb-mssqlpo.inc.php
+		- drivers/adodb-mssql_n.inc.php
+		- drivers/adodb-fbsql.inc.php       # Frontbase unsupported since PHP 5.3
+		- */adodb-odbtp*.inc.php
+		- */adodb-oracle.inc.php
+		- */adodb-sqlite.inc.php
+		- */adodb-sqlitepo.inc.php
+		- */adodb-text.inc.php
+		- */*-sybase*.inc.php               # Sybase unsupported since PHP 7.0
+		- adodb-xmlschema.inc.php
+		- pear/
+		- adodb-pear.inc.php
+		- session/old/
