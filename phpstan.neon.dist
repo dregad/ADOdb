@@ -1,5 +1,10 @@
 # ADOdb PHPStan standard configuration
 #
+# To override settings locally, create a `phpstan.neon` file with the
+# following contents (see https://phpstan.org/config-reference):
+#   includes:
+#       - phpstan.neon.dist
+#
 # This file is part of ADOdb, a Database Abstraction Layer library for PHP.
 #
 # @link https://adodb.org Project's web site and documentation

@@ -21,3 +21,6 @@ docs/cache
 # PHPUnit
 /.phpunit.cache
 .phpunit.result.cache
+
+# PHPStan
+phpstan.neon
