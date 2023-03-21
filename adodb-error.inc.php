@@ -4,6 +4,7 @@
  *
  * Adapted from the PEAR DB error handling code.
  * Portions (c)1997-2002 The PHP Group
+ * @see https://github.com/pear/DB
  *
  * This file is part of ADOdb, a Database Abstraction Layer library for PHP.
  *
@@ -22,9 +23,9 @@
  * @copyright 2014 Damien Regad, Mark Newnham and the ADOdb community
  */
 
-if (!defined("DB_ERROR")) define("DB_ERROR",-1);
-
-if (!defined("DB_ERROR_SYNTAX")) {
+if (!defined("DB_ERROR")) {
+	# See https://github.com/pear/DB/blob/v1.11.0/DB.php
+	define("DB_ERROR",                     -1);
 	define("DB_ERROR_SYNTAX",              -2);
 	define("DB_ERROR_CONSTRAINT",          -3);
 	define("DB_ERROR_NOT_FOUND",           -4);
@@ -39,7 +40,7 @@ if (!defined("DB_ERROR_SYNTAX")) {
 	define("DB_ERROR_DIVZERO",            -13);
 	define("DB_ERROR_NODBSELECTED",       -14);
 	define("DB_ERROR_CANNOT_CREATE",      -15);
-	define("DB_ERROR_CANNOT_DELETE",      -16);
+	define("DB_ERROR_CANNOT_DELETE",      -16); // No longer exists in PEAR DB
 	define("DB_ERROR_CANNOT_DROP",        -17);
 	define("DB_ERROR_NOSUCHTABLE",        -18);
 	define("DB_ERROR_NOSUCHFIELD",        -19);
@@ -49,11 +50,17 @@ if (!defined("DB_ERROR_SYNTAX")) {
 	define("DB_ERROR_INVALID_DSN",        -23);
 	define("DB_ERROR_CONNECT_FAILED",     -24);
 	define("DB_ERROR_EXTENSION_NOT_FOUND",-25);
-	define("DB_ERROR_NOSUCHDB",           -25);
 	define("DB_ERROR_ACCESS_VIOLATION",   -26);
-	define("DB_ERROR_DEADLOCK",           -27);
+	define("DB_ERROR_NOSUCHDB",           -27);
 	define("DB_ERROR_STATEMENT_TIMEOUT",  -28);
-	define("DB_ERROR_SERIALIZATION_FAILURE", -29);
+	define("DB_ERROR_CONSTRAINT_NOT_NULL", -29);
+	define("DB_ERROR_LOCK_TIMEOUT",       -30);
+	define("DB_ERROR_DEADLOCK",           -31);
+	define("DB_ERROR_INVALID_VIEW",       -32);
+
+	// Custom ADOdb error codes
+	// Numbering starts with -100 to avoid conflicts with PEAR DB
+	define("DB_ERROR_SERIALIZATION_FAILURE", -100);
 }
 
 function adodb_errormsg($value)
