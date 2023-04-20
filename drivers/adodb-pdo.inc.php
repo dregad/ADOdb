@@ -90,9 +90,6 @@ class ADODB_pdo extends ADOConnection {
 	var $_autocommit = true;
 	var $_lastAffectedRows = 0;
 
-	var $_errormsg = false;
-	var $_errorno = false;
-
 	var $_stmt = false;
 
 	/** @var ADODB_pdo_base */
@@ -211,9 +208,9 @@ class ADODB_pdo extends ADOConnection {
 			$this->_connectionID = new \PDO($argDSN, $argUsername, $argPassword, $this->pdoParameters);
 		} catch (Exception $e) {
 			$this->_connectionID = false;
-			$this->_errorno = -1;
+			$this->_errorCode = -1;
 			//var_dump($e);
-			$this->_errormsg = 'Connection attempt failed: '.$e->getMessage();
+			$this->_errorMsg = 'Connection attempt failed: '.$e->getMessage();
 			return false;
 		}
 
@@ -299,8 +296,8 @@ class ADODB_pdo extends ADOConnection {
 	 */
 	public function errorMsg()
 	{
-		if ($this->_errormsg !== false) {
-			return $this->_errormsg;
+		if ($this->_errorMsg !== false) {
+			return $this->_errorMsg;
 		}
 		if (!empty($this->_stmt)) {
 			$arr = $this->_stmt->errorInfo();
@@ -336,8 +333,8 @@ class ADODB_pdo extends ADOConnection {
 	 */
 	public function errorNo()
 	{
-		if ($this->_errorno !== false) {
-			return $this->_errorno;
+		if ($this->_errorCode !== false) {
+			return $this->_errorCode;
 		}
 		if (!empty($this->_stmt)) {
 			$err = $this->_stmt->errorCode();
@@ -527,9 +524,8 @@ class ADODB_pdo extends ADOConnection {
 			}
 		}
 
-
-		$this->_errormsg = false;
-		$this->_errorno = false;
+		$this->_errorMsg = false;
+		$this->_errorCode = false;
 
 		if ($ok) {
 			$this->_stmt = $stmt;
@@ -537,16 +533,11 @@ class ADODB_pdo extends ADOConnection {
 		}
 
 		if ($stmt) {
-
 			$arr = $stmt->errorinfo();
 			if ((integer)$arr[1]) {
-				$this->_errormsg = $arr[2];
-				$this->_errorno = $arr[1];
+				$this->_errorMsg = $arr[2];
+				$this->_errorCode = $arr[1];
 			}
-
-		} else {
-			$this->_errormsg = false;
-			$this->_errorno = false;
 		}
 		return false;
 	}
