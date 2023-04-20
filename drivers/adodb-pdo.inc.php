@@ -77,9 +77,18 @@ class ADODB_pdo extends ADOConnection {
 	var $replaceQuote = "''"; // string to use to replace quotes
 	var $hasAffectedRows = true;
 	var $_bindInputArray = true;
-	var $_genIDSQL;
-	var $_genSeqSQL = "create table %s (id integer)";
-	var $_dropSeqSQL;
+
+	/*
+	* Sequence management statements
+	*/
+	public $_genIDSQL 		 = '';
+	public $_genSeqSQL 	 	 = 'CREATE TABLE %s (id integer)';
+	public $_genSeqCountSQL  = '';
+	public $_genSeq2SQL 	 = '';
+	public $_dropSeqSQL 	 = 'DROP TABLE %s';
+
+
+
 	var $_autocommit = true;
 	var $_lastAffectedRows = 0;
 
@@ -100,7 +109,7 @@ class ADODB_pdo extends ADOConnection {
 	/*
 	* Describe parameters passed directly to the PDO driver
 	*
-	* @example $db->pdoOptions = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
+	* @example $db->pdoParameters = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
 	*/
 	public $pdoParameters = array();
 
@@ -113,51 +122,55 @@ class ADODB_pdo extends ADOConnection {
 	*/
 	public $bindParameterStyle = self::BIND_USE_BOTH;
 
-	function _UpdatePDO()
+	/**
+	 * Connect to a database.
+	 *
+	 * @param string|null $argDSN 		 	The host to connect to.
+	 * @param string|null $argUsername 	 	The username to connect as.
+	 * @param string|null $argPassword 		The password to connect with.
+	 * @param string|null $argDatabasename 	The name of the database to start in when connected.
+	 * @param bool $persist (Optional) 		Whether or not to use a persistent connection.
+	 *
+	 * @return bool|null True if connected successfully, false if connection failed, or null if the mysqli extension
+	 * isn't currently loaded.
+	 */
+	public function _connect($argDSN, $argUsername, $argPassword, $argDatabasename, $persist=false)
 	{
-		$d = $this->_driver;
-		$this->fmtDate = $d->fmtDate;
-		$this->fmtTimeStamp = $d->fmtTimeStamp;
-		$this->replaceQuote = $d->replaceQuote;
-		$this->sysDate = $d->sysDate;
-		$this->sysTimeStamp = $d->sysTimeStamp;
-		$this->random = $d->random;
-		$this->concat_operator = $d->concat_operator;
-		$this->nameQuote = $d->nameQuote;
-		$this->arrayClass = $d->arrayClass;
 
-		$this->hasGenID = $d->hasGenID;
-		$this->_genIDSQL = $d->_genIDSQL;
-		$this->_genSeqSQL = $d->_genSeqSQL;
-		$this->_dropSeqSQL = $d->_dropSeqSQL;
+		$driverClassArray = explode('_',get_class($this));
+		/*
+		* We have already instantiated the correct driver class using pdo\<driver> so the array looks like
+		*
+		Array
+		(
+			[0] => ADODB
+			[1] => pdo
+			[2] => mysql
+		)
+		* So its easy to determine that the driver we are using is mysql
+		*/
+		$driverClass      = array_pop($driverClassArray);
 
-		$d->_init($this);
-	}
-
-	function Time()
-	{
-		if (!empty($this->_driver->_hasdual)) {
-			$sql = "select $this->sysTimeStamp from dual";
-		}
-		else {
-			$sql = "select $this->sysTimeStamp";
-		}
-
-		$rs = $this->_Execute($sql);
-		if ($rs && !$rs->EOF) {
-			return $this->UnixTimeStamp(reset($rs->fields));
-		}
-
-		return false;
-	}
-
-	// returns true or false
-	function _connect($argDSN, $argUsername, $argPassword, $argDatabasename, $persist=false)
-	{
 		$at = strpos($argDSN,':');
-		$this->dsnType = substr($argDSN,0,$at);
+		if ($at > 0)
+		{
+
+			$this->dsnType = substr($argDSN,0,$at);
+			if (strcmp($this->dsnType,$driverClass) <> 0)
+				die('If a database type is specified, it must match the previously defined driver');
+		}
+		else
+		{
+			/*
+			* Move the driver info back to its traditional position
+			*/
+			$this->dsnType = $driverClass;
+			$argDSN 	   = $driverClass . ':' . $argDSN;
+		}
 
 		if ($argDatabasename) {
+			$this->databaseName = $argDatabasename;
+
 			switch($this->dsnType){
 				case 'sqlsrv':
 					$argDSN .= ';database='.$argDatabasename;
@@ -172,6 +185,9 @@ class ADODB_pdo extends ADOConnection {
 					$argDSN .= ';dbname='.$argDatabasename;
 			}
 		}
+		elseif (!$this->databaseName)
+			$this->databaseName = $this->getDatabasenameFromDsn($argDSN);
+
 		/*
 		* Configure for persistent connection if required,
 		* by adding the the pdo parameter into any provided
@@ -180,6 +196,11 @@ class ADODB_pdo extends ADOConnection {
 		if ($persist) {
 			$this->pdoParameters[\PDO::ATTR_PERSISTENT] = true;
 		}
+
+
+		/*
+		* Execute a connection
+		*/
 
 		try {
 			$this->_connectionID = new \PDO($argDSN, $argUsername, $argPassword, $this->pdoParameters);
@@ -217,69 +238,24 @@ class ADODB_pdo extends ADOConnection {
 					$this->_connectionID->setAttribute($k,$v);
 				}
 			}
-
-			$class = 'ADODB_pdo_'.$this->dsnType;
-			//$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT,true);
-			switch($this->dsnType) {
-				case 'mssql':
-				case 'mysql':
-				case 'oci':
-				case 'pgsql':
-				case 'sqlite':
-				case 'sqlsrv':
-				case 'firebird':
-				case 'dblib':
-					include_once(ADODB_DIR.'/drivers/adodb-pdo_'.$this->dsnType.'.inc.php');
-					break;
-			}
-			if (class_exists($class)) {
-				$this->_driver = new $class();
-			}
-			else {
-				$this->_driver = new ADODB_pdo_base();
-			}
-
-			$this->_driver->_connectionID = $this->_connectionID;
-			$this->_UpdatePDO();
-			$this->_driver->database = $this->database;
 			return true;
 		}
-		$this->_driver = new ADODB_pdo_base();
+
 		return false;
 	}
 
-	function Concat()
-	{
-		$args = func_get_args();
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'Concat')) {
-			return call_user_func_array(array($this->_driver, 'Concat'), $args);
-		}
-
-		return call_user_func_array(parent::class . '::Concat', $args);
-	}
-
 	/**
-	 * Triggers a driver-specific request for a bind parameter
+	 * Connect to a database with a persistent connection.
 	 *
-	 * @param string $name
-	 * @param string $type
+	 * @param string|null $argDSN 		The connection DSN
+	 * @param string|null $argUsername  The username to connect as.
+	 * @param string|null $argPassword  The password to connect with.
+	 * @param string|null $argDatabasename The name of the database to start in when connected.
 	 *
-	 * @return string
+	 * @return bool|null True if connected successfully, false if connection failed, or null if the mysqli extension
+	 * isn't currently loaded.
 	 */
-	public function param($name,$type='C') {
-
-		$args = func_get_args();
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'param')) {
-			// Return the driver specific entry, that mimics the native driver
-			return call_user_func_array(array($this->_driver, 'param'), $args);
-		}
-
-		// No driver specific method defined, use mysql format '?'
-		return call_user_func_array(parent::class . '::param', $args);
-	}
-
-	// returns true or false
-	function _pconnect($argDSN, $argUsername, $argPassword, $argDatabasename)
+	public function _pconnect($argDSN, $argUsername, $argPassword, $argDatabasename)
 	{
 		return $this->_connect($argDSN, $argUsername, $argPassword, $argDatabasename, true);
 	}
@@ -287,92 +263,18 @@ class ADODB_pdo extends ADOConnection {
 	/*------------------------------------------------------------------------------*/
 
 
-	function SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0)
-	{
-		$save = $this->_driver->fetchMode;
-		$this->_driver->fetchMode = $this->fetchMode;
-		$this->_driver->debug = $this->debug;
-		$ret = $this->_driver->SelectLimit($sql,$nrows,$offset,$inputarr,$secs2cache);
-		$this->_driver->fetchMode = $save;
-		return $ret;
-	}
-
-
-	function ServerInfo()
-	{
-		return $this->_driver->ServerInfo();
-	}
-
-	function MetaTables($ttype=false,$showSchema=false,$mask=false)
-	{
-		return $this->_driver->MetaTables($ttype,$showSchema,$mask);
-	}
-
-	function MetaColumns($table,$normalize=true)
-	{
-		return $this->_driver->MetaColumns($table,$normalize);
-	}
-
-	public function metaIndexes($table,$normalize=true,$owner=false)
-	{
-		if (method_exists($this->_driver,'metaIndexes'))
-			return $this->_driver->metaIndexes($table,$normalize,$owner);
-	}
-
 	/**
-	 * Return a list of Primary Keys for a specified table.
+	 * Self-documenting version of parameter().
 	 *
-	 * @param string   $table
-	 * @param bool     $owner      (optional) not used in this driver
+	 * @param $stmt
+	 * @param &$var
+	 * @param $name
+	 * @param int $maxLen
+	 * @param bool $type
 	 *
-	 * @return string[]    Array of indexes
+	 * @return bool
 	 */
-	public function metaPrimaryKeys($table,$owner=false)
-	{
-		if (method_exists($this->_driver,'metaPrimaryKeys'))
-			return $this->_driver->metaPrimaryKeys($table,$owner);
-	}
-
-	/**
-	 * Returns a list of Foreign Keys associated with a specific table.
-	 *
-	 * @param string   $table
-	 * @param string   $owner      (optional) not used in this driver
-	 * @param bool     $upper
-	 * @param bool     $associative
-	 *
-	 * @return string[]|false An array where keys are tables, and values are foreign keys;
-	 *                        false if no foreign keys could be found.
-	 */
-	public function metaForeignKeys($table, $owner = '', $upper = false, $associative = false) {
-		if (method_exists($this->_driver,'metaForeignKeys'))
-			return $this->_driver->metaForeignKeys($table, $owner, $upper, $associative);
-	}
-
-	/**
-	 * List procedures or functions in an array.
-	 *
-	 * @param $procedureNamePattern A procedure name pattern; must match the procedure name as it is stored in the database.
-	 * @param $catalog              A catalog name; must match the catalog name as it is stored in the database.
-	 * @param $schemaPattern        A schema name pattern.
-	 *
-	 * @return false|array false if not supported, or array of procedures on current database with structure below
-	 *         Array(
-	 *           [name_of_procedure] => Array(
-	 *             [type] => PROCEDURE or FUNCTION
-	 *             [catalog] => Catalog_name
-	 *             [schema] => Schema_name
-	 *             [remarks] => explanatory comment on the procedure
-	 *           )
-	 *         )
-	 */
-	public function metaProcedures($procedureNamePattern = null, $catalog  = null, $schemaPattern  = null) {
-		if (method_exists($this->_driver,'metaProcedures'))
-			return $this->_driver->metaProcedures($procedureNamePattern,$catalog,$schemaPattern);
-		return false;
-	}
-
-	function InParameter(&$stmt,&$var,$name,$maxLen=4000,$type=false)
+	public function inParameter(&$stmt,&$var,$name,$maxLen=4000,$type=false)
 	{
 		$obj = $stmt[1];
 		if ($type) {
@@ -383,22 +285,14 @@ class ADODB_pdo extends ADOConnection {
 		}
 	}
 
-	function OffsetDate($dayFraction,$date=false)
-	{
-		return $this->_driver->OffsetDate($dayFraction,$date);
-	}
-
-	function SelectDB($dbName)
-	{
-		return $this->_driver->SelectDB($dbName);
-	}
-
-	function SQLDate($fmt, $col=false)
-	{
-		return $this->_driver->SQLDate($fmt, $col);
-	}
-
-	function ErrorMsg()
+	/**
+	 * Returns a database specific error message.
+	 *
+	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:connection:errormsg
+	 *
+	 * @return string The last error message.
+	 */
+	public function errorMsg()
 	{
 		if ($this->_errormsg !== false) {
 			return $this->_errormsg;
@@ -430,7 +324,12 @@ class ADODB_pdo extends ADOConnection {
 	}
 
 
-	function ErrorNo()
+	/**
+	 * Returns the last error number from previous database operation.
+	 *
+	 * @return int The last error number.
+	 */
+	public function errorNo()
 	{
 		if ($this->_errorno !== false) {
 			return $this->_errorno;
@@ -457,30 +356,25 @@ class ADODB_pdo extends ADOConnection {
 	}
 
 	/**
-	 * @param bool $auto_commit
-	 * @return void
+	 * @deprecated - replace with setConnectionParameter()
+     * @param bool $auto_commit
+     * @return void
+     */
+    public function setAutoCommit($auto_commit)
+    {
+		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT, $auto_commit);
+    }
+
+
+	/**
+	 * Begin a Transaction.
+	 *
+	 * Must be followed by CommitTrans() or RollbackTrans().
+	 *
+	 * @return bool true if succeeded or false if database does not support transactions
 	 */
-	function SetAutoCommit($auto_commit)
+	public function beginTrans()
 	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'SetAutoCommit')) {
-			$this->_driver->SetAutoCommit($auto_commit);
-		}
-	}
-
-	function SetTransactionMode($transaction_mode)
-	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'SetTransactionMode')) {
-			return $this->_driver->SetTransactionMode($transaction_mode);
-		}
-
-		return parent::SetTransactionMode($transaction_mode);
-	}
-
-	function beginTrans()
-	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'beginTrans')) {
-			return $this->_driver->beginTrans();
-		}
 
 		if (!$this->hasTransactions) {
 			return false;
@@ -490,17 +384,23 @@ class ADODB_pdo extends ADOConnection {
 		}
 		$this->transCnt += 1;
 		$this->_autocommit = false;
-		$this->SetAutoCommit(false);
+		$this->setAutoCommit(false);
 
 		return $this->_connectionID->beginTransaction();
 	}
 
-	function commitTrans($ok=true)
+	/**
+	 * Commits a transaction.
+	 *
+	 * If database does not support transactions, return true as data is
+	 * always committed.
+	 *
+	 * @param bool $ok True to commit, false to rollback the transaction.
+	 *
+	 * @return bool true if successful
+	 */
+	public function commitTrans($ok=true)
 	{
-
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'commitTrans')) {
-			return $this->_driver->commitTrans($ok);
-		}
 
 		if (!$this->hasTransactions) {
 			return false;
@@ -521,12 +421,17 @@ class ADODB_pdo extends ADOConnection {
 		return $ret;
 	}
 
-	function RollbackTrans()
-	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'RollbackTrans')) {
-			return $this->_driver->RollbackTrans();
-		}
 
+	/**
+	 * Rolls back a transaction.
+	 *
+	 * If database does not support transactions, return false as rollbacks
+	 * always fail.
+	 *
+	 * @return bool true if successful
+	 */
+	public function rollbackTrans()
+	{
 		if (!$this->hasTransactions) {
 			return false;
 		}
@@ -543,7 +448,18 @@ class ADODB_pdo extends ADOConnection {
 		return $ret;
 	}
 
-	function Prepare($sql)
+	/**
+	 * Prepares an SQL statement and returns a handle to use.
+	 * This is not used by bound parameters anymore
+	 *
+	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:connection:prepare
+	 * @todo update this function to handle prepared statements correctly
+	 *
+	 * @param string $sql The SQL to prepare.
+	 *
+	 * @return string The original SQL that was provided.
+	 */
+	public function prepare($sql)
 	{
 		$this->_stmt = $this->_connectionID->prepare($sql);
 		if ($this->_stmt) {
@@ -553,7 +469,18 @@ class ADODB_pdo extends ADOConnection {
 		return false;
 	}
 
-	function PrepareStmt($sql)
+	/**
+	 * Undocument feature that prepares an SQL statement and returns a handle to use.
+	 * Only exists in the PDO driver and loads the ADOPDOStatement object
+	 *
+	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:connection:prepare
+	 * @todo update this function to handle prepared statements correctly
+	 *
+	 * @param string $sql The SQL to prepare.
+	 *
+	 * @return string The original SQL that was provided.
+	 */
+	public function prepareStmt($sql)
 	{
 		$stmt = $this->_connectionID->prepare($sql);
 		if (!$stmt) {
@@ -563,36 +490,15 @@ class ADODB_pdo extends ADOConnection {
 		return $obj;
 	}
 
-	public function createSequence($seqname='adodbseq',$startID=1)
-	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'createSequence')) {
-			return $this->_driver->createSequence($seqname, $startID);
-		}
-
-		return parent::CreateSequence($seqname, $startID);
-	}
-
-	function DropSequence($seqname='adodbseq')
-	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'DropSequence')) {
-			return $this->_driver->DropSequence($seqname);
-		}
-
-		return parent::DropSequence($seqname);
-	}
-
-	function GenID($seqname='adodbseq',$startID=1)
-	{
-		if($this->_driver instanceof ADODB_pdo && method_exists($this->_driver, 'GenID')) {
-			return $this->_driver->GenID($seqname, $startID);
-		}
-
-		return parent::GenID($seqname, $startID);
-	}
-
-
-	/* returns queryID or false */
-	function _query($sql,$inputarr=false)
+	/**
+	* Return the query id.
+	*
+	* @param string|array $sql
+	* @param array $inputarr
+	*
+	* @return bool|mysqli_result
+	*/
+	public function _query($sql,$inputarr=false)
 	{
 		$ok = false;
 		if (is_array($sql)) {
@@ -602,11 +508,15 @@ class ADODB_pdo extends ADOConnection {
 		}
 
 		if ($stmt) {
-			if ($this->_driver instanceof ADODB_pdo) {
-				$this->_driver->debug = $this->debug;
-			}
+
 			if ($inputarr) {
+
 				$inputarr = $this->conformToBindParameterStyle($stmt->queryString, $inputarr);
+
+				/*
+				* inputarr must be numeric
+				*/
+				$inputarr = array_values($inputarr);
 				$ok = $stmt->execute($inputarr);
 			}
 			else {
@@ -638,18 +548,33 @@ class ADODB_pdo extends ADOConnection {
 		return false;
 	}
 
-	// returns true or false
-	function _close()
+	/**
+	 * Close the database connection.
+	 *
+	 * @return void
+	 */
+	public function _close()
 	{
 		$this->_stmt = false;
-		return true;
+
 	}
 
-	function _affectedrows()
+	/**
+	 * Returns how many rows were effected by the most recently executed SQL statement.
+	 * Only works for INSERT, UPDATE and DELETE queries.
+	 *
+	 * @return int The number of rows affected.
+	 */
+	public function _affectedrows()
 	{
 		return ($this->_stmt) ? $this->_stmt->rowCount() : 0;
 	}
 
+	/**
+	 * Return the AUTO_INCREMENT id of the last row that has been inserted or updated in a table.
+	 *
+	 * @inheritDoc
+	 */
 	protected function _insertID($table = '', $column = '')
 	{
 		return ($this->_connectionID) ? $this->_connectionID->lastInsertId() : 0;
@@ -659,8 +584,7 @@ class ADODB_pdo extends ADOConnection {
 	 * Quotes a string to be sent to the database.
 	 *
 	 * If we have an active connection, delegates quoting to the underlying
-	 * PDO object PDO::quote(). Otherwise, replace "'" by the value of
-	 * $replaceQuote (same behavior as mysqli driver).
+	 * PDO object PDO::quote(). Otherwise, delegate to parent method
 	 *
 	 * @param string  $s           The string to quote
 	 * @param bool   $magic_quotes This param is not used since 5.21.0.
@@ -668,12 +592,13 @@ class ADODB_pdo extends ADOConnection {
 	 *
 	 * @return string Quoted string
 	 */
-	function qStr($s, $magic_quotes = false)
+	public function qStr($s, $magic_quotes = false)
 	{
-		if ($this->_connectionID) {
+		if ($this->_connectionID)
+		{
 			return $this->_connectionID->quote($s);
 		}
-		return "'" . str_replace("'", $this->replaceQuote, $s) . "'";
+		return parent::qStr($s,$magic_quotes);
 	}
 
 	/**
@@ -728,45 +653,54 @@ class ADODB_pdo extends ADOConnection {
 		}
 		return false;
 	}
+
+	/**
+	 * Returns the server information
+	 *
+	 * @return array()
+	 */
+	public function serverInfo()
+	{
+
+		global $ADODB_FETCH_MODE;
+		static $arr = false;
+		if (is_array($arr))
+			return $arr;
+		if ($this->fetchMode === false) {
+			$savem = $ADODB_FETCH_MODE;
+			$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
+		} elseif ($this->fetchMode >=0 && $this->fetchMode <=2) {
+			$savem = $this->fetchMode;
+		} else
+			$savem = $this->SetFetchMode(ADODB_FETCH_NUM);
+
+		//$arr = $this->_connectionID->getAttribute(constant("PDO::ATTR_SERVER_INFO"));
+
+		$ADODB_FETCH_MODE = $savem;
+		return $arr;
+	}
+
+	/**
+	  * Gets the database name from the DSN
+	  *
+	  * @param	string	$dsnString
+	  *
+	  * @return string
+	  */
+	  protected function getDatabasenameFromDsn($dsnString){
+
+		$dsnArray = preg_split('/[;=]+/',$dsnString);
+		$dbIndex  = array_search('database',$dsnArray);
+
+		return $dsnArray[$dbIndex + 1];
+	}
+
+
 }
 
 /**
- * Base class for Database-specific PDO drivers.
+ * Undocumented class to support the PDO preparestmt method
  */
-class ADODB_pdo_base extends ADODB_pdo {
-
-	var $sysDate = "'?'";
-	var $sysTimeStamp = "'?'";
-
-
-	function _init($parentDriver)
-	{
-		$parentDriver->_bindInputArray = true;
-		#$parentDriver->_connectionID->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,true);
-	}
-
-	function ServerInfo()
-	{
-		return ADOConnection::ServerInfo();
-	}
-
-	function SelectLimit($sql,$nrows=-1,$offset=-1,$inputarr=false,$secs2cache=0)
-	{
-		$ret = ADOConnection::SelectLimit($sql,$nrows,$offset,$inputarr,$secs2cache);
-		return $ret;
-	}
-
-	function MetaTables($ttype=false,$showSchema=false,$mask=false)
-	{
-		return false;
-	}
-
-	function MetaColumns($table,$normalize=true)
-	{
-		return false;
-	}
-}
-
 class ADOPDOStatement {
 
 	var $databaseType = "pdo";
@@ -839,6 +773,8 @@ class ADOPDOStatement {
 			return $this->_connectionID->errorInfo();
 		}
 	}
+
+
 }
 
 /*--------------------------------------------------------------------------------------
@@ -875,32 +811,9 @@ class ADORecordSet_pdo extends ADORecordSet {
 	}
 
 
-	function Init()
+	public function _initrs()
 	{
-		if ($this->_inited) {
-			return;
-		}
-		$this->_inited = true;
-		if ($this->_queryID) {
-			@$this->_initrs();
-		}
-		else {
-			$this->_numOfRows = 0;
-			$this->_numOfFields = 0;
-		}
-		if ($this->_numOfRows != 0 && $this->_currentRow == -1) {
-			$this->_currentRow = 0;
-			if ($this->EOF = ($this->_fetch() === false)) {
-				$this->_numOfRows = 0; // _numOfRows could be -1
-			}
-		} else {
-			$this->EOF = true;
-		}
-	}
-
-	function _initrs()
-	{
-	global $ADODB_COUNTRECS;
+		global $ADODB_COUNTRECS;
 
 		$this->_numOfRows = ($ADODB_COUNTRECS) ? @$this->_queryID->rowCount() : -1;
 		if (!$this->_numOfRows) {
@@ -909,8 +822,16 @@ class ADORecordSet_pdo extends ADORecordSet {
 		$this->_numOfFields = $this->_queryID->columnCount();
 	}
 
-	// returns the field object
-	function FetchField($fieldOffset = -1)
+	/**
+	 * Returns raw, database specific information about a field.
+	 *
+	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:recordset:fetchfield
+	 *
+	 * @param int $fieldOffset (Optional) The field number to get information for.
+	 *
+	 * @return ADOFieldObject|bool
+	 */
+	public function fetchField($fieldOffset = -1)
 	{
 		$off=$fieldOffset+1; // offsets begin at 1
 
@@ -956,12 +877,24 @@ class ADORecordSet_pdo extends ADORecordSet {
 		return $o;
 	}
 
-	function _seek($row)
+	/**
+	 * Adjusts the result pointer to an arbitrary row in the result.
+	 *
+	 * @param int $row The row to seek to.
+	 *
+	 * @return bool False if the recordset contains no rows, otherwise true.
+	 */
+	public function _seek($row)
 	{
 		return false;
 	}
 
-	function _fetch()
+	/**
+	 * Attempt to fetch a result row using the current fetch mode and return whether or not this was successful.
+	 *
+	 * @return bool True if row was fetched successfully, otherwise false.
+	 */
+	public function _fetch()
 	{
 		if (!$this->_queryID) {
 			return false;
@@ -971,12 +904,26 @@ class ADORecordSet_pdo extends ADORecordSet {
 		return !empty($this->fields);
 	}
 
-	function _close()
+	/**
+	 * Frees the memory associated with a result.
+	 *
+	 * @return void
+	 */
+	public function _close()
 	{
 		$this->_queryID = false;
 	}
 
-	function Fields($colname)
+	/**
+	 * Returns a single field in a single row of the current recordset.
+	 *
+	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:recordset:fields
+	 *
+	 * @param string $colname The name of the field to retrieve.
+	 *
+	 * @return mixed
+	 */
+	public function fields($colname)
 	{
 		if ($this->adodbFetchMode != ADODB_FETCH_NUM) {
 			return @$this->fields[$colname];
