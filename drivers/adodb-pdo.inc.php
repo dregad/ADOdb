@@ -285,10 +285,10 @@ class ADODB_pdo extends ADOConnection {
 		/** @var PDOStatement $obj */
 		$obj = $stmt[1];
 		if ($type) {
-			$obj->bindParam($name, $var, $type, $maxLen);
+			return $obj->bindParam($name, $var, $type, $maxLen);
 		}
 		else {
-			$obj->bindParam($name, $var);
+			return $obj->bindParam($name, $var);
 		}
 	}
 
