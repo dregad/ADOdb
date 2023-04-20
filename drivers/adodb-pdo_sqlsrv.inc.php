@@ -53,11 +53,6 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 	public $fmtDate 		= "'Y-m-d'";
 	public $cachedSchemaFlush = false;
 
-	function _init(ADODB_pdo $parentDriver)
-	{
-
-	}
-
 	/**
 	 * Begins a granular transaction.
 	 *

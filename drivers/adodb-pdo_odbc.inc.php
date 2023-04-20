@@ -29,7 +29,6 @@ class ADODB_pdo_odbc extends ADODB_pdo {
 
 	public $metaColumnsSQL;
 
-	function _init($parentDriver){}
 
 	/**
 	 * Calculate the offset of a date for a particular database

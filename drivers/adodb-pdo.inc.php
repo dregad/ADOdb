@@ -121,6 +121,13 @@ class ADODB_pdo extends ADOConnection {
 	public $bindParameterStyle = self::BIND_USE_BOTH;
 
 	/**
+	 * PDO Driver initialization.
+	 *
+	 * @param ADODB_pdo $parentDriver
+	 */
+	function _init(ADODB_pdo $parentDriver) {}
+
+	/**
 	 * Connect to a database.
 	 *
 	 * @param string|null $argDSN 		 	The host to connect to.

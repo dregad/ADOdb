@@ -73,7 +73,6 @@ class ADODB_pdo_pgsql extends ADODB_pdo {
 	public $hasInsertID = true;
 	public $_nestedSQL = true;
 
-	public function _init($parentDriver){}
 
 	/**
 	 * Returns the server information

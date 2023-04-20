@@ -61,8 +61,6 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 	 */
 	private $tableCase = 2;
 
-	public function _init($parentDriver){}
-
 
 	/**
 	 * Select a limited number of rows.
