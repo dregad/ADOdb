@@ -92,7 +92,7 @@ class ADODB_pdo extends ADOConnection {
 
 	var $_stmt = false;
 
-	/** @var ADODB_pdo_base */
+	/** @var ADODB_pdo */
 	var $_driver;
 
 	/** @var PDO */
@@ -101,20 +101,24 @@ class ADODB_pdo extends ADOConnection {
 	/** @var PDOStatement */
 	var $_queryID;
 
-	/*
-	* Describe parameters passed directly to the PDO driver
-	*
-	* @example $db->pdoParameters = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
-	*/
+	/**
+	 * Describe parameters passed directly to the PDO driver
+	 *
+	 * @example $db->pdoParameters = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION];
+	 *
+	 * @var array
+	 */
 	public $pdoParameters = array();
 
-	/*
-	* Set which style is used to bind parameters
-	*
-	* BIND_USE_QUESTION_MARKS   = Use only question marks
-	* BIND_USE_NAMED_PARAMETERS = Use only named parameters
-	* BIND_USE_BOTH             = Use both question marks and named parameters (Default)
-	*/
+	/**
+	 * Set which style is used to bind parameters
+	 *
+	 * BIND_USE_QUESTION_MARKS   = Use only question marks
+	 * BIND_USE_NAMED_PARAMETERS = Use only named parameters
+	 * BIND_USE_BOTH             = Use both question marks and named parameters (Default)
+	 *
+	 * @var int
+	 */
 	public $bindParameterStyle = self::BIND_USE_BOTH;
 
 	/**
@@ -278,6 +282,7 @@ class ADODB_pdo extends ADOConnection {
 	 */
 	public function inParameter(&$stmt,&$var,$name,$maxLen=4000,$type=false)
 	{
+		/** @var PDOStatement $obj */
 		$obj = $stmt[1];
 		if ($type) {
 			$obj->bindParam($name, $var, $type, $maxLen);
@@ -457,7 +462,7 @@ class ADODB_pdo extends ADOConnection {
 	 *
 	 * @param string $sql The SQL to prepare.
 	 *
-	 * @return string The original SQL that was provided.
+	 * @return array|false The original SQL that was provided.
 	 */
 	public function prepare($sql)
 	{
@@ -470,7 +475,7 @@ class ADODB_pdo extends ADOConnection {
 	}
 
 	/**
-	 * Undocument feature that prepares an SQL statement and returns a handle to use.
+	 * Undocumented feature that prepares an SQL statement and returns a handle to use.
 	 * Only exists in the PDO driver and loads the ADOPDOStatement object
 	 *
 	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:connection:prepare
@@ -478,7 +483,7 @@ class ADODB_pdo extends ADOConnection {
 	 *
 	 * @param string $sql The SQL to prepare.
 	 *
-	 * @return string The original SQL that was provided.
+	 * @return ADOPDOStatement|false The original SQL that was provided.
 	 */
 	public function prepareStmt($sql)
 	{

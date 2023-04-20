@@ -5508,7 +5508,12 @@ class ADORecordSet implements IteratorAggregate {
 	}
 
 	/**
-	 * Load the code for a specific database driver. Private function. Do not use.
+	 * Load the code for a specific database driver.
+	 *
+	 * @internal Private function. Do not use.
+	 *
+	 * @param string $dbType       Database driver type
+	 * @param string $pdoExtension PDO extension (if $dbType == PDO, ignored otherwise)
 	 */
 	function ADOLoadCode($dbType, $pdoExtension='') {
 		global $ADODB_LASTDB;

@@ -52,7 +52,7 @@ class ADODB_pdo_firebird extends ADODB_pdo
 
 
 	/**
-	 * Gets the version iformation from the server
+	 * Gets the version information from the server
 	 *
 	 * @return string[]
 	 */
