@@ -174,7 +174,7 @@ class ADODB_pdo extends ADOConnection {
 		}
 
 		if ($argDatabasename) {
-			$this->databaseName = $argDatabasename;
+			$this->database = $argDatabasename;
 
 			switch($this->dsnType){
 				case 'sqlsrv':
@@ -190,8 +190,8 @@ class ADODB_pdo extends ADOConnection {
 					$argDSN .= ';dbname='.$argDatabasename;
 			}
 		}
-		elseif (!$this->databaseName)
-			$this->databaseName = $this->getDatabasenameFromDsn($argDSN);
+		elseif (!$this->database)
+			$this->database = $this->getDatabasenameFromDsn($argDSN);
 
 		/*
 		* Configure for persistent connection if required,
