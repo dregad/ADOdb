@@ -54,19 +54,6 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 	public $cachedSchemaFlush = false;
 
 	/**
-	 * Begins a granular transaction.
-	 *
-	 * @link https://adodb.org/dokuwiki/doku.php?id=v5:reference:connection:begintrans
-	 *
-	 * @return bool Always returns true.
-	 */
-	public function beginTrans()
-	{
-		$returnval = parent::BeginTrans();
-		return $returnval;
-	}
-
-	/**
 	 * List indexes on a table as an array.
 	 * @param table  table name to query
 	 * @param primary true to only show primary keys. Not actually used for most databases
