@@ -20,14 +20,14 @@
 
 class ADODB_pdo_odbc extends ADODB_pdo {
 
-    /*
-    * Because we don't know what the end point database is, 
-    * we can't support any of the database specific functions
-    */    
+	/*
+	* Because we don't know what the end point database is,
+	* we can't support any of the database specific functions
+	*/
 	public $hasTransactions = false;
 	public $hasInsertID     = false;
 
-    public $metaColumnsSQL;
+	public $metaColumnsSQL;
 
 	function _init($parentDriver){}
 
@@ -52,7 +52,7 @@ class ADODB_pdo_odbc extends ADODB_pdo {
 		return $date . ' + INTERVAL ' .	$fraction . ' SECOND';
 //		return "from_unixtime(unix_timestamp($date)+$fraction)";
 	}
-	
+
 	/**
 	 * Get information about the current server.
 	 *
@@ -66,15 +66,14 @@ class ADODB_pdo_odbc extends ADODB_pdo {
 		return $arr;
 	}
 
-    /**
-	  * Gets the database name from the DSN
-	  *
-	  * @param	string	$dsnString
-	  *
-	  * @return string
-	  */
-	  protected function getDatabasenameFromDsn($dsnString){
-
+	/**
+	 * Gets the database name from the DSN
+	 *
+	 * @param	string	$dsnString
+	 *
+	 * @return string
+	 */
+	protected function getDatabasenameFromDsn($dsnString){
 		return $dsnString;
 	}
 

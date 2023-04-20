@@ -31,19 +31,19 @@ final class ADODB2_pdo_mysql extends ADODB_DataDict {
 	var $renameColumn = 'ALTER TABLE %s CHANGE COLUMN %s %s %s';	// needs column-definition!
 
 	public $blobAllowsNotNull = true;
-	
+
 	/**
 	 * Returns a database-independent value for a physical type
-	 * 
+	 *
 	 * @param	string		$t
 	 * @param	int			$len;
 	 * @param	obj			$fieldobj;
-	 * 
+	 *
 	 * @return string
 	 */
 	public function metaType($t,$len=-1,$fieldobj=false)
 	{
-		
+
 		if (is_object($t)) {
 			$fieldobj = $t;
 			$t = $fieldobj->type;
@@ -52,14 +52,14 @@ final class ADODB2_pdo_mysql extends ADODB_DataDict {
 		$is_serial = is_object($fieldobj) && $fieldobj->primary_key && $fieldobj->auto_increment;
 
 		$len = -1; // mysql max_length is not accurate
-			
+
 		$t = strtoupper($t);
-		
+
 		if (array_key_exists($t,$this->connection->customActualTypes))
 			return  $this->connection->customActualTypes[$t];
-		
+
 		switch ($t) {
-			
+
 		case 'STRING':
 		case 'CHAR':
 		case 'VARCHAR':
@@ -99,34 +99,34 @@ final class ADODB2_pdo_mysql extends ADODB_DataDict {
 		case 'SMALLINT': return $is_serial ? 'R' : 'I2';
 		case 'MEDIUMINT': return $is_serial ? 'R' : 'I4';
 		case 'BIGINT':  return $is_serial ? 'R' : 'I8';
-		default: 
-			
+		default:
+
 			return ADODB_DEFAULT_METATYPE;
 		}
 	}
 
 	/**
 	 * Returns a database-specific type for a metatype
-	 * 
+	 *
 	 * @param	string		$meta
-	 * 
+	 *
 	 * @return string
 	 */
 	public function actualType($meta)
 	{
-		
+
 		$meta = strtoupper($meta);
-		
+
 		/*
 		* Add support for custom meta types. We do this
 		* first, that allows us to override existing types
 		*/
 		if (isset($this->connection->customMetaTypes[$meta]))
 			return $this->connection->customMetaTypes[$meta]['actual'];
-				
-		switch($meta) 
+
+		switch($meta)
 		{
-		
+
 		case 'C': return 'VARCHAR';
 		case 'XL':return 'LONGTEXT';
 		case 'X': return 'TEXT';
@@ -150,15 +150,15 @@ final class ADODB2_pdo_mysql extends ADODB_DataDict {
 
 		case 'F': return 'DOUBLE';
 		case 'N': return 'NUMERIC';
-			
+
 		default:
-			
+
 			return $meta;
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @return string
 	 */
 	public function _createSuffix($fname,&$ftype,$fnotnull,$fdefault,$fautoinc,$fconstraint,$funsigned)
@@ -232,3 +232,4 @@ final class ADODB2_pdo_mysql extends ADODB_DataDict {
 		return $sql;
 	}
 }
+

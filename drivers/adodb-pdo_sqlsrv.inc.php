@@ -188,7 +188,7 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 
 	/**
 	 * Returns a list of databases
-	 * 
+	 *
 	 * @return array
 	 */
 	public function metaDatabases()
@@ -408,11 +408,12 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 			$procedureName = $r[0];
 			$schemaName    = $r[2];
 			$routineCatalog= $r[3];
-			$metaProcedures[$procedureName] = array('type'=> $r[1],
-												   'catalog' => $routineCatalog,
-												   'schema'  => $schemaName,
-												   'remarks' => '',
-												    );
+			$metaProcedures[$procedureName] = array(
+				'type'=> $r[1],
+				'catalog' => $routineCatalog,
+				'schema'  => $schemaName,
+				'remarks' => '',
+				);
 		}
 
 		return $metaProcedures;
@@ -442,7 +443,7 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 	 * Dies if connected to a non-supported version (2000 and older)
 	 */
 	public function serverVersion() {
-		
+
 		$data = $this->serverInfo();
 		preg_match('/^\d{2}/', $data['version'], $matches);
 		$version = (int)reset($matches);
@@ -457,7 +458,7 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 
 	/**
 	 * Returns the server information
-	 * 
+	 *
 	 * @return array()
 	 */
 	public function serverInfo() {
@@ -475,14 +476,14 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 			$savem = $this->SetFetchMode(ADODB_FETCH_NUM);
 
 		$arrServerInfo = $this->_connectionID->getAttribute(constant("PDO::ATTR_SERVER_INFO"));
-	
+
 		$ADODB_FETCH_MODE = $savem;
-		
+
 		$arr['description'] = $arrServerInfo['SQLServerName'].' connected to '.$arrServerInfo['CurrentDatabase'];
 		$arr['version']     = $arrServerInfo['SQLServerVersion'];//ADOConnection::_findvers($arr['description']);
 		return $arr;
 	}
-	
+
 	/**
 	 * Proper Sequences Only available to Server 2012 and up
 	 */
@@ -493,11 +494,11 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 			$sql = "SELECT name FROM sys.sequences";
 			$this->sequences = $this->GetCol($sql);
 		}
-		
+
 		$ok = $this->Execute("CREATE SEQUENCE $seq START WITH $start INCREMENT BY 1");
 		if (!$ok)
 			die("CANNOT CREATE SEQUENCE");
-		
+
 		$this->sequences[] = $seq;
 	}
 
@@ -509,7 +510,7 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 	 *
 	 * @param string $seq
 	 * @param int	 $start
-	 * 
+	 *
 	 * @return int
 	 */
 	public function genID($seq='adodbseq',$start=1)
@@ -534,7 +535,7 @@ class ADODB_pdo_sqlsrv extends ADODB_pdo
 		$num = $this->GetOne("SELECT NEXT VALUE FOR $seq");
 		return $num;
 	}
-	
+
 }
 
 class ADORecordSet_pdo_sqlsrv extends ADORecordSet_pdo
@@ -640,7 +641,7 @@ class ADORecordSet_array_pdo_sqlsrv extends ADORecordSet_array_pdo
 
 		return $o;
 	}
-	
+
 	/**
 	 * Sets the isolation level of a transaction.
 	 *

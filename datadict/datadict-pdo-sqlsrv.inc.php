@@ -69,13 +69,13 @@ final class ADODB2_pdo_sqlsrv extends ADODB_DataDict {
 			$fieldobj = $t;
 			$t = $fieldobj->type;
 		}
-		
-	
+
+
 		$t = strtoupper($t);
-		
+
 		if (array_key_exists($t,$this->connection->customActualTypes))
 			return  $this->connection->customActualTypes[$t];
-		
+
 		$_typeConversion = array(
 			-155 => 'D',
 			  93 => 'D',
@@ -120,39 +120,38 @@ final class ADODB2_pdo_sqlsrv extends ADODB_DataDict {
 	{
 		$DATE_TYPE = 'DATETIME';
 		$meta = strtoupper($meta);
-		
+
 		/*
 		* Add support for custom meta types. We do this
 		* first, that allows us to override existing types
 		*/
 		if (isset($this->connection->customMetaTypes[$meta]))
 			return $this->connection->customMetaTypes[$meta]['actual'];
-		
+
 		switch(strtoupper($meta)) {
+			case 'C': return 'VARCHAR';
+			case 'XL': return (isset($this)) ? $this->typeXL : 'TEXT';
+			case 'X': return (isset($this)) ? $this->typeX : 'TEXT'; ## could be varchar(8000), but we want compat with oracle
+			case 'C2': return 'NVARCHAR';
+			case 'X2': return 'NTEXT';
 
-		case 'C': return 'VARCHAR';
-		case 'XL': return (isset($this)) ? $this->typeXL : 'TEXT';
-		case 'X': return (isset($this)) ? $this->typeX : 'TEXT'; ## could be varchar(8000), but we want compat with oracle
-		case 'C2': return 'NVARCHAR';
-		case 'X2': return 'NTEXT';
+			case 'B': return 'IMAGE';
 
-		case 'B': return 'IMAGE';
+			case 'D': return $DATE_TYPE;
+			case 'T': return 'TIME';
+			case 'L': return 'BIT';
 
-		case 'D': return $DATE_TYPE;
-		case 'T': return 'TIME';
-		case 'L': return 'BIT';
+			case 'R':
+			case 'I': return 'INT';
+			case 'I1': return 'TINYINT';
+			case 'I2': return 'SMALLINT';
+			case 'I4': return 'INT';
+			case 'I8': return 'BIGINT';
 
-		case 'R':
-		case 'I': return 'INT';
-		case 'I1': return 'TINYINT';
-		case 'I2': return 'SMALLINT';
-		case 'I4': return 'INT';
-		case 'I8': return 'BIGINT';
-
-		case 'F': return 'REAL';
-		case 'N': return 'NUMERIC';
-		default:
-			return $meta;
+			case 'F': return 'REAL';
+			case 'N': return 'NUMERIC';
+			default:
+				return $meta;
 		}
 	}
 

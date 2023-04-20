@@ -30,43 +30,43 @@ final class ADODB2_pdo_ibm extends ADODB_DataDict {
 	public $blobAllowsDefaultValue = true;
 	public $blobAllowsNotNull      = true;
 
-	
- 	function ActualType($meta)
+
+	function ActualType($meta)
 	{
 		$meta = strtoupper($meta);
-		
+
 		/*
 		* Add support for custom meta types. We do this
 		* first, that allows us to override existing types
 		*/
 		if (isset($this->connection->customMetaTypes[$meta]))
 			return $this->connection->customMetaTypes[$meta]['actual'];
-		
+
 		switch($meta) {
-		case 'C': return 'VARCHAR';
-		case 'XL': return 'CLOB';
-		case 'X': return 'VARCHAR(3600)';
+			case 'C': return 'VARCHAR';
+			case 'XL': return 'CLOB';
+			case 'X': return 'VARCHAR(3600)';
 
-		case 'C2': return 'VARCHAR'; // up to 32K
-		case 'X2': return 'VARCHAR(3600)'; // up to 32000, but default page size too small
+			case 'C2': return 'VARCHAR'; // up to 32K
+			case 'X2': return 'VARCHAR(3600)'; // up to 32000, but default page size too small
 
-		case 'B': return 'BLOB';
+			case 'B': return 'BLOB';
 
-		case 'D': return 'DATE';
-		case 'TS':
-		case 'T': return 'TIMESTAMP';
+			case 'D': return 'DATE';
+			case 'TS':
+			case 'T': return 'TIMESTAMP';
 
-		case 'L': return 'SMALLINT';
-		case 'I': return 'INTEGER';
-		case 'I1': return 'SMALLINT';
-		case 'I2': return 'SMALLINT';
-		case 'I4': return 'INTEGER';
-		case 'I8': return 'BIGINT';
+			case 'L': return 'SMALLINT';
+			case 'I': return 'INTEGER';
+			case 'I1': return 'SMALLINT';
+			case 'I2': return 'SMALLINT';
+			case 'I4': return 'INTEGER';
+			case 'I8': return 'BIGINT';
 
-		case 'F': return 'DOUBLE';
-		case 'N': return 'DECIMAL';
-		default:
-			return $meta;
+			case 'F': return 'DOUBLE';
+			case 'N': return 'DECIMAL';
+			default:
+				return $meta;
 		}
 	}
 
@@ -89,24 +89,24 @@ final class ADODB2_pdo_ibm extends ADODB_DataDict {
 		// genfields can return FALSE at times
 		if ($lines == null) $lines = array();
 		$alter = 'ALTER TABLE ' . $tabname . $this->alterCol . ' ';
-		
+
 		$dataTypeWords = array('SET','DATA','TYPE');
-		
-		foreach($lines as $v) 
+
+		foreach($lines as $v)
 		{
 			/*
 			 * We must now post-process the line to insert the 'SET DATA TYPE'
 			 * text into the alter statement
 			 */
 			$e = explode(' ',$v);
-			
+
 			array_splice($e,1,0,$dataTypeWords);
-			
+
 			$v = implode(' ',$e);
-			
+
 			$sql[] = $alter . $v;
 		}
-		if (is_array($idxs)) 
+		if (is_array($idxs))
 		{
 			foreach($idxs as $idx => $idxdef) {
 				$sql_idxs = $this->CreateIndexSql($idx, $tabname, $idxdef['cols'], $idxdef['opts']);
@@ -118,14 +118,14 @@ final class ADODB2_pdo_ibm extends ADODB_DataDict {
 	}
 
 
-	
+
 	function dropColumnSql($tabname, $flds, $tableflds='',$tableoptions='')
 	{
-		
-		
+
+
 		$tabname = $this->connection->getMetaCasedValue($tabname);
 		$flds    = $this->connection->getMetaCasedValue($flds);
-		
+
 		if (ADODB_ASSOC_CASE  == ADODB_ASSOC_CASE_NATIVE )
 		{
 			/*
@@ -138,22 +138,18 @@ final class ADODB2_pdo_ibm extends ADODB_DataDict {
 		return (array)$sql;
 
 	}
-    
+
 
 	function changeTableSQL($tablename, $flds, $tableoptions = false, $dropOldFields=false)
 	{
-
-		/**
-		  Allow basic table changes to DB2 databases
-		  DB2 will fatally reject changes to non character columns
-
-		*/
+		// Allow basic table changes to DB2 databases
+		// DB2 will fatally reject changes to non character columns
 
 		$validTypes = array("CHAR","VARC");
 		$invalidTypes = array("BIGI","BLOB","CLOB","DATE", "DECI","DOUB", "INTE", "REAL","SMAL", "TIME");
 		// check table exists
-		
-		
+
+
 		$cols = $this->metaColumns($tablename);
 		if ( empty($cols)) {
 			return $this->createTableSQL($tablename, $flds, $tableoptions);
@@ -172,13 +168,11 @@ final class ADODB2_pdo_ibm extends ADODB_DataDict {
 			 */
 			$id = str_replace($this->connection->nameQuote,'',$id);
 			if ( isset($cols[$id]) && is_object($cols[$id]) ) {
-				/**
-				  If the first field of $v is the fieldname, and
-				  the second is the field type/size, we assume its an
-				  attempt to modify the column size, so check that it is allowed
-				  $v can have an indeterminate number of blanks between the
-				  fields, so account for that too
-				 */
+				// If the first field of $v is the fieldname, and the second is
+				// the field type/size, we assume its an attempt to modify the
+				// column size, so check that it is allowed $v can have an
+				// indeterminate number of blanks between the fields, so account
+				// for that too
 				$vargs = explode(' ' , $v);
 				// assume that $vargs[0] is the field name.
 				$i=0;

@@ -5299,6 +5299,7 @@ class ADORecordSet implements IteratorAggregate {
 		var $sql = '';
 		var $compat = false;
 
+
 		/**
 		 * Constructor
 		 *

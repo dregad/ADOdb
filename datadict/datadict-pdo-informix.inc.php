@@ -29,37 +29,37 @@ class ADODB2_pdo_informix extends ADODB_DataDict {
 
 	var $alterCol = ' MODIFY COLUMN';
 	var $alterTableAddIndex = true;
-	
+
 	public $dropTable = 'DROP TABLE IF EXISTS %s';
 
 	var $dropIndex = 'DROP INDEX %s ON %s';
 	var $renameColumn = 'ALTER TABLE %s CHANGE COLUMN %s %s %s';	// needs column-definition!
 
 	public $blobAllowsNotNull = true;
-	
+
 	public function metaType($t,$len=-1,$fieldobj=false)
 	{
-		
+
 		print "\nMT=$t";
-		
+
 		if (is_object($t)) {
 			$fieldobj = $t;
 			$t = $fieldobj->type;
 		}
-	
+
 		$t = strtoupper($t);
-		
+
 		if (array_key_exists($t,$this->connection->customActualTypes))
 			return  $this->connection->customActualTypes[$t];
-	
+
 		if (!is_integer($t))
 			return ADODB_DEFAULT_METATYPE;
-	
+
 		if ($t >= 255 && $t < 512)
 		{
-			$t -= 256; 
+			$t -= 256;
 		}
-		
+
 		$typeCrossRef = array(
 			0 => 'C', //'CHAR',
 			1 => 'I2', //'SMALLINT',
@@ -94,29 +94,29 @@ class ADODB2_pdo_informix extends ADODB_DataDict {
 			2061 => 'C', //'IDSSECURITYLABEL',
 			4118 => 'R' //'ROW'
 		);
-		
-		
+
+
 		if (array_key_exists($t,$typeCrossRef))
 		{
 			return $typeCrossRef[$t];
 		}
-		
+
 		return ADODB_DEFAULT_METATYPE;
 	}
 
 	public function actualType($meta)
 	{
 		$meta = strtoupper($meta);
-		
+
 		/*
 		* Add support for custom meta types. We do this
 		* first, that allows us to override existing types
 		*/
 		if (isset($this->connection->customMetaTypes[$meta]))
 			return $this->connection->customMetaTypes[$meta]['actual'];
-		
+
 		switch($meta) {
-		
+
 		case 'C': return 'VARCHAR';// 255
 		case 'XL':
 		case 'X': return 'TEXT';
@@ -139,13 +139,13 @@ class ADODB2_pdo_informix extends ADODB_DataDict {
 
 		case 'F': return 'FLOAT';
 		case 'N': return 'DECIMAL';
-		
-		default: 
+
+		default:
 			return $meta;
 		}
 	}
 
-	
+
 	// return string must begin with space
 	public function _createSuffix($fname, &$ftype, $fnotnull,$fdefault,$fautoinc,$fconstraint,$funsigned)
 	{

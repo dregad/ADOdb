@@ -195,7 +195,7 @@ class ADODB2_firebird extends ADODB_DataDict
 	for each row
 	begin
 	IF ( NEW."seqField" IS NULL OR NEW."seqField" = 0 ) THEN
-	  NEW."seqField" = GEN_ID("GEN_tabname", 1);
+		NEW."seqField" = GEN_ID("GEN_tabname", 1);
 	end;
 	*/
 	function _triggers($tabname, $taboptions)

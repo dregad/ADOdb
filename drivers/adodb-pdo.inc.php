@@ -87,8 +87,6 @@ class ADODB_pdo extends ADOConnection {
 	public $_genSeq2SQL 	 = '';
 	public $_dropSeqSQL 	 = 'DROP TABLE %s';
 
-
-
 	var $_autocommit = true;
 	var $_lastAffectedRows = 0;
 
@@ -357,13 +355,13 @@ class ADODB_pdo extends ADOConnection {
 
 	/**
 	 * @deprecated - replace with setConnectionParameter()
-     * @param bool $auto_commit
-     * @return void
-     */
-    public function setAutoCommit($auto_commit)
-    {
+	 * @param bool $auto_commit
+	 * @return void
+	 */
+	public function setAutoCommit($auto_commit)
+	{
 		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT, $auto_commit);
-    }
+	}
 
 
 	/**
@@ -375,7 +373,6 @@ class ADODB_pdo extends ADOConnection {
 	 */
 	public function beginTrans()
 	{
-
 		if (!$this->hasTransactions) {
 			return false;
 		}
@@ -401,7 +398,6 @@ class ADODB_pdo extends ADOConnection {
 	 */
 	public function commitTrans($ok=true)
 	{
-
 		if (!$this->hasTransactions) {
 			return false;
 		}
@@ -661,7 +657,6 @@ class ADODB_pdo extends ADOConnection {
 	 */
 	public function serverInfo()
 	{
-
 		global $ADODB_FETCH_MODE;
 		static $arr = false;
 		if (is_array($arr))
@@ -681,13 +676,13 @@ class ADODB_pdo extends ADOConnection {
 	}
 
 	/**
-	  * Gets the database name from the DSN
-	  *
-	  * @param	string	$dsnString
-	  *
-	  * @return string
-	  */
-	  protected function getDatabasenameFromDsn($dsnString){
+	 * Gets the database name from the DSN
+	 *
+	 * @param	string	$dsnString
+	 *
+	 * @return string
+	 */
+	protected function getDatabasenameFromDsn($dsnString) {
 
 		$dsnArray = preg_split('/[;=]+/',$dsnString);
 		$dbIndex  = array_search('database',$dsnArray);
@@ -849,18 +844,18 @@ class ADORecordSet_pdo extends ADORecordSet {
 		$o->name = $arr['name'];
 		if (isset($arr['sqlsrv:decl_type']) && $arr['sqlsrv:decl_type'] <> "null")
 		{
-		    /*
-		    * If the database is SQL server, use the native built-ins
-		    */
-		    $o->type = $arr['sqlsrv:decl_type'];
+			/*
+			* If the database is SQL server, use the native built-ins
+			*/
+			$o->type = $arr['sqlsrv:decl_type'];
 		}
 		elseif (isset($arr['native_type']) && $arr['native_type'] <> "null")
 		{
-		    $o->type = $arr['native_type'];
+			$o->type = $arr['native_type'];
 		}
 		else
 		{
-		     $o->type = adodb_pdo_type($arr['pdo_type']);
+			 $o->type = adodb_pdo_type($arr['pdo_type']);
 		}
 
 		$o->max_length = $arr['len'];

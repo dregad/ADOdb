@@ -30,7 +30,7 @@ class ADODB_pdo_mysql extends ADODB_pdo {
 	var $sysDate = 'CURDATE()';
 	var $sysTimeStamp = 'NOW()';
 	var $hasGenID = true;
-	
+
 	/*
 	* Sequence management statements
 	*/
@@ -39,7 +39,7 @@ class ADODB_pdo_mysql extends ADODB_pdo {
 	public $_genSeqCountSQL  = 'SELECT COUNT(*) FROM %s';
 	public $_genSeq2SQL 	 = 'INSERT INTO %s VALUES (%s)';
 	public $_dropSeqSQL 	 = 'DROP TABLE IF EXISTS %s';
-	
+
 	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $nameQuote = '`';
 
@@ -195,15 +195,15 @@ class ADODB_pdo_mysql extends ADODB_pdo {
 		return $ret;
 	}
 
-    /**
+	/**
 	 * @deprecated - replace with setConnectionParameter()
-     * @param bool $auto_commit
-     * @return void
-     */
-    public function setAutoCommit($auto_commit)
-    {
-        $this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT, $auto_commit);
-    }
+	 * @param bool $auto_commit
+	 * @return void
+	 */
+	public function setAutoCommit($auto_commit)
+	{
+		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT, $auto_commit);
+	}
 
 	/**
 	 * Sets the isolation level of a transaction.
@@ -287,7 +287,7 @@ class ADODB_pdo_mysql extends ADODB_pdo {
 				$fld->enums = $arr;
 				$zlen = max(array_map('strlen', $arr)) - 2; // PHP >= 4.0.6
 				$fld->max_length = ($zlen > 0) ? $zlen : 1;
-			} else { 
+			} else {
 				$fld->type = $type;
 				$fld->max_length = -1;
 			}

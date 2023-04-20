@@ -28,7 +28,7 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 	var $nameQuote       = '`';
 	var $replaceQuote    = "''";
 	var $hasGenID        = true;
-	
+
 	var $concat_operator = '||';
 	var $random='abs(random())';
 
@@ -43,7 +43,7 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 	 */
 	public function serverInfo()
 	{
-		
+
 		@($ver = array_pop($this->GetCol("SELECT sqlite_version()")));
 		@($enc = array_pop($this->GetCol("PRAGMA encoding")));
 
@@ -194,7 +194,7 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 		return $ret;
 	}
 
-	
+
 	/**
 	 * Returns a list of Foreign Keys associated with a specific table.
 	 *
@@ -212,22 +212,22 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 	 */
 	public function metaForeignKeys($table, $owner = '', $upper =  false, $associative =  false)
 	{
-	    global $ADODB_FETCH_MODE;
+		global $ADODB_FETCH_MODE;
 		if ($ADODB_FETCH_MODE == ADODB_FETCH_ASSOC
 		|| $this->fetchMode == ADODB_FETCH_ASSOC)
 		$associative = true;
 
-	    /*
+		/*
 		* Read sqlite master to find foreign keys
 		*/
 		$sql = "SELECT sql
-				 FROM (
-				SELECT sql sql, type type, tbl_name tbl_name, name name
-				  FROM sqlite_master
-			          )
+				FROM (
+					SELECT sql sql, type type, tbl_name tbl_name, name name
+					FROM sqlite_master
+					)
 				WHERE type != 'meta'
-				  AND sql NOTNULL
-				  AND LOWER(name) ='" . strtolower($table) . "'";
+				AND sql NOTNULL
+				AND LOWER(name) ='" . strtolower($table) . "'";
 
 		$tableSql = $this->getOne($sql);
 
@@ -263,7 +263,7 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 		return $fkeyList;
 	}
 
-    /**
+	/**
 	 * List columns in a database as an array of ADOFieldObjects.
 	 * See top of file for definition of object.
 	 *
@@ -330,7 +330,7 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 	 */
 	public function metaTables($ttype=false,$showSchema=false,$mask=false)
 	{
-	
+
 		if ($mask) {
 			$save = $this->metaTablesSQL;
 			$mask = $this->qstr(strtoupper($mask));
@@ -359,15 +359,14 @@ class ADODB_pdo_sqlite extends ADODB_pdo {
 	}
 
 	/**
-	  * Gets the database name from the DSN
-	  *
-	  * @param	string	$dsnString
-	  *
-	  * @return string
-	  */
-	  protected function getDatabasenameFromDsn($dsnString){
-
+	 * Gets the database name from the DSN
+	 *
+	 * @param	string	$dsnString
+	 *
+	 * @return string
+	 */
+	protected function getDatabasenameFromDsn($dsnString){
 		return $dsnString;
 	}
-	
+
 }

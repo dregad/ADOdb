@@ -30,23 +30,23 @@ final class ADODB2_pdo_sqlite extends ADODB_DataDict {
 	var $dropIndex = 'DROP INDEX IF EXISTS %s';
 	var $renameTable = 'ALTER TABLE %s RENAME TO %s';
 
-    public $hasTransactions = false;
+	public $hasTransactions = false;
 
 	public $blobAllowsDefaultValue = true;
 	public $blobAllowsNotNull      = true;
-    
+
 	function ActualType($meta)
 	{
-		
+
 		$meta = strtoupper($meta);
-		
+
 		/*
 		* Add support for custom meta types. We do this
 		* first, that allows us to override existing types
 		*/
 		if (isset($this->connection->customMetaTypes[$meta]))
 			return $this->connection->customMetaTypes[$meta]['actual'];
-		
+
 		switch(strtoupper($meta)) {
 		case 'C': return 'VARCHAR'; //  TEXT , TEXT affinity
 		case 'XL':return 'LONGTEXT'; //  TEXT , TEXT affinity

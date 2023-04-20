@@ -28,31 +28,28 @@ class ADODB_pdo_informix extends ADODB_pdo {
 	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $replaceQuote = "''"; // string to use to replace quotes
 
- 	var $_initdate 			= true;
+	var $_initdate 			= true;
 	public $_bindInputArray = true;
 	public $_nestedSQL 		= true;
-	
-    public $substr = 'SUBSTR';
 
-	public $metaTablesSQL = 
-        "SELECT tabname,tabtype 
-           FROM systables 
-          WHERE tabtype IN ('T','V') 
-            AND owner !='informix'"; //Don't get informix tables and pseudo-tables
+	public $substr = 'SUBSTR';
 
-	public $metaColumnsSQL =
-		"SELECT c.colname, c.coltype, c.collength, d.default,c.colno, c.collength
-		   FROM syscolumns c, systables t,
-          OUTER sysdefaults d
-		  WHERE c.tabid=t.tabid AND d.tabid=t.tabid AND d.colno=c.colno
-		    AND tabname='%s' 
-       ORDER BY c.colno";
+	public $metaTablesSQL = "SELECT tabname,tabtype
+		FROM systables
+		WHERE tabtype IN ('T','V')
+		AND owner !='informix'"; //Don't get informix tables and pseudo-tables
 
-	public $metaPrimaryKeySQL =
-		"SELECT part1,part2,part3,part4,part5,part6,part7,part8 
-           FROM	systables t,sysconstraints s,sysindexes i 
-          WHERE t.tabname='%s' AND s.tabid=t.tabid AND s.constrtype='P'
-		    AND i.idxname=s.idxname";
+	public $metaColumnsSQL = "SELECT c.colname, c.coltype, c.collength, d.default,c.colno, c.collength
+		FROM syscolumns c, systables t,
+		OUTER sysdefaults d
+		WHERE c.tabid=t.tabid AND d.tabid=t.tabid AND d.colno=c.colno
+		AND tabname='%s'
+		ORDER BY c.colno";
+
+	public $metaPrimaryKeySQL = "SELECT part1,part2,part3,part4,part5,part6,part7,part8
+			FROM	systables t,sysconstraints s,sysindexes i
+			WHERE t.tabname='%s' AND s.tabid=t.tabid AND s.constrtype='P'
+			AND i.idxname=s.idxname";
 
 
 	/*
@@ -62,7 +59,7 @@ class ADODB_pdo_informix extends ADODB_pdo {
 	public $_genSeqSQL = "";
 	public $_dropSeqSQL = "";
 
-    public $hasTop = 'FIRST';
+	public $hasTop = 'FIRST';
 	public $ansiOuter = true;
 
 	protected $typeCrossRef = array(
@@ -99,18 +96,17 @@ class ADODB_pdo_informix extends ADODB_pdo {
 		2061 => 'IDSSECURITYLABEL',
 		4118 => 'ROW'
 		);
-		
-	public function _init($parentDriver){}
-		
-    /**
-     * Returns a database specific IF NULL 
-     * 
-     * @param string    $field
-     * @param string    $ifNull
-     * 
-     * @return string
-     */
-    function IfNull( $field, $ifNull )
+
+
+	/**
+	 * Returns a database specific IF NULL
+	 *
+	 * @param string    $field
+	 * @param string    $ifNull
+	 *
+	 * @return string
+	 */
+	function IfNull( $field, $ifNull )
 	{
 		return " NVL($field, $ifNull) "; // if Informix 9.X or 10.X
 	}
@@ -126,7 +122,7 @@ class ADODB_pdo_informix extends ADODB_pdo {
 	 */
 	public function  metaPrimaryKeys($table,$owner=false)
 	{
-		
+
 		$primaryKeys = array();
 
 		global $ADODB_FETCH_MODE;
@@ -137,45 +133,45 @@ class ADODB_pdo_informix extends ADODB_pdo {
 		$savem 			  = $ADODB_FETCH_MODE;
 		$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
 		$this->setFetchMode(ADODB_FETCH_NUM);
-		
+
 		$sql = "SELECT c.constrname, c.constrtype AS tp , c.idxname AS pk_idx , t2.tabname, c2.idxname
-				  FROM sysconstraints c, systables t, 
-				 OUTER (sysreferences r, systables t2, sysconstraints c2)
-				 WHERE t.tabname = '%s'
-				   AND t.tabid = c.tabid
-				   AND r.constrid = c.constrid
-				   AND t2.tabid = r.ptabid
-				   AND c2.constrid = r.constrid
-				   AND c.constrtype='P'";
+				FROM sysconstraints c, systables t,
+				OUTER (sysreferences r, systables t2, sysconstraints c2)
+				WHERE t.tabname = '%s'
+				AND t.tabid = c.tabid
+				AND r.constrid = c.constrid
+				AND t2.tabid = r.ptabid
+				AND c2.constrid = r.constrid
+				AND c.constrtype='P'";
 
 		$rows = $this->getRow(sprintf($sql,$table));
-		
+
 		$primaryKey = $rows[2];
-		
-		$sql = "SELECT UNIQUE t.tabname, i.idxname, i.idxtype, 
-		(SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part1 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part2 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part3 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part4 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part5 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part6 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part7 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part8 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part9 )
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part10)
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part11)
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part12)
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part13)
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part14)
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part15)
-		  , (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part16)
-		  FROM sysindexes i , systables t
-		  WHERE i.tabid = t.tabid
+
+		$sql = "SELECT UNIQUE t.tabname, i.idxname, i.idxtype
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part1 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part2 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part3 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part4 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part5 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part6 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part7 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part8 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part9 )
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part10)
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part11)
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part12)
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part13)
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part14)
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part15)
+			, (SELECT c.colname FROM syscolumns c WHERE c.tabid = i.tabid AND c.colno = i.part16)
+			FROM sysindexes i , systables t
+			WHERE i.tabid = t.tabid
 			AND t.tabname = '%s'
 			AND i.idxname = '%s'";
-	
+
 		$rows = $this->getAll(sprintf($sql,$table,$primaryKey));
-	
+
 		$this->setFetchMode($savem);
 		$ADODB_FETCH_MODE = $savem;
 
@@ -196,8 +192,8 @@ class ADODB_pdo_informix extends ADODB_pdo {
 		return $primaryKeys;
 	}
 
-	
-	
+
+
 
 /*
 coltype	SMALLINT	Code indicating the data type of the column:
@@ -252,27 +248,27 @@ coltype	SMALLINT	Code indicating the data type of the column:
 		$false = false;
 		$save = $ADODB_FETCH_MODE;
 		$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
-		//if ($this->fetchMode !== false) 
+		//if ($this->fetchMode !== false)
 			$savem = $this->SetFetchMode(ADODB_FETCH_ASSOC);
 
 		$SQL = sprintf($this->metaColumnsSQL,strtolower($table));
 		$rs = $this->Execute($SQL);
-		if (isset($savem)) 
+		if (isset($savem))
 			$this->SetFetchMode($savem);
 		$ADODB_FETCH_MODE = $save;
 		if (!$rs) {
 			return $false;
 		}
-		
+
 		$retarr = array();
-		while (!$rs->EOF) { 
+		while (!$rs->EOF) {
 			/*
 			[colname] => order_num
-            [coltype] => 262
-            [collength] => 4
-            [default] => 
-            [colno] => 1
-			
+			[coltype] => 262
+			[collength] => 4
+			[default] =>
+			[colno] => 1
+
 			HIDDEN
 1 - Hidden column
 ROWVER
@@ -290,42 +286,42 @@ UPGRD3_COL
 PK_NOTNULL
 128 - NOT NULL by PRIMARY KEY
 			*/
-			
+
 			$fld = new ADOFieldObject();
-			
+
 			$fld->name = $rs->fields['colname'];
-			
+
 			$notNull = 0;
-			
+
 			if ($rs->fields['coltype'] > 256 && $rs->fields['coltype'] < 512)
 			{
 				$notNull = 1;
-				$rs->fields['coltype'] = $rs->fields['coltype'] - 256; 
+				$rs->fields['coltype'] = $rs->fields['coltype'] - 256;
 			}
-			
+
 			$fld->type = $this->typeCrossRef[$rs->fields['coltype']];
-			
+
 			$fld->max_length = $rs->fields['collength'];
-			
+
 			$fld->scale = 0; //$rs->fields[3];
-			
-			
+
+
 			/*
 			if ($rs->fields[1] == 'NUMBER' && $rs->fields[3] == 0) {
 				$fld->type ='INT';
 				$fld->max_length = $rs->fields['colmax'];
-		
+
 			$fld->binary = (strpos($fld->type,'BLOB') !== false);
-			
-		
+
+
 				}
 			*/
 			$fld->not_null 		= $notNull;
 			$fld->default_value = $rs->fields['default'];
-			
-			if ($ADODB_FETCH_MODE == ADODB_FETCH_NUM) 
+
+			if ($ADODB_FETCH_MODE == ADODB_FETCH_NUM)
 				$retarr[] = $fld;
-			else 
+			else
 				$retarr[strtoupper($fld->name)] = $fld;
 			$rs->MoveNext();
 		}
@@ -345,25 +341,25 @@ PK_NOTNULL
 		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT, $auto_commit);
 	}
 
-    /**
+	/**
 	 * Begin a Transaction.
 	 *
 	 * Must be followed by CommitTrans() or RollbackTrans().
 	 *
 	 * @return bool true if succeeded or false if database does not support transactions
 	 */
-    public function beginTrans()
+	public function beginTrans()
 	{
-		if ($this->transOff) 
-            return true;
-		
-        $this->transCnt += 1;
+		if ($this->transOff)
+			return true;
+
+		$this->transCnt += 1;
 		$this->Execute('BEGIN');
 		$this->_autocommit = false;
 		return true;
 	}
 
-    /**
+	/**
 	 * Commits a transaction.
 	 *
 	 * If database does not support transactions, return true as data is
@@ -383,7 +379,7 @@ PK_NOTNULL
 		return true;
 	}
 
-    
+
 	/**
 	 * Rolls back a transaction.
 	 *
@@ -394,17 +390,17 @@ PK_NOTNULL
 	 */
 	public function rollbackTrans()
 	{
-		if ($this->transOff) 
-            return true;
-		if ($this->transCnt) 
-            $this->transCnt -= 1;
-		
-        $this->Execute('ROLLBACK');
+		if ($this->transOff)
+			return true;
+		if ($this->transCnt)
+			$this->transCnt -= 1;
+
+		$this->Execute('ROLLBACK');
 		$this->_autocommit = true;
 		return true;
 	}
 
-     /**
+	 /**
 	 * Lock a row.
 	 * Will escalate and lock the table if row locking is not supported.
 	 * Will normally free the lock at the end of the transaction.
@@ -417,58 +413,56 @@ PK_NOTNULL
 	 */
 	public function rowLock($tables,$where,$col='1 as adodbignore')
 	{
-		if ($this->_autocommit) 
-            $this->BeginTrans();
+		if ($this->_autocommit)
+			$this->BeginTrans();
 
-        $SQL = sprintf('SELECT %s FROM %s WHERE %s FOR UPDATE',
-                       $col,$tables, $where);
+		$SQL = sprintf('SELECT %s FROM %s WHERE %s FOR UPDATE',
+			$col, $tables, $where
+		);
 
 		return $this->GetOne($SQL);
 	}
-	
+
 	/**
 	 * Returns the server information
-	 * 
+	 *
 	 * @return array()
 	 */
-	public function serverInfo() 
+	public function serverInfo()
 	{
 
-        static $arr = false;
+		static $arr = false;
 		if (is_array($arr))
 			return $arr;
 
-        $SQL = "SELECT DBINFO('version','full') 
-                  FROM systables 
-                 WHERE tabid = 1";
+		$SQL = "SELECT DBINFO('version','full')
+				FROM systables
+				WHERE tabid = 1";
 
-	    $arr['description'] = $this->GetOne($SQL);
+		$arr['description'] = $this->GetOne($SQL);
 
-        $SQL = "SELECT DBINFO('version','major') || DBINFO('version','minor') 
-                  FROM systables 
-                 WHERE tabid = 1";
+		$SQL = "SELECT DBINFO('version','major') || DBINFO('version','minor')
+				FROM systables
+				WHERE tabid = 1";
 
-	    $arr['version'] = $this->GetOne($SQL);
- 
-	    return $arr;
+		$arr['version'] = $this->GetOne($SQL);
+
+		return $arr;
 	}
 
 
 	/**
-	  * Lists databases. Because instances are independent, we only know about
-	  * the current database name
-	  *
-	  * @return string[]
-	  */
-	  public function metaDatabases(){
-
+	 * Lists databases. Because instances are independent, we only know about
+	 * the current database name
+	 *
+	 * @return string[]
+	 */
+	public function metaDatabases(){
 		$dbName = $this->databaseName;
-
 		return (array)$dbName;
-
 	}
 
-    /**
+	/**
 	 * List procedures or functions in an array.
 	 * @param procedureNamePattern  a procedure name pattern; must match the procedure name as it is stored in the database
 	 * @param catalog a catalog name; must match the catalog name as it is stored in the database;
@@ -485,53 +479,52 @@ PK_NOTNULL
 	 *   )
 	 * )
 	 */
-    public function metaProcedures($NamePattern = false, $catalog  = null, $schemaPattern  = null)
-    {
-        // save old fetch mode
-        global $ADODB_FETCH_MODE;
+	public function metaProcedures($NamePattern = false, $catalog  = null, $schemaPattern  = null)
+	{
+		// save old fetch mode
+		global $ADODB_FETCH_MODE;
 
-        $false = false;
-        $save = $ADODB_FETCH_MODE;
-        $ADODB_FETCH_MODE = ADODB_FETCH_NUM;
-        if ($this->fetchMode !== FALSE) {
-               $savem = $this->SetFetchMode(FALSE);
+		$false = false;
+		$save = $ADODB_FETCH_MODE;
+		$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
+		if ($this->fetchMode !== FALSE) {
+			$savem = $this->SetFetchMode(FALSE);
+		}
+		$procedures = array ();
 
-        }
-        $procedures = array ();
+		// get index details
 
-        // get index details
+		$likepattern = '';
+		if ($NamePattern) {
+			$likepattern = " WHERE procname LIKE '" . $NamePattern . "'";
+		}
 
-        $likepattern = '';
-        if ($NamePattern) {
-           $likepattern = " WHERE procname LIKE '".$NamePattern."'";
-        }
+		$rs = $this->Execute('SELECT procname, isproc FROM sysprocedures' . $likepattern);
 
-        $rs = $this->Execute('SELECT procname, isproc FROM sysprocedures'.$likepattern);
+		if (is_object($rs)) {
+			// parse index data into array
 
-        if (is_object($rs)) {
-            // parse index data into array
+			while ($row = $rs->FetchRow()) {
+				$procedures[$row[0]] = array(
+						'type' => ($row[1] == 'f' ? 'FUNCTION' : 'PROCEDURE'),
+						'catalog' => '',
+						'schema' => '',
+						'remarks' => ''
+					);
+			}
+		}
 
-            while ($row = $rs->FetchRow()) {
-                $procedures[$row[0]] = array(
-                        'type' => ($row[1] == 'f' ? 'FUNCTION' : 'PROCEDURE'),
-                        'catalog' => '',
-                        'schema' => '',
-                        'remarks' => ''
-                    );
-            }
-	    }
+		// restore fetchmode
+		if (isset($savem)) {
+				$this->SetFetchMode($savem);
+		}
+		$ADODB_FETCH_MODE = $save;
 
-        // restore fetchmode
-        if (isset($savem)) {
-                $this->SetFetchMode($savem);
-        }
-        $ADODB_FETCH_MODE = $save;
+		return $procedures;
+	}
 
-        return $procedures;
-    }
 
-    
-    /**
+	/**
 	 * Returns a list of Foreign Keys associated with a specific table.
 	 *
 	 * If there are no foreign keys then the function returns false.
@@ -546,15 +539,15 @@ PK_NOTNULL
 	 * @return string[]|false An array where keys are tables, and values are foreign keys;
 	 *                        false if no foreign keys could be found.
 	 */
-    public function metaForeignKeys($table, $owner = '', $upper = false, $associative = false)
+	public function metaForeignKeys($table, $owner = '', $upper = false, $associative = false)
 	{
-	
+
 		global $ADODB_FETCH_MODE;
-	
+
 		$savem 			  = $ADODB_FETCH_MODE;
 		$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 		$this->setFetchMode(ADODB_FETCH_ASSOC);
-		
+
 		$sql = "
 			SELECT tr.tabname,updrule,delrule,
 			i.part1 o1,i2.part1 d1,i.part2 o2,i2.part2 d2,i.part3 o3,i2.part3 d3,i.part4 o4,i2.part4 d4,
@@ -565,24 +558,24 @@ PK_NOTNULL
 			AND s.tabid=t.tabid AND s.constrtype='R' AND r.constrid=s.constrid
 			AND i.idxname=s.idxname AND tr.tabid=r.ptabid
 			AND s2.constrid=r.primary AND i2.idxname=s2.idxname";
-			
+
 		$rs = $this->execute($sql);
-		if (!$rs || $rs->EOF)  
-            return false;
-		
-        $arr = $rs->getArray();
+		if (!$rs || $rs->EOF)
+			return false;
+
+		$arr = $rs->getArray();
 		$this->setFetchMode($savem);
 		$a = array();
-		foreach($arr as $v) 
-        {
+		foreach($arr as $v)
+		{
 
 			$coldest=$this->metaColumnNames($v["tabname"]);
 			$coldestValues = array_values($coldest);
 			$colorig=$this->metaColumnNames($table);
 			$colorigValues = array_values($colorig);
-			
+
 			$colnames=array();
-			
+
 			for($i=1;$i<=8 && $v["o{$i}"] ;$i++) {
 				$colnames[]=$coldestValues[$v["d{$i}"]-1]."=".$colorigValues[$v["o{$i}"]-1];
 			}

@@ -27,16 +27,16 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $replaceQuote = "''"; // string to use to replace quotes
 
- 	var $_initdate 			= true;
+	var $_initdate 			= true;
 	public $_bindInputArray = true;
 	public $_nestedSQL 		= true;
-	
-	public $metaColumnsSQL = "SELECT 
-       colname, typename,length, scale,default, remarks, 
-       case when nulls='Y' then 1 else 0 end as nullable,
-       case when identity ='Y' then 1 else 0 end as is_identity,
-       case when generated ='' then 0 else 1 end as  is_computed,
-       text as computed_formula
+
+	public $metaColumnsSQL = "SELECT
+		colname, typename,length, scale,default, remarks,
+		case when nulls='Y' then 1 else 0 end as nullable,
+		case when identity ='Y' then 1 else 0 end as is_identity,
+		case when generated ='' then 0 else 1 end as  is_computed,
+		text as computed_formula
 		FROM syscat.columns
 		WHERE tabname = '%s'
 		ORDER BY colno";
@@ -50,7 +50,7 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 	NO MAXVALUE NO CYCLE INCREMENT BY 1 NO CACHE
 	";
 	public $_dropSeqSQL = "DROP SEQUENCE %s";
-	
+
 
 	const TABLECASE_LOWER    =  0;
 	const TABLECASE_UPPER    =  1;
@@ -62,8 +62,8 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 	private $tableCase = 2;
 
 	public function _init($parentDriver){}
-	
-	
+
+
 	/**
 	 * Select a limited number of rows.
 	 *
@@ -106,7 +106,7 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 
 		return $rs;
 	}
-	
+
 	/**
 	 * Returns a list of tables
 	 *
@@ -135,13 +135,13 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 		* If $ttype passed as 'T' it is assumed to be 'TABLE'
 		* if $ttype passed as 'V' it is assumed to be 'VIEW'
 		*/
-		
+
 		$sqlArgs = array();
-		
+
 		$ttype = trim(strtoupper(substr($ttype,0,1)));
-		
+
 		$ttypeSql = '';
-		if ($ttype) 
+		if ($ttype)
 		{
 			$sqlArgs[] = "type='$ttype'";
 		}
@@ -154,22 +154,19 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 		{
 			$sqlArgs[] = "name LIKE '$schema'";
 		}
-		
+
 		if ($mask)
 		{
 			$sqlArgs = "tbspace LIKE '$mask'";
 		}
-		
+
 		$sqlOptions = '';
-		
+
 		if (count($sqlArgs) > 0)
 			$sqlOptions = 'WHERE ' . implode(' AND ' ,$sqlArgs);
-		
 
-		$SQL = "SELECT * 
-				  FROM sysibm.systables 
-				  $sqlOptions";
-		
+		$SQL = "SELECT * FROM sysibm.systables $sqlOptions";
+
 		$rs = $this->execute($SQL);
 
 		$ADODB_FETCH_MODE = $savem;
@@ -178,7 +175,7 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 			return false;
 
 		$arr = $rs->getArray();
-		
+
 		$rs->Close();
 
 		$tableList = array();
@@ -207,24 +204,18 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 			if ($ttype == '' && (strcmp($tableType,'T') <> 0 && strcmp($tableType,'V') <> 0))
 				continue;
 
-			/*
-			 * Set metacasing if required
-			 */
+			// Set metacasing if required
 			$tableName = $this->getMetaCasedValue($tableName);
 
-			/*
-			 * If we requested a schema, we prepend the schema
-			   name to the table name
-			 */
+			// If we requested a schema, we prepend the schema name to the table name
 			if (strcmp($schema,'%') <> 0)
 				$tableName = $schema . '.' . $tableName;
 
 			$tableList[] = $tableName;
-
 		}
 		return $tableList;
 	}
-	
+
 	/**
 	 * Return a list of Primary Keys for a specified table
 	 *
@@ -239,7 +230,6 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 	 */
 	public function metaPrimaryKeys($table,$owner=false)
 	{
-
 		$primaryKeys = array();
 
 		global $ADODB_FETCH_MODE;
@@ -253,10 +243,7 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 		$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
 		$this->setFetchMode(ADODB_FETCH_NUM);
 
-
-		$sql = "SELECT *
-				  FROM syscat.indexes
-				 WHERE tabname='$table'";
+		$sql = "SELECT * FROM syscat.indexes WHERE tabname='$table'";
 
 		$rows = $this->getAll($sql);
 
@@ -266,14 +253,12 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 		if (empty($rows))
 			return false;
 
-		foreach ($rows as $r)
-		{
+		foreach ($rows as $r) {
 			if ($r[7] != 'P')
 				continue;
 
 			$cols = explode('+',$r[6]);
-			foreach ($cols as $colIndex=>$col)
-			{
+			foreach ($cols as $colIndex=>$col) {
 				if ($colIndex == 0)
 					continue;
 				$columnName = $this->getMetaCasedValue($col);
@@ -332,11 +317,11 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 		REMARKS";
 
 		$SQL = "SELECT $fields
-				  FROM syscat.routines
-				 WHERE OWNER IS NOT NULL
-				  $procedureSQL
-				  $catalogSQL
-				  $schemaSQL
+				FROM syscat.routines
+				WHERE OWNER IS NOT NULL
+					$procedureSQL
+					$catalogSQL
+					$schemaSQL
 				ORDER BY ROUTINENAME
 				";
 
@@ -351,16 +336,16 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 			$procedureName = $this->getMetaCasedValue($r[0]);
 			$schemaName    = $this->getMetaCasedValue($r[2]);
 			$metaProcedures[$procedureName] = array('type'=> $r[1],
-												   'catalog' => '',
-												   'schema'  => $schemaName,
-												   'remarks' => $r[3]
+													'catalog' => '',
+													'schema'  => $schemaName,
+													'remarks' => $r[3]
 													);
 		}
 
 		return $metaProcedures;
 
 	}
-	
+
 	/**
 	 * Returns a list of Foreign Keys associated with a specific table.
 	 *
@@ -385,12 +370,13 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 
 		$this->setFetchMode(ADODB_FETCH_NUM);
 
-		$sql = "SELECT SUBSTR(tabname,1,20) table_name,
-					   SUBSTR(constname,1,20) fk_name,
-					   SUBSTR(REFTABNAME,1,12) parent_table,
-					   SUBSTR(refkeyname,1,20) pk_orig_table,
-					   fk_colnames
-				 FROM syscat.references
+		$sql = "SELECT
+					SUBSTR(tabname,1,20) table_name,
+					SUBSTR(constname,1,20) fk_name,
+					SUBSTR(REFTABNAME,1,12) parent_table,
+					SUBSTR(refkeyname,1,20) pk_orig_table,
+					fk_colnames
+				FROM syscat.references
 				WHERE tabname = '$table'";
 
 		$results = $this->getAll($sql);
@@ -475,13 +461,13 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT, $auto_commit);
 	}
 
-	
+
 	/**
 	 * Returns the server information
-	 * 
+	 *
 	 * @return array()
 	 */
-	public function serverInfo() 
+	public function serverInfo()
 	{
 
 		global $ADODB_FETCH_MODE;
@@ -497,29 +483,28 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 			$savem = $this->SetFetchMode(ADODB_FETCH_NUM);
 
 		$sql = "SELECT service_level, fixpack_num
-				  FROM TABLE(sysproc.env_get_inst_info())
-					AS INSTANCEINFO";
+				FROM TABLE(sysproc.env_get_inst_info()) AS INSTANCEINFO";
 		$row = $this->GetRow($sql);
 
 		$ADODB_FETCH_MODE = $savem;
 		$info = array();
-		
+
 		if ($row) {
 			$info['version'] = $row['SERVICE_LEVEL'].':'.$row['FIXPACK_NUM'];
 			$info['fixpack'] = $row['FIXPACK_NUM'];
 			$info['description'] = $row['SERVICE_LEVEL'];
 			return $info;
-		} else 
-		
+		} else
+
 
 		$arr = array();
 		$arr['version'] 	=  '';
 		$arr['description'] = $this->_connectionID->getAttribute(constant("PDO::ATTR_SERVER_INFO"));
 
-		
+
 		return $arr;
 	}
-	
+
 	/**
 	 * Gets a meta cased parameter
 	 *
@@ -593,17 +578,15 @@ class ADODB_pdo_ibm extends ADODB_pdo {
 	}
 
 	/**
-	  * Lists databases. Because instances are independent, we only know about
-	  * the current database name
-	  *
-	  * @return string[]
-	  */
-	  public function metaDatabases(){
-
+	 * Lists databases. Because instances are independent, we only know about
+	 * the current database name
+	 *
+	 * @return string[]
+	 */
+	public function metaDatabases(){
 		$dbName = $this->getMetaCasedValue($this->databaseName);
 
 		return (array)$dbName;
-
 	}
 
 }

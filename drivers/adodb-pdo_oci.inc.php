@@ -40,13 +40,13 @@ BEGIN
 END;';
 	public $_dropSeqSQL 	 = 'DROP SEQUENCE %s';
 
- 	var $_initdate = true;
+	var $_initdate = true;
 	public $_bindInputArray = true;
 	public $_nestedSQL = true;
 
 	public function _init($parentDriver)
 	{
-		
+
 		if ($this->_initdate) {
 			$this->Execute("ALTER SESSION SET NLS_DATE_FORMAT='".$this->NLS_DATE_FORMAT."'");
 		}
@@ -59,9 +59,9 @@ END;';
 	public function time()
 	{
 		$sql = "select $this->sysTimeStamp from dual";
-		
+
 		$rs = $this->_Execute($sql);
-		if ($rs && !$rs->EOF) 
+		if ($rs && !$rs->EOF)
 		{
 			return $this->UnixTimeStamp(reset($rs->fields));
 		}
@@ -92,7 +92,7 @@ END;';
 		}
 		return $ret;
 	}
-	
+
 	/**
 	 * Returns a list of Foreign Keys associated with a specific table.
 	 *
@@ -220,10 +220,10 @@ END;';
 
 	/**
 	 * Returns the server information
-	 * 
+	 *
 	 * @return array()
 	 */
-	public function serverInfo() 
+	public function serverInfo()
 	{
 
 		global $ADODB_FETCH_MODE;

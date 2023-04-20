@@ -27,21 +27,21 @@
 class ADODB_pdo_firebird extends ADODB_pdo
 {
 	public $dialect = 3;
-	
+
 	public $metaTablesSQL = "
-	SELECT LOWER(rdb\$relation_name) 
-	FROM rdb\$relations 
+	SELECT LOWER(rdb\$relation_name)
+	FROM rdb\$relations
 	WHERE rdb\$relation_name NOT LIKE 'RDB\$%'";
-	
+
 	public $metaColumnsSQL = "
 	SELECT LOWER(a.rdb\$field_name), a.rdb\$null_flag,
 	a.rdb\$default_source, b.rdb\$field_length, b.rdb\$field_scale,
-    b.rdb\$field_sub_type, b.rdb\$field_precision, b.rdb\$field_type 
-	FROM rdb\$relation_fields a, rdb\$fields b 
-	WHERE a.rdb\$field_source = b.rdb\$field_name 
-	AND a.rdb\$relation_name = '%s' 
+	b.rdb\$field_sub_type, b.rdb\$field_precision, b.rdb\$field_type
+	FROM rdb\$relation_fields a, rdb\$fields b
+	WHERE a.rdb\$field_source = b.rdb\$field_name
+	AND a.rdb\$relation_name = '%s'
 	ORDER BY a.rdb\$field_position ASC";
-	
+
 	/*
 	* Sequence management statements
 	*/
@@ -49,7 +49,6 @@ class ADODB_pdo_firebird extends ADODB_pdo
 	public $_dropSeqSql = 'DROP SEQUENCE %s';
 
 	var $arrayClass = 'ADORecordSet_array_pdo_firebird';
-
 
 
 	function _init($parentDriver){}
@@ -283,10 +282,10 @@ class ADODB_pdo_firebird extends ADODB_pdo
 
 	/**
 	 * Creates a sequence starting at the required number
-	 * 
+	 *
 	 * @param	string	$seqname
 	 * @param	int		$startID
-	 * 
+	 *
 	 * @return bool success
 	 */
 	public function createSequence($seqname = 'adodbseq', $startID = 1)
@@ -299,7 +298,7 @@ class ADODB_pdo_firebird extends ADODB_pdo
 		return $this->execute("ALTER SEQUENCE $seqname RESTART WITH " . ($startID - 1));
 	}
 
-	
+
 	/**
 	 * Generates a sequence id and stores it in $this->genID.
 	 *
