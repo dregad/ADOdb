@@ -5598,6 +5598,8 @@ class ADORecordSet implements IteratorAggregate {
 			define('ADODB_ASSOC_CASE', ADODB_ASSOC_CASE_NATIVE);
 		}
 
+		$origdb = $db;
+
 		// If we have a pdo driver in format PDO\\driver,
 		// we need to remove the driver portion of the file
 		$pdoExtension = '';
@@ -5628,19 +5630,18 @@ class ADORecordSet implements IteratorAggregate {
 
 		$errorfn = (defined('ADODB_ERROR_HANDLER')) ? ADODB_ERROR_HANDLER : false;
 		if (($at = strpos($db,'://')) !== FALSE) {
-			$origdsn = $db;
 			$fakedsn = 'fake'.substr($origdsn,$at);
 			if (($at2 = strpos($origdsn,'@/')) !== FALSE) {
 				// special handling of oracle, which might not have host
 				$fakedsn = str_replace('@/','@adodb-fakehost/',$fakedsn);
 			}
 
-			if ((strpos($origdsn, 'sqlite')) !== FALSE && stripos($origdsn, '%2F') === FALSE) {
+			if ((strpos($origdb, 'sqlite')) !== FALSE && stripos($origdb, '%2F') === FALSE) {
 				// special handling for SQLite, it only might have the path to the database file.
 				// If you try to connect to a SQLite database using a dsn
 				// like 'sqlite:///path/to/database', the 'parse_url' php function
 				// will throw you an exception with a message such as "unable to parse url"
-				list($scheme, $path) = explode('://', $origdsn);
+				list($scheme, $path) = explode('://', $origdb);
 				$dsna['scheme'] = $scheme;
 				if ($qmark = strpos($path,'?')) {
 					$dsn['query'] = substr($path,$qmark+1);
@@ -5672,12 +5673,12 @@ class ADORecordSet implements IteratorAggregate {
 			if (!$dsna) {
 				return false;
 			}
-			$dsna['scheme'] = substr($origdsn,0,$at);
+			$dsna['scheme'] = substr($origdb, 0, $at);
 			if ($at2 !== FALSE) {
 				$dsna['host'] = '';
 			}
 
-			if (strncmp($origdsn,'pdo',3) == 0) {
+			if (strncmp($origdb, 'pdo', 3) == 0) {
 				$sch = explode('_',$dsna['scheme']);
 				if (sizeof($sch)>1) {
 					$dsna['host'] = isset($dsna['host']) ? rawurldecode($dsna['host']) : '';
@@ -5746,17 +5747,14 @@ class ADORecordSet implements IteratorAggregate {
 			}
 
 			if (!$db) {
-				if (isset($origdsn)) {
-					$db = $origdsn;
-				}
 				if ($errorfn) {
 					// raise an error
 					$ignore = false;
 					$errorfn('ADONewConnection', 'ADONewConnection', -998,
-							"could not load the database driver for '$db'",
-							$db,false,$ignore);
+							"could not load the database driver for '$origdb'",
+							$origdb, false, $ignore);
 				} else {
-					ADOConnection::outp( "<p>ADONewConnection: Unable to load database driver '$db'</p>",false);
+					ADOConnection::outp( "<p>ADONewConnection: Unable to load database driver '$origdb'</p>",false);
 				}
 				return false;
 			}
