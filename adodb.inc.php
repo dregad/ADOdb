@@ -5521,6 +5521,7 @@ class ADORecordSet implements IteratorAggregate {
 		if (!$dbType) {
 			return false;
 		}
+		$driver_dir = ADODB_DIR . '/drivers/';
 		$db = strtolower($dbType);
 		switch ($db) {
 			case 'ado':
@@ -5543,6 +5544,18 @@ class ADORecordSet implements IteratorAggregate {
 				$class = $db = 'mysqli';
 				break;
 
+			case 'pdo':
+				include_once $driver_dir . 'adodb-pdo.inc.php';
+
+				// Load the specific PDO driver
+				$driver = $driver_dir . "adodb-pdo_$pdoExtension.inc.php";
+				if (!file_exists($driver)) {
+					ADOConnection::outp("Invalid PDO driver: '$pdoExtension'");
+					return false;
+				}
+				include_once $driver;
+				return 'pdo';
+
 			default:
 				if (strcmp('pdo',$db) == 0 && $pdoExtension) {
 					// Loads the necessary PDO driver files
@@ -5555,18 +5568,18 @@ class ADORecordSet implements IteratorAggregate {
 				break;
 		}
 
-		$file = "drivers/adodb-$db.inc.php";
-		@include_once(ADODB_DIR . '/' . $file);
-		$ADODB_LASTDB = $class;
-		if (class_exists("ADODB_" . $class)) {
-			return $class;
-		}
-
-		//ADOConnection::outp(adodb_pr(get_declared_classes(),true));
+		// Process non-PDO driver files
+		$file = $driver_dir . "adodb-$db.inc.php";
 		if (!file_exists($file)) {
-			ADOConnection::outp("Missing file: $file");
+			ADOConnection::outp("Missing file: '$file'");
+			return false;
 		} else {
-			ADOConnection::outp("Syntax error in file: $file");
+			@include_once $file;
+			$ADODB_LASTDB = $class;
+			if (class_exists("ADODB_" . $class)) {
+				return $class;
+			}
+			ADOConnection::outp("Syntax error in file: '$file'");
 		}
 		return false;
 	}
