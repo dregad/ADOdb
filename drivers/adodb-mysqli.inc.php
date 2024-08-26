@@ -25,6 +25,7 @@
  *
  * @noinspection PhpComposerExtensionStubsInspection, SqlNoDataSourceInspection
  * @noinspection PhpMissingFieldTypeInspection, PhpMissingParamTypeInspection, PhpMissingReturnTypeInspection
+ * @noinspection DuplicatedCode Driver was originally copied from legacy mysql.
  */
 
 // security - hide paths
@@ -53,7 +54,15 @@ class ADODB_mysqli extends ADOConnection {
 			CASE WHEN TABLE_TYPE = 'VIEW' THEN 'V' ELSE 'T' END
 		FROM INFORMATION_SCHEMA.TABLES
 		WHERE TABLE_SCHEMA=";
+	// @TODO after testing replace $metaColumnsSQL by $metaColumnsSQL2
 	var $metaColumnsSQL = "SHOW COLUMNS FROM `%s`";
+	public $metaColumnsSQL2 = <<<SQL
+			SELECT column_name, data_type, column_type, character_maximum_length,
+			       numeric_precision, numeric_scale, is_nullable, column_key, extra, column_default
+			FROM information_schema.columns
+			WHERE table_schema = ? AND table_name = ?
+		SQL;
+
 	var $fmtTimeStamp = "'Y-m-d H:i:s'";
 	var $hasLimit = true;
 	var $hasMoveFirst = true;
@@ -1092,6 +1101,65 @@ class ADODB_mysqli extends ADOConnection {
 		}
 
 		$rs->close();
+		return $retarr;
+	}
+
+	/**
+	 * Return an array of information about a table's columns.
+	 * @TODO  after testing replace old metaColumns method by metaColumns2
+	 *
+	 * @param string $table The name of the table to get the column info for.
+	 * @param bool $normalize (Optional) Unused.
+	 *
+	 * @return ADOFieldObject[]|bool An array of info for each column, or false if it could not determine the info.
+	 */
+	function metaColumns2($table, $normalize = true)
+	{
+		$savemode = $this->setFetchMode(ADODB_FETCH_NUM);
+		$fields = $this->getArray($this->metaColumnsSQL2, [$this->database, $table]);
+		$this->setFetchMode($savemode);
+		if (!$fields) {
+			return false;
+		}
+
+		$retarr = [];
+		foreach ($fields as $field) {
+			$fld = new ADOFieldObject();
+			$fld->name = $field[0];
+			$fld->type = $field[1];
+			$col_type = $field[2] ?? '';
+			$fld->max_length = $field[3] ?: $field[4];
+			$fld->scale = $field[5];
+			$fld->not_null = $field[6] != 'YES';
+			$fld->primary_key = $field[7] == 'PRI';
+			$fld->auto_increment = strpos($field[8] ?? '', 'auto_increment') !== false;
+			$fld->binary = strpos($col_type,'blob') !== false;
+			$fld->unsigned = strpos($col_type,'unsigned') !== false;
+			$fld->zerofill = strpos($col_type,'zerofill') !== false;
+
+			if (!$fld->binary) {
+				$default = $rs->fields[9] ?? '';
+				if ($default != '' && $default != 'NULL') {
+					$fld->has_default = true;
+					$fld->default_value = $default;
+				} else {
+					$fld->has_default = false;
+				}
+			}
+
+			// Get enum type's values
+			// @TODO should we handle SET datatype too ?
+			if($fld->type == 'enum') {
+				$fld->enums = substr($col_type, 5, -1);
+			}
+
+			if ($savemode == ADODB_FETCH_NUM) {
+				$retarr[] = $fld;
+			} else {
+				$retarr[strtoupper($fld->name)] = $fld;
+			}
+		}
+
 		return $retarr;
 	}
 
