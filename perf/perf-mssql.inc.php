@@ -123,7 +123,7 @@ class perf_mssql extends adodb_perf{
 		return $s;
 	}
 
-	function Tables()
+	function Tables($orderby='1')
 	{
 	global $ADODB_FETCH_MODE;
 

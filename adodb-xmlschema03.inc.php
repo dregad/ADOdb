@@ -1802,6 +1802,7 @@ class adoSchema {
 			fwrite( $fp, $query . ";\n" );
 		}
 		fclose( $fp );
+		return true;
 	}
 
 	/**

@@ -149,13 +149,12 @@ function adodb_log_sql(&$connx,$sql,$inputarr)
 		if ($conn->dataProvider == 'oci8' && $dbT != 'oci8po') {
 			$isql = "insert into $perf_table values($d,:b,:c,:d,:e,:f)";
 		} else if ($dbT == 'mssqlnative' || $dbT == 'odbc_mssql' || $dbT == 'informix' || strncmp($dbT,'odbtp',4)==0) {
-			$timer = $arr['f'];
-			if ($dbT == 'informix') $sql2 = substr($sql2,0,230);
-
 			$sql1 = $conn->qstr($arr['b']);
 			$sql2 = $conn->qstr($arr['c']);
 			$params = $conn->qstr($arr['d']);
 			$tracer = $conn->qstr($arr['e']);
+			$timer = $arr['f'];
+			if ($dbT == 'informix') $sql2 = substr($sql2,0,230);
 
 			$isql = "insert into $perf_table (created,sql0,sql1,params,tracer,timer) values($d,$sql1,$sql2,$params,$tracer,$timer)";
 			if ($dbT == 'informix') $isql = str_replace(chr(10),' ',$isql);
@@ -1036,14 +1035,15 @@ Committed_AS:   348732 kB
         foreach( $args as $table) {
             $this->optimizeTable( $table, $mode);
         }
+		return true;
 	}
 
     /**
      * Reorganise the table-indices/statistics/.. depending on the given mode.
      * Default Implementation throws an error.
      *
-     * @param string table name of the table to optimize
-     * @param int mode optimization-mode
+     * @param string $table Name of the table to optimize
+     * @param int    $mode  Optimization-mode
      *      <code>ADODB_OPT_HIGH</code> for full optimization
      *      <code>ADODB_OPT_LOW</code> for CPU-less optimization
      *      Default is LOW <code>ADODB_OPT_LOW</code>
