@@ -914,8 +914,9 @@ class dbData extends dbObject {
 	/**
 	 * Adds a field to the insert
 	 *
-	 * @param string $name Field name
-	 * @return string Field list
+	 * @param array $attributes
+	 *
+	 * @return void
 	 */
 	function addField( $attributes ) {
 		// check we're in a valid row

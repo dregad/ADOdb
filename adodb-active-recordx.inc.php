@@ -619,19 +619,21 @@ class ADODB_Active_Record
 	}
 
 
-	// retrieve ADOConnection from _ADODB_Active_DBs
+	/**
+	 * Retrieve ADOConnection from _ADODB_Active_DBs.
+	 *
+	 * @return ADOConnection|false
+	 */
 	function DB()
 	{
 		global $_ADODB_ACTIVE_DBS;
 
 		if ($this->_dbat < 0) {
-			$false = false;
 			$this->Error("No database connection set: use ADOdb_Active_Record::SetDatabaseAdaptor(\$db)", "DB");
-			return $false;
+			return false;
 		}
 		$activedb = $_ADODB_ACTIVE_DBS[$this->_dbat];
-		$db = $activedb->db;
-		return $db;
+		return $activedb->db;
 	}
 
 	// retrieve ADODB_Active_Table
