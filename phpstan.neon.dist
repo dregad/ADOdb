@@ -40,5 +40,12 @@ parameters:
 	ignoreErrors:
 		# mcrypt moved to PECL, not bundled with PHP since 7.2.0
 		- '#Function mcrypt_\w+ not found#'
+
 		- '#Instantiated class PEAR_Error not found#'
+
+		# Usage protected by function_exists() call
 		- '#Function adodb_daylight_sv not found#'
+		- '#Function ibase_prepare invoked with 2 parameters, 3 required#'
+
+		# References to Horde::Secret in adodb-encrypt-secret.php
+		- '#Call to static method \w+\(\) on an unknown class Secret#'
