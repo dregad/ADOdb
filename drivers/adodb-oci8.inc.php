@@ -521,7 +521,7 @@ END;
 		// save old fetch mode
 		global $ADODB_FETCH_MODE;
 
-		$tableName = $this->metatables('T', false, $table);
+		$tableName = $this->metaTables('T', $owner, $table);
 		if ($tableName == false) {
 			return false;
 		}
