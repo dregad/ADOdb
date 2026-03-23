@@ -571,7 +571,7 @@ END;
 			}
 			if (!isset($indexes[$row[0]])) {
 				$indexes[$row[0]] = array(
-					'unique' => ($row[1] == 'UNIQUE'),
+					'unique' => ($row[1] == 'UNIQUE') ? 1 : 0,
 					'columns' => [],
 					'primary' => ($primary_key == $row[0] ? 1 : 0)
 				);
