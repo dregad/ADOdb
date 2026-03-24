@@ -545,6 +545,19 @@ END;
 				 WHERE UPPER(ALL_INDEXES.TABLE_NAME)=$p1
 				   AND ALL_IND_COLUMNS.INDEX_NAME=ALL_INDEXES.INDEX_NAME";
 		$rs = $this->Execute($sql, $bind);
+/*
+ * https://dbfiddle.uk/CymYf5Fn
+ *
+SELECT i.INDEX_NAME, i.UNIQUENESS,
+  col.COLUMN_POSITION, col.COLUMN_NAME,
+  c.CONSTRAINT_TYPE
+FROM ALL_INDEXES i
+  join ALL_IND_COLUMNS col on col.INDEX_NAME = i.INDEX_NAME
+  left join all_constraints c
+    on i.owner = c.owner and i.index_name = c.index_name and i.table_name = c.table_name
+WHERE UPPER(i.TABLE_NAME)= 'SCHEDULER_FILEWATCHER_QT'
+*/
+
 
 		if (!is_object($rs)) {
 			$ADODB_FETCH_MODE = $saveModes[0];
