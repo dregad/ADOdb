@@ -504,17 +504,14 @@ END;
 	}
 
 	/**
-      * Return a list of indexes for a specified table
-      *
-      * We don't use db2_statistics as the function does not seem to play
-      * well with mixed case table names
-      *
-      * @param string   $table
-      * @param bool     $primary    (optional) return primary key
-      * @param bool     $owner      (optional) not used in this driver
-      *
-      * @return string[]    Array of indexes
-      */
+	 * Get a list of indexes on the specified table.
+	 *
+	 * @param string $table   The name of the table to get indexes for.
+	 * @param bool   $primary True to include the primary key.
+	 * @param string $owner   Unused.
+	 *
+	 * @return string[]|false An array of indexes or false on failure.
+	 */
 	function MetaIndexes($table, $primary = false, $owner = false)
 	{
 		global $ADODB_FETCH_MODE;
