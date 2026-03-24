@@ -66,7 +66,7 @@ class ADODB_oci8 extends ADOConnection {
 	var $sysDate = "TRUNC(SYSDATE)";
 	var $sysTimeStamp = 'SYSDATE'; // requires oracle 9 or later, otherwise use SYSDATE
 	var $metaDatabasesSQL = "
-SELECT LOWER(USERNAME) FROM ALL_USERS 
+SELECT LOWER(USERNAME) FROM ALL_USERS
  WHERE USERNAME NOT IN ('SYS','SYSTEM','OUTLN','DBSNMP',
 'APPQOSSYS','AUDSYS','CTXSYS','DVSYS','GSMADMIN_INTERNAL',
 'LBACSYS','MDSYS','OJVMSYS','ORDDATA','ORDPLUGINS','ORDSYS',
@@ -184,8 +184,8 @@ END;
 			}
 			$fld->not_null = $rs->fields[5] == 'N';
 			$fld->binary = (strpos($fld->type,'BLOB') !== false);
-			
-			
+
+
 
 			if ($ADODB_FETCH_MODE == ADODB_FETCH_NUM) {
 				$retarr[] = $fld;
@@ -515,22 +515,20 @@ END;
       *
       * @return string[]    Array of indexes
       */
-
-	function MetaIndexes ($table, $primary = FALSE, $owner=false)
+	function MetaIndexes($table, $primary = false, $owner = false)
 	{
-		// save old fetch mode
 		global $ADODB_FETCH_MODE;
 
 		$tableName = $this->metaTables('T', $owner, $table);
 		if ($tableName == false) {
 			return false;
 		}
-		
+
+		// save old fetch mode
 		$saveModes = [
 			$ADODB_FETCH_MODE,
 			$this->fetchMode
 		];
-
 		$this->SetFetchMode(ADODB_FETCH_NUM);
 
 		// get index details
@@ -538,33 +536,28 @@ END;
 
 		// get Primary index
 		$primary_key = '';
-		
 		$p1 = $this->param('p1');
 		$bind = ['p1' => $table];
+		$sql = "SELECT CONSTRAINT_NAME FROM ALL_CONSTRAINTS
+				 WHERE UPPER(TABLE_NAME) = $p1
+				   AND CONSTRAINT_TYPE='P'";
+		$primary_key = $this->getOne($sql, $bind);
 
-		$sql = "SELECT CONSTRAINT_NAME FROM ALL_CONSTRAINTS 
-				WHERE UPPER(TABLE_NAME) = $p1  
-				AND CONSTRAINT_TYPE='P'";
-		
-		$primary_key = $this->getOne($sql,$bind);
-
-		$sql = "SELECT ALL_INDEXES.INDEX_NAME, ALL_INDEXES.UNIQUENESS, 
-			        ALL_IND_COLUMNS.COLUMN_POSITION, ALL_IND_COLUMNS.COLUMN_NAME 
-			   FROM ALL_INDEXES,ALL_IND_COLUMNS 
-			   WHERE UPPER(ALL_INDEXES.TABLE_NAME)=$p1 
-			     AND ALL_IND_COLUMNS.INDEX_NAME=ALL_INDEXES.INDEX_NAME";
-		
+		$sql = "SELECT ALL_INDEXES.INDEX_NAME, ALL_INDEXES.UNIQUENESS,
+				       ALL_IND_COLUMNS.COLUMN_POSITION, ALL_IND_COLUMNS.COLUMN_NAME
+				  FROM ALL_INDEXES,ALL_IND_COLUMNS
+				 WHERE UPPER(ALL_INDEXES.TABLE_NAME)=$p1
+				   AND ALL_IND_COLUMNS.INDEX_NAME=ALL_INDEXES.INDEX_NAME";
 		$rs = $this->Execute($sql, $bind);
 
 		if (!is_object($rs)) {
 			$ADODB_FETCH_MODE = $saveModes[0];
-			$this->fetchMode  = $saveModes[1];
+			$this->fetchMode = $saveModes[1];
 			return false;
 		}
 
-		$indexes = array ();
 		// parse index data into array
-
+		$indexes = array();
 		while ($row = $rs->FetchRow()) {
 			if (!$primary && $row[0] == $primary_key) {
 				continue;
@@ -580,13 +573,13 @@ END;
 		}
 
 		// sort columns by order in the index
-		foreach ( array_keys ($indexes) as $index ) {
-			ksort ($indexes[$index]['columns']);
+		foreach (array_keys($indexes) as $index) {
+			ksort($indexes[$index]['columns']);
 		}
 
 		$ADODB_FETCH_MODE = $saveModes[0];
-		$this->fetchMode  = $saveModes[1];
-		
+		$this->fetchMode = $saveModes[1];
+
 		return $indexes;
 	}
 
@@ -1571,7 +1564,7 @@ SELECT /*+ RULE */ distinct b.column_name
 	public function metaForeignKeys($table, $owner = '', $upper = false, $associative = false)
 	{
 		global $ADODB_FETCH_MODE;
-		
+
 		$tableName = $this->metaTables('T', $owner, $table);
 		if ($tableName == false) {
 			return false;
@@ -1603,7 +1596,7 @@ SELECT /*+ RULE */ distinct b.column_name
 		$sql =
 "SELECT constraint_name,r_owner,r_constraint_name
    FROM {$tabp}constraints
-  WHERE constraint_type = 'R' 
+  WHERE constraint_type = 'R'
 	AND table_name = $table $owner";
 
 		$constraints = $this->GetArray($sql);
@@ -1613,16 +1606,16 @@ SELECT /*+ RULE */ distinct b.column_name
 			$rowner = $this->qstr($constr[1]);
 			$rcons  = $this->qstr($constr[2]);
 
-			$sql = "SELECT column_name 
-					  FROM {$tabp}cons_columns 
-					 WHERE constraint_name=$cons $owner 
+			$sql = "SELECT column_name
+					  FROM {$tabp}cons_columns
+					 WHERE constraint_name=$cons $owner
 					 ORDER BY position";
 			$sourceData = $this->GetCol($sql);
-			
-			$sql = "SELECT table_name,column_name 
-			          FROM {$tabp}cons_columns 
-					  WHERE owner=$rowner 
-					  AND constraint_name=$rcons 
+
+			$sql = "SELECT table_name,column_name
+			          FROM {$tabp}cons_columns
+					  WHERE owner=$rowner
+					  AND constraint_name=$rcons
 					  ORDER BY position";
 			$targetData = $this->GetArray($sql);
 
@@ -1635,7 +1628,7 @@ SELECT /*+ RULE */ distinct b.column_name
 					} else {
 						$tableName = strtolower($v[0]);
 					}
-					
+
 					if (!array_key_exists($tableName, $arr)) {
 						$arr[$tableName] = [];
 					}
@@ -1654,29 +1647,29 @@ SELECT /*+ RULE */ distinct b.column_name
 						*/
 						if ($upper) {
 						$arr[$tableName][] = sprintf(
-							'%s=%s', 		
+							'%s=%s',
 							strtoupper($sourceData[$k]),
 							strtoupper($v[1])
 						);
 						} else {
 							$arr[$tableName][] = sprintf(
-							'%s=%s', 
+							'%s=%s',
 							strtolower($sourceData[$k]),
 							strtolower($v[1])
 						);
 						}
-					} 
+					}
 				}
 			}
 		}
-		
+
 		$ADODB_FETCH_MODE = $saveModes[0];
 		$this->fetchMode  = $saveModes[1];
-		
-		if (!$arr || count($arr) == 0) { 
+
+		if (!$arr || count($arr) == 0) {
 			return false;
 		}
-		
+
 		return $arr;
 	}
 
