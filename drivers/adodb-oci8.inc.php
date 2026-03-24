@@ -517,7 +517,7 @@ END;
 		global $ADODB_FETCH_MODE;
 
 		$tableName = $this->metaTables('T', $owner, $table);
-		if ($tableName == false) {
+		if (!$tableName) {
 			return false;
 		}
 
@@ -532,7 +532,6 @@ END;
 		$table = strtoupper($table);
 
 		// get Primary index
-		$primary_key = '';
 		$p1 = $this->param('p1');
 		$bind = ['p1' => $table];
 		$sql = "SELECT CONSTRAINT_NAME FROM ALL_CONSTRAINTS
